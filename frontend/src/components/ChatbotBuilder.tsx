@@ -1,8 +1,7 @@
 import './ChatbotBuilder.css';
 import React, { useState, useEffect, useRef} from 'react';
-import ChatbotPreview from './ChatbotPreview'; 
-import { fetchChatbots, saveChatbot } from '../api/chatbot';
-   
+import ChatbotPreview from './ChatbotPreview';
+
 interface Rule {
   id: string;
   trigger: string;
@@ -14,8 +13,8 @@ interface Rule {
 interface NodeData {
   title: string;
   content: string;
-  options?: { label: string; value: string; nextNodeId?: string }[]; 
-  useAI?: boolean; 
+  options?: { label: string; value: string; nextNodeId?: string }[];
+  useAI?: boolean;
 }
 
 interface Node {
@@ -24,13 +23,13 @@ interface Node {
   x: number;
   y: number;
   data: NodeData;
-  outputs: string[]; 
+  outputs: string[];
 }
 
 interface Connection {
   id: string;
   sourceId: string;
-  sourceOutput: string; 
+  sourceOutput: string;
   targetId: string;
 }
 
@@ -61,7 +60,11 @@ const ChatbotBuilder = () => {
   const [draggingNode, setDraggingNode] = useState<Node | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [creatingConnection, setCreatingConnection] = useState<any | null>(null);
- 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeSidebarView, setActiveSidebarView] = useState<'main' | 'nodeProperties'>('main');
+  // NEW STATE: To manage sub-views within the 'main' sidebar
+  const [activeMainSidebarSubView, setActiveMainSidebarSubView] = useState<'settings' | 'nodeTypes'>('settings');
+
 
 const [availableNodeTypes] = useState<NodeTypeDefinition[]>([ // Using the new interface
     { type: 'start', label: 'Start' },
@@ -79,6 +82,12 @@ const [availableNodeTypes] = useState<NodeTypeDefinition[]>([ // Using the new i
    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
+  const backToMainSidebar = () => {
+    setActiveSidebarView('main');
+    setSelectedNode(null); // Deselect node when going back to main view
+    setActiveMainSidebarSubView('settings'); // Reset to settings view when coming back from node properties
   };
 
   useEffect(() => {
@@ -111,7 +120,7 @@ const toggleSidebar = () => {
     if (isPreviewMode) {
       setIsInitialLoading(true);
       setConversation([{ sender: 'bot', message: '...', isTyping: true }]);
-      
+
       const generatedRules: Rule[] = [];
       const startNode = nodes.find(node => node.type === 'start');
       let initialCurrentNodeId: string | null = null;
@@ -235,6 +244,7 @@ const exportChatbot = () => {
     });
 };
 
+
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
     if (!canvasRef.current) return;
 
@@ -248,6 +258,7 @@ const exportChatbot = () => {
 
     if (clickedNode) {
       setSelectedNode(clickedNode);
+      setActiveSidebarView('nodeProperties'); // Switch to node properties view
       setDraggingNode(clickedNode);
       setDragOffset({
         x: x - clickedNode.x,
@@ -255,6 +266,8 @@ const exportChatbot = () => {
       });
     } else {
       setSelectedNode(null);
+      setActiveSidebarView('main'); // Go back to main view if no node is clicked
+      setActiveMainSidebarSubView('settings'); // Default to settings
     }
   };
 
@@ -403,6 +416,7 @@ const exportChatbot = () => {
 
     setNodes([...nodes, newNode]);
     setSelectedNode(newNode);
+    setActiveSidebarView('nodeProperties'); // Automatically switch to node properties
   };
 
   const updateNodeData = (nodeId: string, field: keyof NodeData, value: any) => {
@@ -514,17 +528,21 @@ const exportChatbot = () => {
       });
     }
   };
-
   const deleteNode = (nodeId: string) => {
-    if (nodeId === 'start-1') return; // Prevent deleting start node
+    if (nodeId === 'start-1') {
+      return;
+    }
     setNodes((prevNodes) => prevNodes.filter((node) => node.id !== nodeId));
     setConnections((prevConnections) =>
       prevConnections.filter((conn) => conn.sourceId !== nodeId && conn.targetId !== nodeId)
     );
     if (selectedNode && selectedNode.id === nodeId) {
       setSelectedNode(null);
+      setActiveSidebarView('main'); // Go back to main view after deleting
+      setActiveMainSidebarSubView('settings'); // Reset to settings
     }
   };
+
 
   const deleteConnection = (connId: string) => {
     setConnections((prevConnections) => prevConnections.filter((conn) => conn.id !== connId));
@@ -540,17 +558,29 @@ const exportChatbot = () => {
 
  return (
     <div className="app-container">
+      
       <header className="app-header">
+        
         <div className="header-content">
+          
           <h1 className="app-title">No-Code Chatbot Builder</h1>
           <div className="header-buttons">
-            {/* The export button remains */}
             <button onClick={exportChatbot} className="btn btn-export">
               Export Chatbot
             </button>
           </div>
         </div>
       </header>
+      <button
+        id="fixed-sidebar-toggle-btn"
+        className={`fixed-sidebar-toggle ${!isSidebarOpen ? 'sidebar-closed-state' : ''}`}
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
+      >
+        {/* Always show the hamburger icon for the fixed toggle button */}
+        <span className="icon-hamburger"><span></span></span>
+      </button>
+
 
       {isPreviewMode ? (
         <ChatbotPreview
@@ -564,151 +594,167 @@ const exportChatbot = () => {
         <div className={`flow-builder-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
           {isSidebarCollapsed && (
             <div className="sidebar-toggle-bar">
-              <button
-                id="sidebar-toggle-btn-show"
-                className="btn btn-toggle"
-                onClick={toggleSidebar}
-                aria-label="Show Sidebar"
-              >
-                <span className="icon-hamburger"></span>
-              </button>
+
             </div>
           )}
 
           {!isSidebarCollapsed && (
             <div className="sidebar">
-              <div className="sidebar-section">
-                <div className="sidebar-header-with-toggle">
-                  <h3>Chatbot Settings</h3>
-                  <button
-                    id="sidebar-toggle-btn-hide"
-                    className="btn btn-toggle btn-hide-sidebar"
-                    onClick={toggleSidebar}
-                    aria-label="Hide Sidebar"
-                  >
-                    <span className="icon-arrow-left"></span>
-                  </button>
-                </div>
-
-                <div className="setting-item">
-                  <label>Name</label>
-                  <input
-                    type="text"
-                    value={botName}
-                    onChange={(e) => setBotName(e.target.value)}
-                    className="input-box"
-                  />
-                </div>
-                <div className="setting-item">
-                  <label>Welcome</label>
-                  <input
-                    type="text"
-                    value={welcomeMessage}
-                    onChange={(e) => setWelcomeMessage(e.target.value)}
-                    className="input-box"
-                  />
-                </div>
-                <div className="setting-item">
-                  <label>Fallback</label>
-                  <input
-                    type="text"
-                    value={fallbackMessage}
-                    onChange={(e) => setFallbackMessage(e.target.value)}
-                    className="input-box"
-                  />
-                </div>
-              </div>
-
-              <div className="sidebar-section">
-                <h3>Node Types</h3>
-                <div className="node-types">
-                  {availableNodeTypes.map((nodeType) => (
-                    <div
-                      key={nodeType.type}
-                       className={`node-type-item node-type-${nodeType.type.toLowerCase()}`}
-            
-                      onClick={() => addNewNode(nodeType.type)}
-                    >
-                      {nodeType.label}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {selectedNode && (
-                <div className="sidebar-section">
-                  <h3>Node Properties</h3>
-                  <div className="setting-item">
-                    <label>Title</label>
-                    <input
-                      type="text"
-                      value={selectedNode.data?.title || ''}
-                      onChange={(e) => updateNodeData(selectedNode.id, 'title', e.target.value)}
-                      className="input-box"
-                    />
-                  </div>
-                  <div className="setting-item">
-                    <label>Content</label>
-                    <textarea
-                      value={selectedNode.data?.content || ''}
-                      onChange={(e) => updateNodeData(selectedNode.id, 'content', e.target.value)}
-                      className="input-box"
-                      rows={4}
-                    />
-                  </div>
-
-                  {(selectedNode.type === 'multichoice' || selectedNode.type === 'button') && (
-                    <div className="setting-item">
-                      <label>Options</label>
-                      {selectedNode.data.options?.map((option, index) => (
-                        <div key={index} className="node-option-item">
-                          <input
-                            type="text"
-                            placeholder="Label"
-                            value={option.label}
-                            onChange={(e) => updateNodeOption(selectedNode.id, index, 'label', e.target.value)}
-                            className="input-box small-input"
-                          />
-                          <input
-                            type="text"
-                            placeholder="Value (trigger)"
-                            value={option.value}
-                            onChange={(e) => updateNodeOption(selectedNode.id, index, 'value', e.target.value)}
-                            className="input-box small-input"
-                          />
-                          <button
-                            onClick={() => deleteNodeOption(selectedNode.id, index)}
-                            className="btn btn-delete-option"
-                          >
-                            X
-                          </button>
+                {/* Sidebar content container for transitions */}
+                <div className={`sidebar-content-wrapper ${activeSidebarView}`}>
+                    {/* Main Sidebar View - Now with sub-views */}
+                    <div className="sidebar-view main-view">
+                        <div className="sidebar-menu">
+                            <button
+                                className={`menu-option ${activeMainSidebarSubView === 'settings' ? 'active' : ''}`}
+                                onClick={() => setActiveMainSidebarSubView('settings')}
+                            >
+                                Settings
+                            </button>
+                            <button
+                                className={`menu-option ${activeMainSidebarSubView === 'nodeTypes' ? 'active' : ''}`}
+                                onClick={() => setActiveMainSidebarSubView('nodeTypes')}
+                            >
+                                Input Cards
+                            </button>
                         </div>
-                      ))}
-                      <button onClick={() => addNodeOption(selectedNode.id)} className="btn btn-add-option">
-                        Add Option
-                      </button>
-                    </div>
-                  )}
 
-                  {(selectedNode.type === 'message' || selectedNode.type === 'textinput') && (
-                    <div className="setting-item ai-toggle-section">
-                      <input
-                        type="checkbox"
-                        id="aiToggle"
-                        checked={selectedNode.data.useAI || false}
-                        onChange={(e) => updateNodeData(selectedNode.id, 'useAI', e.target.checked)}
-                      />
-                      <label htmlFor="aiToggle">Use AI for response</label>
-                    </div>
-                  )}
+                        {activeMainSidebarSubView === 'settings' && (
+                            <div className="sidebar-settings-content">
+                                <div className="sidebar-section">
+                                    <h3>Chatbot Settings</h3>
+                                    <div className="setting-item">
+                                        <label>Name</label>
+                                        <input
+                                            type="text"
+                                            value={botName}
+                                            onChange={(e) => setBotName(e.target.value)}
+                                            className="input-box"
+                                        />
+                                    </div>
+                                    <div className="setting-item">
+                                        <label>Welcome</label>
+                                        <input
+                                            type="text"
+                                            value={welcomeMessage}
+                                            onChange={(e) => setWelcomeMessage(e.target.value)}
+                                            className="input-box"
+                                        />
+                                    </div>
+                                    <div className="setting-item">
+                                        <label>Fallback</label>
+                                        <input
+                                            type="text"
+                                            value={fallbackMessage}
+                                            onChange={(e) => setFallbackMessage(e.target.value)}
+                                            className="input-box"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
-                  {selectedNode.id !== 'start-1' && (
-                    <button onClick={() => deleteNode(selectedNode.id)} className="btn btn-delete">
-                      Delete Node
-                    </button>
-                  )}
+                        {activeMainSidebarSubView === 'nodeTypes' && (
+                            <div className="sidebar-node-types-content">
+                                <div className="sidebar-section">
+                                    <h3>Node Types</h3>
+                                    <div className="node-types">
+                                        {availableNodeTypes.map((nodeType) => (
+                                            <div
+                                                key={nodeType.type}
+                                                className={`node-type-item node-type-${nodeType.type.toLowerCase()}`}
+                                                onClick={() => addNewNode(nodeType.type)}
+                                            >
+                                                {nodeType.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Node Properties View */}
+                    <div className="sidebar-view node-properties-view">
+                        {selectedNode && (
+                            <div className="sidebar-section">
+                                <div className="node-properties-back-area">
+                                    <button onClick={backToMainSidebar} className="back-btn">
+                                        &larr; Back
+                                    </button>
+                                </div>
+                                <div className="node-properties-header">
+                                    <h3>Node Properties</h3>
+                                </div>
+                                <div className="setting-item">
+                                    <label>Title</label>
+                                    <input
+                                        type="text"
+                                        value={selectedNode.data?.title || ''}
+                                        onChange={(e) => updateNodeData(selectedNode.id, 'title', e.target.value)}
+                                        className="input-box"
+                                    />
+                                </div>
+                                <div className="setting-item">
+                                    <label>Content</label>
+                                    <textarea
+                                        value={selectedNode.data?.content || ''}
+                                        onChange={(e) => updateNodeData(selectedNode.id, 'content', e.target.value)}
+                                        className="input-box"
+                                        rows={4}
+                                    />
+                                </div>
+
+                                {(selectedNode.type === 'multichoice' || selectedNode.type === 'button') && (
+                                    <div className="setting-item">
+                                        <label>Options</label>
+                                        {selectedNode.data.options?.map((option, index) => (
+                                            <div key={index} className="node-option-item">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Label"
+                                                    value={option.label}
+                                                    onChange={(e) => updateNodeOption(selectedNode.id, index, 'label', e.target.value)}
+                                                    className="input-box small-input"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Value (trigger)"
+                                                    value={option.value}
+                                                    onChange={(e) => updateNodeOption(selectedNode.id, index, 'value', e.target.value)}
+                                                    className="input-box small-input"
+                                                />
+                                                <button
+                                                    onClick={() => deleteNodeOption(selectedNode.id, index)}
+                                                    className="btn btn-delete-option"
+                                                >
+                                                    X
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button onClick={() => addNodeOption(selectedNode.id)} className="btn btn-add-option">
+                                            Add Option
+                                        </button>
+                                    </div>
+                                )}
+
+                                {(selectedNode.type === 'message' || selectedNode.type === 'textinput') && (
+                                    <div className="setting-item ai-toggle-section">
+                                        <input
+                                            type="checkbox"
+                                            id="aiToggle"
+                                            checked={selectedNode.data.useAI || false}
+                                            onChange={(e) => updateNodeData(selectedNode.id, 'useAI', e.target.checked)}
+                                        />
+                                        <label htmlFor="aiToggle">Use AI for response</label>
+                                    </div>
+                                )}
+
+                    
+                            </div>
+                        )}
+                    </div>
                 </div>
-              )}
             </div>
           )}
 
@@ -793,10 +839,22 @@ const exportChatbot = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedNode(node);
+                        setActiveSidebarView('nodeProperties'); // Switch to node properties view
                       }}
                     >
                       <div className="flow-node-header">
                         {node.data?.title || 'Unnamed Node'}
+                        <button
+                                className="delete-node-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevent node selection/drag when clicking delete
+                                    deleteNode(node.id);
+                                }}
+                                title="Delete Node"
+                            >
+                                &#x1F5D1;  
+                                {/* Or use trashcan: &#x1F5D1; */}
+                            </button>
                         <div className="flow-node-input">
                           <div className="input-point" />
                         </div>
@@ -847,5 +905,5 @@ const exportChatbot = () => {
     </div>
   );
 };
-    
+
   export default ChatbotBuilder;

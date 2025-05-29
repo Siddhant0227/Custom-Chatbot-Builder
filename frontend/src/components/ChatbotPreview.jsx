@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useRef } from 'react';
 import './ChatbotPreview.css';
 import ReactDOM from 'react-dom/client';
-import { fetchChatbots, saveChatbot } from '../api/chatbot';
+
 /**
  * @param {Object} props
  * @param {string} props.botName
