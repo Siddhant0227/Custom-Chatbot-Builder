@@ -64,6 +64,51 @@ const ChatbotBuilder = () => {
   const [activeSidebarView, setActiveSidebarView] = useState<'main' | 'nodeProperties'>('main');
   // NEW STATE: To manage sub-views within the 'main' sidebar
   const [activeMainSidebarSubView, setActiveMainSidebarSubView] = useState<'settings' | 'nodeTypes'>('settings');
+const loadChatbot = async (nameToLoad: string) => {
+  if (!nameToLoad) {
+    alert("Please enter a chatbot name to load.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:8000/api/chatbot/${nameToLoad}/`, { // <-- Note the URL structure
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to load chatbot.');
+    }
+
+    const data = await response.json();
+    console.log('Chatbot loaded successfully:', data);
+
+    // Assuming the loaded data's 'configuration' field contains the full chatbot object
+    const loadedConfig = data.configuration;
+
+    // Update your React state with the loaded configuration
+    setBotName(loadedConfig.botName || '');
+    setWelcomeMessage(loadedConfig.welcomeMessage || '');
+    setFallbackMessage(loadedConfig.fallbackMessage || '');
+    setNodes(loadedConfig.nodes || []);
+    setConnections(loadedConfig.connections || []);
+    // If you have other state variables for mountId etc., set them too
+    // setMountId(loadedConfig.mountId || 'my-chatbot-widget');
+
+    alert(`Chatbot '${nameToLoad}' loaded successfully!`);
+
+    // Optionally, switch UI to the builder view if not already there
+    setActiveSidebarView('nodeProperties'); // Or whatever view makes sense
+    setActiveMainSidebarSubView('settings'); // Or relevant sub-view
+
+  } catch (error: any) {
+    console.error('Error loading chatbot:', error);
+    alert(`Error loading chatbot: ${error.message || 'An unknown error occurred.'}`);
+  }
+};
 
 
 const [availableNodeTypes] = useState<NodeTypeDefinition[]>([ // Using the new interface
@@ -190,61 +235,85 @@ const toggleSidebar = () => {
   };
 const exportChatbot = () => {
   const chatbotConfig = {
-    botName,
+    botName,          // This value is crucial as it becomes the 'name' key in Django
     welcomeMessage,
     fallbackMessage,
-    nodes,       // These are the actual JavaScript objects/arrays from your state
-    connections, // These are the actual JavaScript objects/arrays from your state
+    nodes,            // These are the actual JavaScript objects/arrays from your state
+    connections,      // These are the actual JavaScript objects/arrays from your state
     mountId: 'my-chatbot-widget', // The ID of the div where the chatbot will be injected
   };
 
-  const configJsonString = JSON.stringify(chatbotConfig, null, 2); // null, 2 for pretty-printing in the output
+  // 1. --- Send data to Django Backend ---
+  fetch('http://localhost:8000/api/save-chatbot/', { // <-- IMPORTANT: This is your Django backend URL
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // If you've implemented proper CSRF in Django (recommended for production!),
+      // you'd also need to include 'X-CSRFToken': getCookie('csrftoken'),
+      // For development with @csrf_exempt, this header isn't strictly necessary for POST requests.
+    },
+    body: JSON.stringify(chatbotConfig), // Send the entire chatbotConfig object as JSON
+  })
+  .then(response => {
+    if (!response.ok) {
+      // If the response is not OK (e.g., 400, 500 status), throw an error
+      return response.json().then(errorData => {
+        throw new Error(errorData.detail || JSON.stringify(errorData));
+      });
+    }
+    return response.json(); // Parse the JSON response from the backend
+  })
+  .then(data => {
+    console.log('Chatbot saved successfully to Django:', data);
+    alert(`Chatbot '${chatbotConfig.botName}' saved successfully to Django!`);
 
-  const scriptUrl = 'https://your-domain.com/path/to/my-chatbot-widget.bundle.js'; // <<<--- !!! CHANGE THIS URL !!! --->>>
+    // 2. --- Continue with existing script generation and clipboard logic ---
+    const configJsonString = JSON.stringify(chatbotConfig, null, 2); // null, 2 for pretty-printing
 
-  // 4. Construct the complete HTML script tag
-  const generatedScript = `
+    const scriptUrl = 'https://your-domain.com/path/to/my-chatbot-widget.bundle.js'; // <<<--- !!! CHANGE THIS URL !!! --->>>
+
+    const generatedScript = `
 <div id="${chatbotConfig.mountId}"></div>
 <script>
-  // This global variable will hold all the configuration data for the chatbot widget.
-  // It's parsed directly from the JSON string embedded by your builder.
   window.myChatbotConfig = ${configJsonString};
 
-  // Create a new script element to load the chatbot widget bundle.
   const script = document.createElement('script');
   script.id = 'my-chatbot-script';
   script.src = '${scriptUrl}';
-  script.defer = true; // 'defer' ensures the script executes after the HTML is parsed, but before DOMContentLoaded.
+  script.defer = true;
 
-  // When the widget script finishes loading, initialize the chatbot.
   script.onload = () => {
     if (window.MyChatbotWidget && window.MyChatbotWidget.init) {
-      // Call the init function exposed by your widget.bundle.js, passing the configuration.
       window.MyChatbotWidget.init(window.myChatbotConfig);
     } else {
       console.error('MyChatbotWidget or its init method not found after script load. Ensure the widget bundle is loaded correctly and window.MyChatbotWidget is exposed globally.');
     }
   };
 
-  // Append the script element to the document body to start loading.
   document.body.appendChild(script);
 </script>
 `;
 
-  // 5. Provide the generated script to the user
-  console.log("Generated Chatbot Script:\n", generatedScript);
-  alert('Chatbot script generated and copied to clipboard! Paste it into your website\'s HTML (preferably before the closing </body> tag).');
+    console.log("Generated Chatbot Script:\n", generatedScript);
 
-  // Copy to clipboard for easy pasting by the user
-  navigator.clipboard.writeText(generatedScript)
-    .then(() => {}) // Success, alert already handled
-    .catch(err => {
-      console.error('Failed to copy script to clipboard: ', err);
-      alert('Failed to copy script to clipboard. Please copy it manually from the console.');
-    });
+    // Copy to clipboard for easy pasting by the user
+    navigator.clipboard.writeText(generatedScript)
+      .then(() => {
+        // Only alert about clipboard if the Django save was successful
+        alert('Chatbot script also copied to clipboard for embedding!');
+      })
+      .catch(err => {
+        console.error('Failed to copy script to clipboard: ', err);
+        alert('Failed to copy script to clipboard. Please copy it manually from the console.');
+      });
+
+  })
+  .catch(error => {
+    // Handle any errors from the fetch operation or response parsing
+    console.error('Error saving chatbot to Django:', error);
+    alert(`Failed to save chatbot to Django: ${error.message || 'An unknown error occurred.'}`);
+  });
 };
-
-
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
     if (!canvasRef.current) return;
 

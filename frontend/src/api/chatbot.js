@@ -1,8 +1,8 @@
 export async function saveChatbot({ name, config, token, id }) {
   const method = id ? 'PUT' : 'POST';
   const url = id
-    ? `/api/chatbots/${id}/`
-    : '/api/chatbots/';
+    ? `/api/chatbotapi/${id}/`
+    : '/api/chatbotapi/';
   const response = await fetch(url, {
     method,
     headers: {
@@ -16,7 +16,7 @@ export async function saveChatbot({ name, config, token, id }) {
 }
 
 export async function fetchChatbots(token) {
-  const response = await fetch('/api/chatbots/', {
+  const response = await fetch('/api/chatbotapi/', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
