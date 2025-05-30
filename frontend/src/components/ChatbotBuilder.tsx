@@ -1,5 +1,7 @@
+// ChatbotBuilder.tsx
+
 import './ChatbotBuilder.css';
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ChatbotPreview from './ChatbotPreview';
 
 interface Rule {
@@ -19,7 +21,7 @@ interface NodeData {
 
 interface Node {
   id: string;
-  type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating';
+  type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating' | 'end'; // Added 'end' type
   x: number;
   y: number;
   data: NodeData;
@@ -29,21 +31,22 @@ interface Node {
 interface Connection {
   id: string;
   sourceId: string;
-  sourceOutput: string;
+  sourceOutput: string; // The value that triggers this connection (e.g., 'yes', 'option1')
   targetId: string;
+  // No aiIntent here based on your provided connection structure
 }
 
 interface Message {
   sender: string;
   message: string;
-  isTyping?: boolean; // <-- Added this
+  isTyping?: boolean;
   options?: { label: string; value: string }[];
   nodeId?: string;
 }
 
 interface NodeTypeDefinition {
-    type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating'; // Ensure this matches your node types
-    label: string;
+  type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating' | 'end'; // Added 'end' type
+  label: string;
 }
 
 
@@ -54,78 +57,37 @@ const ChatbotBuilder = () => {
   const [fallbackMessage, setFallbackMessage] = useState("I'm sorry, I don't understand. Can you please rephrase?");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [conversation, setConversation] = useState<Message[]>([]);
+  // Adjusted useNodesState and useEdgesState from React Flow to standard useState
   const [nodes, setNodes] = useState<Node[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [draggingNode, setDraggingNode] = useState<Node | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [creatingConnection, setCreatingConnection] = useState<any | null>(null);
+  const [creatingConnection, setCreatingConnection] = useState<any | null>(null); // This holds connection info
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeSidebarView, setActiveSidebarView] = useState<'main' | 'nodeProperties'>('main');
-  // NEW STATE: To manage sub-views within the 'main' sidebar
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activeMainSidebarSubView, setActiveMainSidebarSubView] = useState<'settings' | 'nodeTypes'>('settings');
-const loadChatbot = async (nameToLoad: string) => {
-  if (!nameToLoad) {
-    alert("Please enter a chatbot name to load.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:8000/api/chatbot/${nameToLoad}/`, { // <-- Note the URL structure
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to load chatbot.');
-    }
-
-    const data = await response.json();
-    console.log('Chatbot loaded successfully:', data);
-
-    // Assuming the loaded data's 'configuration' field contains the full chatbot object
-    const loadedConfig = data.configuration;
-
-    // Update your React state with the loaded configuration
-    setBotName(loadedConfig.botName || '');
-    setWelcomeMessage(loadedConfig.welcomeMessage || '');
-    setFallbackMessage(loadedConfig.fallbackMessage || '');
-    setNodes(loadedConfig.nodes || []);
-    setConnections(loadedConfig.connections || []);
-    // If you have other state variables for mountId etc., set them too
-    // setMountId(loadedConfig.mountId || 'my-chatbot-widget');
-
-    alert(`Chatbot '${nameToLoad}' loaded successfully!`);
-
-    // Optionally, switch UI to the builder view if not already there
-    setActiveSidebarView('nodeProperties'); // Or whatever view makes sense
-    setActiveMainSidebarSubView('settings'); // Or relevant sub-view
-
-  } catch (error: any) {
-    console.error('Error loading chatbot:', error);
-    alert(`Error loading chatbot: ${error.message || 'An unknown error occurred.'}`);
-  }
-};
-
-
-const [availableNodeTypes] = useState<NodeTypeDefinition[]>([ // Using the new interface
+  const [availableNodeTypes] = useState<NodeTypeDefinition[]>([
     { type: 'start', label: 'Start' },
     { type: 'message', label: 'Message' },
     { type: 'multichoice', label: 'Multi Choice' },
     { type: 'button', label: 'Button' },
     { type: 'textinput', label: 'Text Input' },
     { type: 'rating', label: 'Rating' },
-]);
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState(false);
-   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-const toggleSidebar = () => {
+    { type: 'end', label: 'End' }, // Added 'end' node type
+  ]);
+
+  // Ref for the hidden file input for import
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+  const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
@@ -152,7 +114,8 @@ const toggleSidebar = () => {
         },
       ]);
     }
-  }, [nodes.length]);
+  }, [nodes.length, setNodes]); // Added setNodes to dependency array
+
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -233,87 +196,85 @@ const toggleSidebar = () => {
   const generateId = (prefix: string) => {
     return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   };
+
 const exportChatbot = () => {
-  const chatbotConfig = {
-    botName,          // This value is crucial as it becomes the 'name' key in Django
-    welcomeMessage,
-    fallbackMessage,
-    nodes,            // These are the actual JavaScript objects/arrays from your state
-    connections,      // These are the actual JavaScript objects/arrays from your state
-    mountId: 'my-chatbot-widget', // The ID of the div where the chatbot will be injected
-  };
+    const chatbotConfig = {
+      botName,
+      welcomeMessage,
+      fallbackMessage,
+      nodes,
+      connections,
+      mountId: 'my-chatbot-widget',
+    };
 
-  // 1. --- Send data to Django Backend ---
-  fetch('http://localhost:8000/api/save-chatbot/', { // <-- IMPORTANT: This is your Django backend URL
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // If you've implemented proper CSRF in Django (recommended for production!),
-      // you'd also need to include 'X-CSRFToken': getCookie('csrftoken'),
-      // For development with @csrf_exempt, this header isn't strictly necessary for POST requests.
-    },
-    body: JSON.stringify(chatbotConfig), // Send the entire chatbotConfig object as JSON
-  })
-  .then(response => {
-    if (!response.ok) {
-      // If the response is not OK (e.g., 400, 500 status), throw an error
-      return response.json().then(errorData => {
-        throw new Error(errorData.detail || JSON.stringify(errorData));
-      });
-    }
-    return response.json(); // Parse the JSON response from the backend
-  })
-  .then(data => {
-    console.log('Chatbot saved successfully to Django:', data);
-    alert(`Chatbot '${chatbotConfig.botName}' saved successfully to Django!`);
-
-    // 2. --- Continue with existing script generation and clipboard logic ---
-    const configJsonString = JSON.stringify(chatbotConfig, null, 2); // null, 2 for pretty-printing
-
-    const scriptUrl = 'https://your-domain.com/path/to/my-chatbot-widget.bundle.js'; // <<<--- !!! CHANGE THIS URL !!! --->>>
-
-    const generatedScript = `
-<div id="${chatbotConfig.mountId}"></div>
-<script>
-  window.myChatbotConfig = ${configJsonString};
-
-  const script = document.createElement('script');
-  script.id = 'my-chatbot-script';
-  script.src = '${scriptUrl}';
-  script.defer = true;
-
-  script.onload = () => {
-    if (window.MyChatbotWidget && window.MyChatbotWidget.init) {
-      window.MyChatbotWidget.init(window.myChatbotConfig);
-    } else {
-      console.error('MyChatbotWidget or its init method not found after script load. Ensure the widget bundle is loaded correctly and window.MyChatbotWidget is exposed globally.');
-    }
-  };
-
-  document.body.appendChild(script);
-</script>
-`;
-
-    console.log("Generated Chatbot Script:\n", generatedScript);
-
-    // Copy to clipboard for easy pasting by the user
-    navigator.clipboard.writeText(generatedScript)
-      .then(() => {
-        // Only alert about clipboard if the Django save was successful
-        alert('Chatbot script also copied to clipboard for embedding!');
+    // 1. --- Send data to Django Backend ---
+    fetch('http://localhost:8000/api/save-chatbot/', { // <-- IMPORTANT: This is your Django backend URL
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(chatbotConfig),
+    })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(errorData => {
+            throw new Error(errorData.detail || JSON.stringify(errorData));
+          });
+        }
+        return response.json();
       })
-      .catch(err => {
-        console.error('Failed to copy script to clipboard: ', err);
-        alert('Failed to copy script to clipboard. Please copy it manually from the console.');
-      });
+      .then(data => {
+        console.log('Chatbot saved successfully to Django:', data);
+        alert(`Chatbot '${chatbotConfig.botName}' saved successfully to Django!`);
+        const configJsonString = JSON.stringify(chatbotConfig, null, 2); // null, 2 for pretty-printing
 
-  })
-  .catch(error => {
-    // Handle any errors from the fetch operation or response parsing
-    console.error('Error saving chatbot to Django:', error);
-    alert(`Failed to save chatbot to Django: ${error.message || 'An unknown error occurred.'}`);
-  });
-};
+        const jsBundleUrl = 'https://your-domain.com/path/to/my-chatbot-widget.bundle.js'; 
+    
+        const cssBundleUrl = 'https://your-domain.com/path/to/static/css/main.6c9faa1e.css'; // <<<--- !!! UPDATE HASHED FILENAME AFTER EACH BUILD !!! --->>>
+
+        const generatedScript = `
+    <link rel="stylesheet" href="${cssBundleUrl}">
+
+    <div id="${chatbotConfig.mountId}"></div>
+
+    <script>
+    window.myChatbotConfig = ${configJsonString};
+
+    const script = document.createElement('script');
+    script.id = 'my-chatbot-script';
+    script.src = '${jsBundleUrl}';
+    script.defer = true;
+
+    script.onload = () => {
+        if (window.MyChatbotWidget && window.MyChatbotWidget.init) {
+            window.MyChatbotWidget.init(window.myChatbotConfig);
+        } else {
+            console.error('MyChatbotWidget or its init method not found after script load. Ensure the widget bundle is loaded correctly and window.MyChatbotWidget is exposed globally.');
+        }
+    };
+
+    document.body.appendChild(script);
+    </script>
+    `;
+
+        console.log("Generated Chatbot Script:\n", generatedScript);
+
+        navigator.clipboard.writeText(generatedScript)
+          .then(() => {
+            alert('Chatbot script also copied to clipboard for embedding!');
+          })
+          .catch(err => {
+            console.error('Failed to copy script to clipboard: ', err);
+            alert('Failed to copy script to clipboard. Please copy it manually from the console.');
+          });
+
+      })
+      .catch(error => {
+        console.error('Error saving chatbot to Django:', error);
+        alert(`Failed to save chatbot to Django: ${error.message || 'An unknown error occurred.'}`);
+      });
+  };
+
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
     if (!canvasRef.current) return;
 
@@ -322,6 +283,7 @@ const exportChatbot = () => {
     const y = (e.clientY - rect.top) / zoom;
 
     const clickedNode = nodes.find((node) => {
+      // Check if click is within node bounds
       return x >= node.x && x <= node.x + 200 && y >= node.y && y <= node.y + 80;
     });
 
@@ -388,7 +350,7 @@ const exportChatbot = () => {
         let sourceOutputIdentifier = 'output-1';
         const sourceNode = nodes.find(n => n.id === creatingConnection.sourceNodeId);
         if (sourceNode && (sourceNode.type === 'multichoice' || sourceNode.type === 'button')) {
-            sourceOutputIdentifier = prompt("Enter the text/value that triggers this connection (e.g., 'Yes', 'Option A'):") || 'output-1';
+          sourceOutputIdentifier = prompt("Enter the text/value that triggers this connection (e.g., 'Yes', 'Option A'):") || 'output-1';
         }
         setConnections([
           ...connections,
@@ -410,12 +372,12 @@ const exportChatbot = () => {
     const sourceNode = nodes.find((node) => node.id === nodeId);
     if (!sourceNode) return;
 
-    const outputX = sourceNode.x + 200;
-    const outputY = sourceNode.y + 40;
+    const outputX = sourceNode.x + 200; // Right edge of the node
+    const outputY = sourceNode.y + 40; // Mid-height of the node
 
     setCreatingConnection({
       sourceNodeId: nodeId,
-      sourceOutput: outputId,
+      sourceOutput: outputId, // This might be "output-1" or an option value for multichoice/button
       startX: outputX,
       startY: outputY,
       endX: outputX,
@@ -429,6 +391,7 @@ const exportChatbot = () => {
     let title: string, content: string;
     let options: { label: string; value: string; nextNodeId?: string }[] | undefined;
     let useAI: boolean = false;
+    let outputs: string[] = ['output-1']; // Default output for most nodes
 
     switch (type) {
       case 'start':
@@ -436,37 +399,46 @@ const exportChatbot = () => {
         content = 'Start your chatbot flow here';
         break;
       case 'message':
-        title = 'Welcome Card';
-        content = 'Welcome to huyu! How can I help you today?';
+        title = 'Message Card'; // Changed title to be more generic
+        content = 'This is a general message.';
         break;
       case 'multichoice':
         title = 'Multi Choice Card';
-        content = 'Hey there! Looking out for the best courses for your educational qualification? I can help!';
+        content = 'Please choose an option:';
         options = [
           { label: 'Option 1', value: 'option1' },
           { label: 'Option 2', value: 'option2' },
         ];
+         outputs = options.map(opt => opt.value);
         break;
       case 'button':
         title = 'Button Card';
-        content = 'Hey there! Looking out for the best and economic loan plans? I can help.';
+        content = 'Click a button to continue:';
         options = [
           { label: 'Yes', value: 'yes' },
           { label: 'No', value: 'no' },
         ];
+         outputs = options.map(opt => opt.value);
         break;
       case 'textinput':
         title = 'Text Input Card';
-        content = 'Please enter your name.';
+        content = 'Please type your response.';
         useAI = true; // Example: Text input might often lead to AI processing
         break;
       case 'rating':
         title = 'Rating Card';
         content = 'Please rate your experience (1-5).';
+        outputs = []; // Rating nodes usually don't have outgoing connections from the node itself
+        break;
+      case 'end':
+        title = 'End';
+        content = 'Thank you for your time!';
+        outputs = []; // End nodes don't have outgoing connections
         break;
       default:
         title = 'New Card';
         content = 'Card content';
+        break;
     }
 
     const newNode: Node = {
@@ -480,7 +452,7 @@ const exportChatbot = () => {
         options,
         useAI,
       },
-      outputs: type !== 'rating' ? ['output-1'] : [],
+      outputs: outputs, // Assign calculated outputs
     };
 
     setNodes([...nodes, newNode]);
@@ -599,6 +571,7 @@ const exportChatbot = () => {
   };
   const deleteNode = (nodeId: string) => {
     if (nodeId === 'start-1') {
+      alert("The 'Start' node cannot be deleted.");
       return;
     }
     setNodes((prevNodes) => prevNodes.filter((node) => node.id !== nodeId));
@@ -625,17 +598,89 @@ const exportChatbot = () => {
     setZoom((prevZoom) => Math.max(prevZoom - 0.1, 0.5));
   };
 
- return (
+
+  // --- NEW: Handle Import Chatbot ---
+  const handleImportButtonClick = () => {
+    fileInputRef.current?.click(); // Programmatically click the hidden file input
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonContent = e.target?.result as string;
+          const importedConfig = JSON.parse(jsonContent);
+
+          // Basic validation for the imported JSON structure
+          if (importedConfig.botName && importedConfig.nodes && Array.isArray(importedConfig.nodes) &&
+            importedConfig.connections && Array.isArray(importedConfig.connections)) {
+
+            setBotName(importedConfig.botName);
+            setWelcomeMessage(importedConfig.welcomeMessage || 'Hello! Welcome to the imported bot.');
+            setFallbackMessage(importedConfig.fallbackMessage || 'I didn\'t understand that. Can you rephrase?');
+
+            // --- Node Mapping for YOUR custom structure ---
+            const mappedNodes: Node[] = importedConfig.nodes.map((node: any) => ({
+              id: node.id,
+              type: node.type,
+              x: node.x || 0, // Use x, y directly
+              y: node.y || 0,
+              data: {
+                title: node.data?.title || '',
+                content: node.data?.content || '',
+                options: node.data?.options || [],
+                useAI: node.data?.useAI ?? false,
+              },
+              outputs: node.outputs || [], // Preserve outputs array
+            }));
+
+            // --- Connection Mapping for YOUR custom structure ---
+            const mappedConnections: Connection[] = importedConfig.connections.map((conn: any) => ({
+              id: conn.id,
+              sourceId: conn.sourceId,
+              sourceOutput: conn.sourceOutput,
+              targetId: conn.targetId,
+            }));
+
+            setNodes(mappedNodes);
+            setConnections(mappedConnections);
+            alert('Chatbot imported successfully!');
+            console.log('Imported Chatbot Config:', importedConfig);
+
+          } else {
+            alert('Invalid JSON structure. Please ensure it contains "botName", "nodes", and "connections" arrays with correct properties.');
+          }
+        } catch (parseError) {
+          console.error('Error parsing JSON file:', parseError);
+          alert('Failed to parse JSON file. Please ensure it\'s a valid JSON.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+
+  return (
     <div className="app-container">
-      
       <header className="app-header">
-        
         <div className="header-content">
-          
           <h1 className="app-title">No-Code Chatbot Builder</h1>
           <div className="header-buttons">
             <button onClick={exportChatbot} className="btn btn-export">
               Export Chatbot
+            </button>
+            {/* Import Button */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }} // Hide the actual file input
+              onChange={handleFileChange}
+              accept=".json" // Only accept JSON files
+            />
+            <button onClick={handleImportButtonClick} className="btn btn-export">
+              Import Chatbot
             </button>
           </div>
         </div>
@@ -663,167 +708,169 @@ const exportChatbot = () => {
         <div className={`flow-builder-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
           {isSidebarCollapsed && (
             <div className="sidebar-toggle-bar">
-
+              {/* This div seems empty in your original code */}
             </div>
           )}
 
           {!isSidebarCollapsed && (
             <div className="sidebar">
-                {/* Sidebar content container for transitions */}
-                <div className={`sidebar-content-wrapper ${activeSidebarView}`}>
-                    {/* Main Sidebar View - Now with sub-views */}
-                    <div className="sidebar-view main-view">
-                        <div className="sidebar-menu">
-                            <button
-                                className={`menu-option ${activeMainSidebarSubView === 'settings' ? 'active' : ''}`}
-                                onClick={() => setActiveMainSidebarSubView('settings')}
-                            >
-                                Settings
-                            </button>
-                            <button
-                                className={`menu-option ${activeMainSidebarSubView === 'nodeTypes' ? 'active' : ''}`}
-                                onClick={() => setActiveMainSidebarSubView('nodeTypes')}
-                            >
-                                Input Cards
-                            </button>
+              {/* Sidebar content container for transitions */}
+              <div className={`sidebar-content-wrapper ${activeSidebarView}`}>
+                {/* Main Sidebar View - Now with sub-views */}
+                <div className="sidebar-view main-view">
+                  <div className="sidebar-menu">
+                    <button
+                      className={`menu-option ${activeMainSidebarSubView === 'settings' ? 'active' : ''}`}
+                      onClick={() => setActiveMainSidebarSubView('settings')}
+                    >
+                      Settings
+                    </button>
+                    <button
+                      className={`menu-option ${activeMainSidebarSubView === 'nodeTypes' ? 'active' : ''}`}
+                      onClick={() => setActiveMainSidebarSubView('nodeTypes')}
+                    >
+                      Input Cards
+                    </button>
+                  </div>
+
+                  {activeMainSidebarSubView === 'settings' && (
+                    <div className="sidebar-settings-content">
+                      <div className="sidebar-section">
+                        <h3>Chatbot Settings</h3>
+                        <div className="setting-item">
+                          <label>Name</label>
+                          <input
+                            type="text"
+                            value={botName}
+                            onChange={(e) => setBotName(e.target.value)}
+                            className="input-box"
+                          />
                         </div>
-
-                        {activeMainSidebarSubView === 'settings' && (
-                            <div className="sidebar-settings-content">
-                                <div className="sidebar-section">
-                                    <h3>Chatbot Settings</h3>
-                                    <div className="setting-item">
-                                        <label>Name</label>
-                                        <input
-                                            type="text"
-                                            value={botName}
-                                            onChange={(e) => setBotName(e.target.value)}
-                                            className="input-box"
-                                        />
-                                    </div>
-                                    <div className="setting-item">
-                                        <label>Welcome</label>
-                                        <input
-                                            type="text"
-                                            value={welcomeMessage}
-                                            onChange={(e) => setWelcomeMessage(e.target.value)}
-                                            className="input-box"
-                                        />
-                                    </div>
-                                    <div className="setting-item">
-                                        <label>Fallback</label>
-                                        <input
-                                            type="text"
-                                            value={fallbackMessage}
-                                            onChange={(e) => setFallbackMessage(e.target.value)}
-                                            className="input-box"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeMainSidebarSubView === 'nodeTypes' && (
-                            <div className="sidebar-node-types-content">
-                                <div className="sidebar-section">
-                                    <h3>Node Types</h3>
-                                    <div className="node-types">
-                                        {availableNodeTypes.map((nodeType) => (
-                                            <div
-                                                key={nodeType.type}
-                                                className={`node-type-item node-type-${nodeType.type.toLowerCase()}`}
-                                                onClick={() => addNewNode(nodeType.type)}
-                                            >
-                                                {nodeType.label}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        <div className="setting-item">
+                          <label>Welcome</label>
+                          <input
+                            type="text"
+                            value={welcomeMessage}
+                            onChange={(e) => setWelcomeMessage(e.target.value)}
+                            className="input-box"
+                          />
+                        </div>
+                        <div className="setting-item">
+                          <label>Fallback</label>
+                          <input
+                            type="text"
+                            value={fallbackMessage}
+                            onChange={(e) => setFallbackMessage(e.target.value)}
+                            className="input-box"
+                          />
+                        </div>
+                      </div>
                     </div>
+                  )}
 
-                    {/* Node Properties View */}
-                    <div className="sidebar-view node-properties-view">
-                        {selectedNode && (
-                            <div className="sidebar-section">
-                                <div className="node-properties-back-area">
-                                    <button onClick={backToMainSidebar} className="back-btn">
-                                        &larr; Back
-                                    </button>
-                                </div>
-                                <div className="node-properties-header">
-                                    <h3>Node Properties</h3>
-                                </div>
-                                <div className="setting-item">
-                                    <label>Title</label>
-                                    <input
-                                        type="text"
-                                        value={selectedNode.data?.title || ''}
-                                        onChange={(e) => updateNodeData(selectedNode.id, 'title', e.target.value)}
-                                        className="input-box"
-                                    />
-                                </div>
-                                <div className="setting-item">
-                                    <label>Content</label>
-                                    <textarea
-                                        value={selectedNode.data?.content || ''}
-                                        onChange={(e) => updateNodeData(selectedNode.id, 'content', e.target.value)}
-                                        className="input-box"
-                                        rows={4}
-                                    />
-                                </div>
-
-                                {(selectedNode.type === 'multichoice' || selectedNode.type === 'button') && (
-                                    <div className="setting-item">
-                                        <label>Options</label>
-                                        {selectedNode.data.options?.map((option, index) => (
-                                            <div key={index} className="node-option-item">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Label"
-                                                    value={option.label}
-                                                    onChange={(e) => updateNodeOption(selectedNode.id, index, 'label', e.target.value)}
-                                                    className="input-box small-input"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Value (trigger)"
-                                                    value={option.value}
-                                                    onChange={(e) => updateNodeOption(selectedNode.id, index, 'value', e.target.value)}
-                                                    className="input-box small-input"
-                                                />
-                                                <button
-                                                    onClick={() => deleteNodeOption(selectedNode.id, index)}
-                                                    className="btn btn-delete-option"
-                                                >
-                                                    X
-                                                </button>
-                                            </div>
-                                        ))}
-                                        <button onClick={() => addNodeOption(selectedNode.id)} className="btn btn-add-option">
-                                            Add Option
-                                        </button>
-                                    </div>
-                                )}
-
-                                {(selectedNode.type === 'message' || selectedNode.type === 'textinput') && (
-                                    <div className="setting-item ai-toggle-section">
-                                        <input
-                                            type="checkbox"
-                                            id="aiToggle"
-                                            checked={selectedNode.data.useAI || false}
-                                            onChange={(e) => updateNodeData(selectedNode.id, 'useAI', e.target.checked)}
-                                        />
-                                        <label htmlFor="aiToggle">Use AI for response</label>
-                                    </div>
-                                )}
-
-                    
+                  {activeMainSidebarSubView === 'nodeTypes' && (
+                    <div className="sidebar-node-types-content">
+                      <div className="sidebar-section">
+                        <h3>Node Types</h3>
+                        <div className="node-types">
+                          {availableNodeTypes.map((nodeType) => (
+                            <div
+                              key={nodeType.type}
+                              className={`node-type-item node-type-${nodeType.type.toLowerCase()}`}
+                              onClick={() => addNewNode(nodeType.type)}
+                            >
+                              {nodeType.label}
                             </div>
-                        )}
+                          ))}
+                        </div>
+                      </div>
                     </div>
+                  )}
                 </div>
+
+                {/* Node Properties View */}
+                <div className="sidebar-view node-properties-view">
+                  {selectedNode && (
+                    <div className="sidebar-section">
+                      <div className="node-properties-back-area">
+                        <button onClick={backToMainSidebar} className="back-btn">
+                          &larr; Back
+                        </button>
+                      </div>
+                      <div className="node-properties-header">
+                        <h3>Node Properties</h3>
+                      </div>
+                      <div className="setting-item">
+                        <label>Title</label>
+                        <input
+                          type="text"
+                          value={selectedNode.data?.title || ''}
+                          onChange={(e) => updateNodeData(selectedNode.id, 'title', e.target.value)}
+                          className="input-box"
+                        />
+                      </div>
+                      <div className="setting-item">
+                        <label>Content</label>
+                        <textarea
+                          value={selectedNode.data?.content || ''}
+                          onChange={(e) => updateNodeData(selectedNode.id, 'content', e.target.value)}
+                          className="input-box"
+                          rows={4}
+                        />
+                      </div>
+
+                      {(selectedNode.type === 'multichoice' || selectedNode.type === 'button') && (
+                        <div className="setting-item">
+                          <label>Options</label>
+                          {selectedNode.data.options?.map((option, index) => (
+                            <div key={index} className="node-option-item">
+                              <input
+                                type="text"
+                                placeholder="Label"
+                                value={option.label}
+                                onChange={(e) => updateNodeOption(selectedNode.id, index, 'label', e.target.value)}
+                                className="input-box small-input label-input"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Value (trigger)"
+                                value={option.value}
+                                onChange={(e) => updateNodeOption(selectedNode.id, index, 'value', e.target.value)}
+                                className="input-box small-input value-input"
+                              />
+                              <button
+                                onClick={() => deleteNodeOption(selectedNode.id, index)}
+                                className="btn btn-delete-option"
+                              >
+                                X
+                              </button>
+                            </div>
+                          ))}
+                          <button onClick={() => addNodeOption(selectedNode.id)} className="btn btn-add-option">
+                            Add Option
+                          </button>
+                        </div>
+                      )}
+
+                      {(selectedNode.type === 'message' || selectedNode.type === 'textinput') && (
+                        <div className="setting-item ai-toggle-section">
+                          <input
+                            type="checkbox"
+                            id="aiToggle"
+                            checked={selectedNode.data.useAI || false}
+                            onChange={(e) => updateNodeData(selectedNode.id, 'useAI', e.target.checked)}
+                          />
+                          <label htmlFor="aiToggle">Use AI for response</label>
+                        </div>
+                      )}
+
+                      <button onClick={() => deleteNode(selectedNode.id)} className="btn btn-delete-node">
+                        Delete Node
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -852,12 +899,40 @@ const exportChatbot = () => {
                     const targetNode = nodes.find((n) => n.id === conn.targetId);
 
                     if (!sourceNode || !targetNode) return null;
+let startX: number;
+                    let startY: number;
 
-                    const startX = sourceNode.x + 200;
-                    const startY = sourceNode.y + 40;
-                    const endX = targetNode.x;
-                    const endY = targetNode.y + 40;
+                    // Determine the exact source point for the connection
+                    if ((sourceNode.type === 'multichoice' || sourceNode.type === 'button') && sourceNode.data.options) {
+                      // Find the specific option's output point
+                      const optionIndex = sourceNode.data.options?.findIndex(opt => opt.value === conn.sourceOutput);
+                      if (optionIndex !== undefined && optionIndex > -1) {
+                       
+                        const NODE_HEADER_HEIGHT = 46.8; 
+                        const NODE_CONTENT_TOP_OFFSET = 15; 
+                        const NODE_OPTIONS_DISPLAY_TOP_PADDING = 10; // From .node-options-display padding-top in CSS
+                        const OPTION_ITEM_HEIGHT = 40; // From .node-option-item-display min-height in CSS
+                        const OPTION_ITEM_GAP = 8;
+                        const OUTPUT_POINT_WIDTH = 16; 
+                        const offsetToOptionsBlock = NODE_HEADER_HEIGHT + NODE_CONTENT_TOP_OFFSET;
 
+                      
+                        startX = sourceNode.x + 240 - (OUTPUT_POINT_WIDTH / 2);
+
+        
+                        startY = sourceNode.y + offsetToOptionsBlock + NODE_OPTIONS_DISPLAY_TOP_PADDING + (OPTION_ITEM_HEIGHT + OPTION_ITEM_GAP) * optionIndex + OPTION_ITEM_HEIGHT / 2;
+
+                      } else {
+                        startX = sourceNode.x + 232;
+                        startY = sourceNode.y + 40; // Mid-height of the node for generic output point
+                      }
+                    } else {
+                    
+                      startX = sourceNode.x + 232; // Node width (240) - half of output point (8)
+                      startY = sourceNode.y + 40; // Mid-height of the node
+                    }
+                    const endX = targetNode.x;         // Input point on the left edge
+                    const endY = targetNode.y + 40;    // Mid-height of the node
                     const controlX1 = startX + 50;
                     const controlX2 = endX - 50;
 
@@ -869,15 +944,18 @@ const exportChatbot = () => {
                           stroke="#888"
                           strokeWidth="2"
                           onClick={() => deleteConnection(conn.id)}
+                          className="connection-path" // Add class for styling/hover
                         />
+                        {/* Arrowhead */}
                         <circle cx={endX} cy={endY} r="5" fill="#888" />
+                        {/* Connection Label */}
                         <text
                           x={(startX + endX) / 2}
                           y={(startY + endY) / 2 - 10}
                           fill="#555"
                           fontSize="10"
                           textAnchor="middle"
-                          pointerEvents="none"
+                          pointerEvents="none" // Important to allow clicking the path beneath
                         >
                           {conn.sourceOutput}
                         </text>
@@ -888,9 +966,9 @@ const exportChatbot = () => {
                   {creatingConnection && (
                     <path
                       d={`M ${creatingConnection.startX} ${creatingConnection.startY}
-                        C ${creatingConnection.startX + 50} ${creatingConnection.startY},
-                          ${creatingConnection.endX - 50} ${creatingConnection.endY},
-                          ${creatingConnection.endX} ${creatingConnection.endY}`}
+                      C ${creatingConnection.startX + 50} ${creatingConnection.startY},
+                      ${creatingConnection.endX - 50} ${creatingConnection.endY},
+                      ${creatingConnection.endX} ${creatingConnection.endY}`}
                       fill="none"
                       stroke="#888"
                       strokeWidth="2"
@@ -903,27 +981,35 @@ const exportChatbot = () => {
                   return (
                     <div
                       key={node.id}
-                      className={`flow-node ${selectedNode?.id === node.id ? 'selected' : ''}`}
-                       style={{ left: node.x, top: node.y }}
+                      className={`flow-node ${selectedNode?.id === node.id ? 'selected' : ''} node-type-${node.type}`}
+                      style={{ left: node.x, top: node.y }}
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedNode(node);
                         setActiveSidebarView('nodeProperties'); // Switch to node properties view
                       }}
+                      onMouseDown={(e) => {
+                        // Allow dragging by clicking anywhere on the node except delete/output handles
+                        if (!(e.target as HTMLElement).closest('.delete-node-btn, .output-point')) {
+                          handleCanvasMouseDown(e); // Use the general canvas mouse down for dragging
+                        }
+                      }}
                     >
                       <div className="flow-node-header">
                         {node.data?.title || 'Unnamed Node'}
-                        <button
-                                className="delete-node-btn"
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Prevent node selection/drag when clicking delete
-                                    deleteNode(node.id);
-                                }}
-                                title="Delete Node"
-                            >
-                                &#x1F5D1;  
-                                {/* Or use trashcan: &#x1F5D1; */}
-                            </button>
+                        {node.id !== 'start-1' && ( // Prevent deleting the start node
+                          <button
+                            className="delete-node-btn"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent node selection/drag when clicking delete
+                              deleteNode(node.id);
+                            }}
+                            title="Delete Node"
+                          >
+                            &#x1F5D1; {/* Trashcan icon */}
+                          </button>
+                        )}
+                        {/* Input point for incoming connections */}
                         <div className="flow-node-input">
                           <div className="input-point" />
                         </div>
@@ -931,13 +1017,15 @@ const exportChatbot = () => {
                       <div className="flow-node-content">
                         {node.data?.content || 'No content'}
                       </div>
-                      {node.outputs && node.outputs.length > 0 && (
+                      {/* Render outputs only if node.outputs array is not empty AND not 'end' or 'rating' (if they truly have no outgoing connections) */}
+                      {node.outputs && node.outputs.length > 0 && node.type !== 'end' && node.type !== 'rating' && (
                         <div className="flow-node-outputs">
                           {node.outputs.map((output: string) => (
                             <div
                               key={output}
                               className="output-point"
                               onMouseDown={(e) => startConnection(node.id, output, e)}
+                              title={`Connect from ${output}`}
                             />
                           ))}
                         </div>
@@ -954,7 +1042,7 @@ const exportChatbot = () => {
                         </div>
                       )}
                       <div className="flow-node-type">
-                        {nodeType?.type.toUpperCase() || 'NODE'}
+                        {nodeType?.label || node.type.toUpperCase()} {/* Display label or type */}
                       </div>
                     </div>
                   );
@@ -964,15 +1052,16 @@ const exportChatbot = () => {
           </div>
         </div>
       )}
-      <ChatbotPreview
-          botName={botName}
-          welcomeMessage={welcomeMessage}
-          fallbackMessage={fallbackMessage}
-          nodes={nodes}
-          connections={connections}
-        />
+
+       <ChatbotPreview
+        botName={botName}
+        welcomeMessage={welcomeMessage}
+        fallbackMessage={fallbackMessage}
+        nodes={nodes}
+        connections={connections}
+      /> 
     </div>
   );
 };
 
-  export default ChatbotBuilder;
+export default ChatbotBuilder;

@@ -2747,3 +2747,28 @@ textarea.input-box {
     padding: 8px 12px;
   }
 }
+
+.node-option-item {
+    /* Change from display: flex; if it was set */
+    display: flex; /* Keep flex, but change direction */
+    flex-direction: column; /* This is the key change */
+    align-items: flex-start; /* Align items to the start of the column */
+    gap: 5px; /* Adjust spacing between label and value inputs */
+    margin-bottom: 15px; /* Add more space between option rows */
+    padding: 8px; /* Optional: Add some padding around each option group */
+    border: 1px solid #eee; /* Optional: Visually separate each option */
+    border-radius: 4px;
+}
+
+.node-option-item .input-box.small-input {
+    width: 100%; /* Make inputs take full width of their container */
+    /* Remove or adjust fixed width/flex-grow if you set them previously */
+    min-height: 30px;
+    padding: 5px 8px;
+    box-sizing: border-box;
+}
+
+.node-option-item .btn-delete-option {
+    margin-top: 5px; /* Add some space above the delete button */
+    align-self: flex-end; /* Align delete button to the right if in a column */
+}

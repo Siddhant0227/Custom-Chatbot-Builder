@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ChatbotPreview.css';
 import ReactDOM from 'react-dom/client';
 
@@ -7,9 +7,10 @@ import ReactDOM from 'react-dom/client';
  * @param {string} props.botName
  * @param {string} props.welcomeMessage
  * @param {string} props.fallbackMessage
- * @param {Array<Object>} props.nodes - The array of chatbot nodes
- * @param {Array<Object>} props.connections - The array of chatbot connections
+ * @param {Array<Object>} props.nodes 
+ * @param {Array<Object>} props.connections // Corrected: Removed 'ns' typo
  */
+
 function renderChatbotWidget(config) {
   const mountPoint = document.getElementById(config.mountId || 'my-chatbot-widget');
 
@@ -20,36 +21,37 @@ function renderChatbotWidget(config) {
   const root = ReactDOM.createRoot(mountPoint);
   root.render(
     <React.StrictMode>
+      {/* ChatbotPreview now manages its own conversation state, so pass only config-related props */}
       <ChatbotPreview
         botName={config.botName}
         welcomeMessage={config.welcomeMessage}
         fallbackMessage={config.fallbackMessage}
         nodes={config.nodes}
         connections={config.connections}
-        // Add any other necessary props here
       />
     </React.StrictMode>
   );
 }
 
+// Expose the init function globally for the embed script to call
 window.MyChatbotWidget = {
   init: renderChatbotWidget,
 };
 
-export const getAIResponse = async (userMessage) => {
+export const getAIResponse = async (userMessage) => { // getAIResponse expects only userMessage
   try {
     console.log('Sending request to Groq API...');
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer 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`,
+        Authorization: `Bearer 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`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         model: "gemma2-9b-it",
         messages: [
           { role: "system", content: "You are a helpful chatbot assistant." },
-          { role: "user", content: userMessage },
+          { role: "user", content: userMessage }, // Only userMessage is used here
         ],
         temperature: 0.7,
         max_tokens: 150,
@@ -128,7 +130,7 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
 
   const startConversationHandler = () => {
     setChatStarted(true);
-    // Find the 'start' node and begin the conversation from there
+  
     const startNode = nodes.find(node => node.id === 'start-1');
     if (startNode) {
       setCurrentNodeId(startNode.id);
@@ -145,6 +147,7 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
     ]);
   };
 
+  // In ChatbotPreview.jsx, inside processUserMessage
   const processUserMessage = async (message) => {
     if (!message.trim()) return;
 
@@ -157,47 +160,51 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate thinking time
 
     setConversation((prevConv) =>
-      prevConv.filter((msg) => !(msg.sender === 'bot' && msg.isTyping))
+        prevConv.filter((msg) => !(msg.sender === 'bot' && msg.isTyping))
     ); // Remove typing indicator
+
     let nextNode = null;
-    let aiResponse = null; // Initialize AI response variable
+    let aiResponseUsed = false; // Flag to indicate if AI was used for this message
 
     if (currentNodeId) {
-      const currentNode = nodes.find(node => node.id === currentNodeId);
+        const currentNode = nodes.find(node => node.id === currentNodeId);
 
-      if (currentNode) {
-        if (currentNode.data?.useAI) { // Check if 'useAI' is true for the current node
-          console.log("AI is enabled for this node. Getting AI response...");
-          aiResponse = await getAIResponse(message);
-          addBotMessage(aiResponse);
-          const singleConnection = connections.find(conn => conn.sourceId === currentNode.id);
-          if (singleConnection) {
-            nextNode = nodes.find(node => node.id === singleConnection.targetId);
-          }
-        } else {
-          if (currentNode.type === 'multichoice' || currentNode.type === 'button') {
-            const matchingConnection = connections.find(conn =>
-              conn.sourceId === currentNode.id && conn.sourceOutput === message
-            );
-            if (matchingConnection) {
-              nextNode = nodes.find(node => node.id === matchingConnection.targetId);
+        if (currentNode) {
+            if (currentNode.data?.useAI) { // Check if 'useAI' is true for the current node
+                console.log("AI is enabled for this node. Getting AI response...");
+                // Corrected: getAIResponse only expects the user message, not conversation history
+                const ai_raw_response = await getAIResponse(message); // Pass only the user message
+                addBotMessage(ai_raw_response);
+                aiResponseUsed = true;
+
+                const singleConnection = connections.find(conn => conn.sourceId === currentNode.id);
+                if (singleConnection) {
+                    nextNode = nodes.find(node => node.id === singleConnection.targetId);
+                }
+            } else {
+            
+                if (currentNode.type === 'multichoice' || currentNode.type === 'button') {
+                    const matchingConnection = connections.find(conn =>
+                        conn.sourceId === currentNode.id && conn.sourceOutput === message
+                    );
+                    if (matchingConnection) {
+                        nextNode = nodes.find(node => node.id === matchingConnection.targetId);
+                    }
+                } else if (currentNode.type === 'textinput' || currentNode.type === 'message') {
+                    const singleConnection = connections.find(conn => conn.sourceId === currentNode.id);
+                    if (singleConnection) {
+                        nextNode = nodes.find(node => node.id === singleConnection.targetId);
+                    }
+                }
             }
-          } else if (currentNode.type === 'textinput' || currentNode.type === 'message') {
-            const singleConnection = connections.find(conn => conn.sourceId === currentNode.id);
-            if (singleConnection) {
-              nextNode = nodes.find(node => node.id === singleConnection.targetId);
-            }
-          }
         }
-      }
     }
 
-    // Process the next node only if AI didn't take over or led to a next node
     if (nextNode) {
-      setCurrentNodeId(nextNode.id);
-      processNode(nextNode, message);
-    } else if (!aiResponse) { 
-      addBotMessage(fallbackMessage || "I'm sorry, I didn't understand that. Can you please rephrase?");
+        setCurrentNodeId(nextNode.id);
+        processNode(nextNode, message);
+    } else if (!aiResponseUsed) { // Only use fallback if AI wasn't even attempted or didn't provide a next node
+        addBotMessage(fallbackMessage || "I'm sorry, I didn't understand that. Can you please rephrase?");
     }
   };
 
@@ -424,6 +431,7 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
                             key={optIndex}
                             className="predefined-btn"
                             onClick={() => handleOptionClick(option.value)}
+                            // Ensure disabled state matches your desired logic
                             disabled={index !== conversation.length - 1 || conversation[conversation.length - 1]?.inputRequired || showRating}
                           >
                             {option.label}
@@ -447,11 +455,13 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
                       handleUserTextInput();
                     }
                   }}
+                  // Ensure disabled state matches your desired logic
                   disabled={conversation.length > 0 && !conversation[conversation.length - 1].inputRequired && conversation[conversation.length - 1].options.length > 0}
                 />
                 <button
                   id="sendBtn"
                   onClick={handleUserTextInput}
+                  // Ensure disabled state matches your desired logic
                   disabled={conversation.length > 0 && !conversation[conversation.length - 1].inputRequired && conversation[conversation.length - 1].options.length > 0}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
