@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.js": "/Custom-Chatbot-Builder/my-chatbot-widget.bundle.js",
+    "main.css": "/Custom-Chatbot-Builder/static/css/main.6c9faa1e.css",
+    "my-chatbot-widget.bundle.js.map": "/Custom-Chatbot-Builder/my-chatbot-widget.bundle.js.map",
+    "main.6c9faa1e.css.map": "/Custom-Chatbot-Builder/static/css/main.6c9faa1e.css.map"
+  },
+  "entrypoints": [
+    "my-chatbot-widget.bundle.js",
+    "static/css/main.6c9faa1e.css"
+  ]
+}
