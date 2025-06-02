@@ -1,14 +1,9 @@
-// src/EmbeddableChatbot.jsx
+
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import ChatbotPreview from './components/ChatbotPreview';
 
-// Interfaces (for your reference, not used in JSX directly)
-// interface NodeData { /* ... */ }
-// interface Node { /* ... */ }
-// interface Connection { /* ... */ }
-// interface Message { /* ... */ }
-// interface EmbeddableChatbotProps { /* ... */ }
+
 
 
 const EmbeddableChatbot = ({
@@ -165,9 +160,6 @@ const EmbeddableChatbot = ({
   );
 };
 
-// --- Global Initialization Logic ---
-// This part makes your EmbeddableChatbot accessible from plain HTML.
-// It will be part of the bundled JavaScript file.
 window.MyChatbotWidget = {
   init: (config) => { // No type annotations here
     const mountPoint = document.getElementById(config.mountId);

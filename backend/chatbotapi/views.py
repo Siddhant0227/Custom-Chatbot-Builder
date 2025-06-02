@@ -2,10 +2,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated # <--- NEW IMPORT
-from rest_framework.authentication import TokenAuthentication # <--- NEW IMPORT
+from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+
+import json
 
 from .models import Chatbot
 from .serializers import ChatbotSerializer
@@ -13,9 +15,8 @@ from django.http import JsonResponse # For WelcomeView
 
 import os
 from groq import Groq
-import json # Make sure this is imported
 
-# Configure your Groq API key
+
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 if not GROQ_API_KEY:
     print("WARNING: GROQ_API_KEY not found in environment variables.")
@@ -207,4 +208,3 @@ class WelcomeView(APIView):
         return JsonResponse({"message": "Welcome to the Chatbot Builder Backend API!"})
     
 
-    
