@@ -2770,4 +2770,54 @@ textarea.input-box {
 .node-option-item .btn-delete-option {
     margin-top: 5px; /* Add some space above the delete button */
     align-self: flex-end; /* Align delete button to the right if in a column */
+}/* Existing CSS */
+
+/* --- Flow Builder Connections --- */
+.connections-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allows clicks to pass through to canvas for drag/drop */
+  overflow: visible; /* Ensure paths are not clipped if they extend slightly */
+}
+
+.connection-path {
+  fill: none;
+  stroke: var(--connection-color, #888); /* Default greyish color */
+  stroke-width: 2;
+  stroke-dasharray: 6 4; /* Creates the dashed effect (dash length, gap length) */
+  pointer-events: all; /* Make path clickable for deletion */
+  transition: stroke-width 0.1s ease; /* Smooth hover effect */
+}
+
+.connection-path:hover {
+  stroke: var(--primary-blue); /* Highlight on hover */
+  stroke-width: 3; /* Thicker on hover */
+}
+
+.connection-dot {
+  fill: var(--connection-color, #888); /* Color of the dots */
+  pointer-events: none; /* Dots themselves are not clickable, the path handles deletion */
+}
+
+.output-dot {
+  /* No specific styling needed beyond .connection-dot if they are identical */
+}
+
+.input-dot {
+  fill: var(--primary-blue); /* Filled blue circle for input */
+}
+
+/* Style for the temporary connection line while dragging */
+.flow-canvas-container .connections-layer line[stroke="#2196F3"] {
+  stroke-dasharray: 5 5; /* Dashed */
+}
+
+.connection-label {
+  font-size: 10px;
+  fill: #555; /* Color for the text label */
+  user-select: none;
+  pointer-events: none; /* Make text non-interactive */
 }
