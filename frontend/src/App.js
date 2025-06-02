@@ -1,68 +1,76 @@
-import React, { useState } from "react";
-import ChatbotBuilder from "./components/ChatbotBuilder.tsx";
-import CustomChatbot from "./components/CustomChatbot.js";
-import WelcomeScreen from "./components/WelcomeScreen.tsx";
-import Login from "./components/Login.jsx"; // ✅ NEW
-import "./App.css";
-import "bootstrap/dist/css/bootstrap.min.css";
+// src/App.jsx
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './AuthContext.tsx';
+import Login from './components/Login.jsx';
+import DashboardPage from './components/DashboardPage.tsx';
+import ChatbotBuilder from './components/ChatbotBuilder.tsx';
+import WelcomeScreen from './components/WelcomeScreen.tsx';
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // ✅ NEW
-  const [chatbotConfig, setChatbotConfig] = useState(null);
-  const [showBuilder, setShowBuilder] = useState(false);
-  const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
+// Define the TopNavBar component within App.jsx or in a separate file (e.g., components/TopNavBar.jsx)
+const TopNavBar = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate(); // Make sure useNavigate is imported from react-router-dom
 
-  const handleStartBuilding = () => {
-    setShowWelcomeScreen(false);
-    setShowBuilder(true);
-  };
+  return (
+    <nav className="top-nav-bar">
+      <div className="nav-logo">
+        {/* Changed to h1 for main title, keeping it clickable to dashboard */}
+        <h1 onClick={() => navigate('/dashboard')}>Your Company Name</h1>
+      </div>
+      <div className="nav-links">
+        {/* You can add other nav links here if needed */}
+        <button onClick={logout} className="btn-logout">Logout</button>
+      </div>
+    </nav>
+  );
+};
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
-  if (!isLoggedIn) {
-    return <Login onLogin={handleLogin} />; // ✅ First show login
-  }
+const AppContent = () => {
+  const { isAuthenticated, login } = useAuth(); // logout is now handled by TopNavBar
+  const location = useLocation();
+
+  // Paths where the header should NOT be shown
+  const hideHeaderRoutes = [
+    '/build/', // When building a chatbot
+    '/login',   // Login page
+    '/welcome'  // Welcome screen (if it's a first-time setup or a different flow)
+  ];
+
+  // Check if current path starts with any of the hideHeaderRoutes
+  const shouldHideHeader = hideHeaderRoutes.some(path => location.pathname.startsWith(path));
 
   return (
     <div className="App">
-      {showWelcomeScreen ? (
-        <WelcomeScreen onStartBuilding={handleStartBuilding} />
-      ) : showBuilder ? (
-        <ChatbotBuilder
-          onExport={(config) => {
-            setChatbotConfig(config);
-            setShowBuilder(false);
-          }}
+      {/* Conditionally render the TopNavBar */}
+      {isAuthenticated && !shouldHideHeader && <TopNavBar />}
+
+      <Routes>
+        <Route path="/login" element={<Login onLogin={login} />} />
+        <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/welcome" element={<PrivateRoute><WelcomeScreen /></PrivateRoute>} />
+        <Route path="/build/:chatbotId?" element={<PrivateRoute><ChatbotBuilder /></PrivateRoute>} />
+        {/* Default route for authenticated users, redirects to dashboard */}
+        <Route
+          path="*"
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />}
         />
-      ) : (
-        <>
-          <div className="p-3 bg-dark text-white">
-            <div className="container d-flex justify-content-between align-items-center">
-              <h1 className="h4 fw-bold">Chatbot Demo Mode</h1>
-              <button
-                onClick={() => setShowBuilder(true)}
-                className="btn btn-primary"
-              >
-                Back to Builder
-              </button>
-            </div>
-          </div>
-          <div className="container py-4">
-            <div className="bg-white shadow-sm border rounded-3 p-4 mb-4">
-              <h2 className="h5 fw-semibold mb-3">Chatbot Demo</h2>
-              <p className="mb-2">
-                You are now previewing the chatbot "<strong>{chatbotConfig?.name}</strong>".
-              </p>
-              <p>Try sending some messages to see how your configured rules work.</p>
-            </div>
-          </div>
-          <CustomChatbot config={chatbotConfig} />
-        </>
-      )}
+      </Routes>
     </div>
   );
-}
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+};
 
 export default App;
