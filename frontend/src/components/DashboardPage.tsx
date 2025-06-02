@@ -82,7 +82,7 @@ const DashboardPage: React.FC = () => {
         </div>
       ) : (
         <div className="chatbot-grid">
-          {chatbots.map((chatbot: Chatbot) => ( // Explicitly type chatbot in map
+          {chatbots.map((chatbot: Chatbot) => ( 
             <div key={chatbot.id} className="chatbot-card">
               <div className="card-header">
                 <div className="chatbot-info">

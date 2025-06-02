@@ -1,25 +1,27 @@
 // src/App.jsx
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './AuthContext.tsx';
+import { AuthProvider, useAuth } from './AuthContext.tsx'; // Assuming AuthContext.tsx provides 'username'
 import Login from './components/Login.jsx';
 import DashboardPage from './components/DashboardPage.tsx';
 import ChatbotBuilder from './components/ChatbotBuilder.tsx';
 import WelcomeScreen from './components/WelcomeScreen.tsx';
 
-// Define the TopNavBar component within App.jsx or in a separate file (e.g., components/TopNavBar.jsx)
+// Define the TopNavBar component
 const TopNavBar = () => {
-  const { logout } = useAuth();
-  const navigate = useNavigate(); // Make sure useNavigate is imported from react-router-dom
+  // Assuming useAuth now provides a 'username' property
+  const { logout, username } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="top-nav-bar">
       <div className="nav-logo">
-        {/* Changed to h1 for main title, keeping it clickable to dashboard */}
-        <h1 onClick={() => navigate('/dashboard')}>Your Company Name</h1>
+        {/* Display the username if available, otherwise a generic welcome */}
+        <h1 onClick={() => navigate('/dashboard')}>
+          {username ? `Welcome, ${username}` : 'Your Dashboard'}
+        </h1>
       </div>
       <div className="nav-links">
-        {/* You can add other nav links here if needed */}
         <button onClick={logout} className="btn-logout">Logout</button>
       </div>
     </nav>
@@ -32,10 +34,10 @@ const PrivateRoute = ({ children }) => {
 };
 
 const AppContent = () => {
-  const { isAuthenticated, login } = useAuth(); // logout is now handled by TopNavBar
+  const { isAuthenticated } = useAuth(); // No need for 'login' here directly
   const location = useLocation();
 
-  // Paths where the header should NOT be shown
+  
   const hideHeaderRoutes = [
     '/build/', // When building a chatbot
     '/login',   // Login page
@@ -51,7 +53,9 @@ const AppContent = () => {
       {isAuthenticated && !shouldHideHeader && <TopNavBar />}
 
       <Routes>
-        <Route path="/login" element={<Login onLogin={login} />} />
+        {/* Pass the login function to Login component if it needs to trigger authentication */}
+        {/* Note: If Login component directly uses useAuth().login(), you don't need to pass it as a prop */}
+        <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
         <Route path="/welcome" element={<PrivateRoute><WelcomeScreen /></PrivateRoute>} />
         <Route path="/build/:chatbotId?" element={<PrivateRoute><ChatbotBuilder /></PrivateRoute>} />
