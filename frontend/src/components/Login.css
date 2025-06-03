@@ -76,3 +76,28 @@
     transform: translateY(0);
   }
 }
+.login-card button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(106, 5, 114, 0.4);
+  }
+
+  .login-card .toggle-mode {
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    color: #555;
+  }
+
+  .login-card .toggle-mode button {
+    background: none;
+    border: none;
+    color: #6a0572;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+  }
+
+  .login-card .toggle-mode button:hover {
+    color: #9a06a0;
+  }
+  

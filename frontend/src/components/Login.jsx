@@ -1,96 +1,126 @@
-import React, { useState } from 'react';
-import './Login.css';
+// src/components/Login.jsx
+import { useState, useEffect } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext.tsx';
+import './Login.css'
 
-const Login = ({ onLogin }) => {
-  const [isRegistering, setIsRegistering] = useState(false);
+const Login = () => {
+  const { isAuthenticated, login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false); // State to toggle between login and register
+  const navigate = useNavigate();
 
-  // Get users from localStorage or empty array
-  const getUsers = () => JSON.parse(localStorage.getItem('users')) || [];
+  // Load users from localStorage on component mount
+  // No type annotation needed for useState in JSX
+  const [users, setUsers] = useState(() => {
+    try {
+      const storedUsers = localStorage.getItem('users');
+      return storedUsers ? JSON.parse(storedUsers) : [];
+    } catch (e) {
+      console.error("Failed to parse users from localStorage:", e);
+      return [];
+    }
+  });
 
-  // Save users back to localStorage
-  const saveUsers = (users) => localStorage.setItem('users', JSON.stringify(users));
+  // Save users to localStorage whenever the users state changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('users', JSON.stringify(users));
+    } catch (e) {
+      console.error("Failed to save users to localStorage:", e);
+    }
+  }, [users]);
 
+  // Removed type annotation for 'e' in handleSubmit
   const handleSubmit = (e) => {
     e.preventDefault();
-    const users = getUsers();
+    setError('');
+    setSuccessMessage('');
+
+    if (!username || !password) {
+      setError('Please enter both username and password.');
+      return;
+    }
 
     if (isRegistering) {
+      // Registration logic
       const userExists = users.some(user => user.username === username);
       if (userExists) {
-        setMessage('Username already exists!');
-        return;
-      }
-      users.push({ username, password });
-      saveUsers(users);
-      setMessage('Registered successfully! You can now sign in.');
-      setIsRegistering(false);
-    } else {
-      const validUser = users.find(user => user.username === username && user.password === password);
-      if (validUser) {
-        setMessage('');
-        onLogin(); // Call parent function to proceed
+        setError('Username already exists. Please choose a different one.');
       } else {
-        setMessage('Invalid username or password');
+        // In a real app, hash the password before storing
+        // Removed explicit type for newUser
+        const newUser = { username, passwordHash: password }; // Using plain password for simplicity
+        setUsers(prevUsers => [...prevUsers, newUser]);
+        setSuccessMessage('Registration successful! You can now log in.');
+        setIsRegistering(false); // Switch to login mode after successful registration
+        setUsername(''); // Clear form fields
+        setPassword('');
+      }
+    } else {
+      // Login logic
+      const foundUser = users.find(
+        user => user.username === username && user.passwordHash === password
+      );
+
+      if (foundUser) {
+        login(); // Mark as authenticated
+        navigate('/dashboard'); // Redirect to dashboard
+      } else {
+        setError('Invalid username or password.');
       }
     }
   };
 
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h2>{isRegistering ? 'Register' : 'Login'}</h2>
-        {message && <div className="error">{message}</div>}
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button type="submit">{isRegistering ? 'Register' : 'Login'}</button>
-        </form>
-        <p style={{ marginTop: '10px', textAlign: 'center' }}>
-          {isRegistering ? (
-            <>
-              Already have an account?{' '}
-              <span
-                style={{ color: '#5a67d8', cursor: 'pointer' }}
-                onClick={() => {
-                  setIsRegistering(false);
-                  setMessage('');
-                }}
-              >
-                Sign In
-              </span>
-            </>
-          ) : (
-            <>
-              Don't have an account?{' '}
-              <span
-                style={{ color: '#5a67d8', cursor: 'pointer' }}
-                onClick={() => {
-                  setIsRegistering(true);
-                  setMessage('');
-                }}
-              >
-                Register
-              </span>
-            </>
-          )}
-        </p>
+    <>
+      <div className="login-container">
+        <div className="login-card">
+          <h2>{isRegistering ? 'Register' : 'Login'}</h2>
+          {error && <div className="error">{error}</div>}
+          {successMessage && <div className="success">{successMessage}</div>}
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button type="submit">
+              {isRegistering ? 'Register' : 'Login'}
+            </button>
+          </form>
+          <div className="toggle-mode">
+            {isRegistering ? (
+              <>
+                Already have an account?{' '}
+                <button onClick={() => setIsRegistering(false)}>Login</button>
+              </>
+            ) : (
+              <>
+                Don't have an account?{' '}
+                <button onClick={() => setIsRegistering(true)}>Register</button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

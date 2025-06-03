@@ -36,3 +36,79 @@
     transform: rotate(360deg);
   }
 }
+/* App.css (or Global.css) - For the Top Navigation Bar */
+
+/* Ensure the @import for fonts is at the very top */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;600;700&display=swap');
+
+:root {
+  /* Keep existing root variables and add new ones if needed */
+  --primary-brand-color: #4A90E2;
+  --primary-brand-dark: #357ABD;
+  --accent-color: #1ABC9C;
+  --background-light: #F8F9FA;
+  --background-card: #FFFFFF;
+  --text-primary: #343A40;
+  --text-secondary: #6C757D;
+  --border-color: #E0E0E0;
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* New variables for the top nav bar */
+  --navbar-bg: #FFFFFF; /* White background for the nav bar */
+  --navbar-shadow: rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+  --nav-text-color: var(--text-primary);
+  --nav-link-hover: var(--primary-brand-color);
+}
+
+/* --- Global Resets / Base Styles (if not already present) --- */
+body {
+  font-family: var(--font-body);
+  background-color: var(--background-light);
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* --- Top Navigation Bar Styles --- */
+.top-nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px; /* Vertical and horizontal padding */
+  background-color: var(--navbar-bg);
+  box-shadow: 0 4px 12px var(--navbar-shadow); /* Attractive shadow */
+  position: sticky; /* Makes it stick to the top when scrolling */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Ensures it stays on top of other content */
+  border-bottom: 1px solid var(--border-color); /* Subtle bottom border */
+}
+
+.nav-logo h2 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem; /* Size of the company name/dashboard title */
+  color: var(--primary-brand-color); /* Matches your brand color */
+  margin: 0;
+  cursor: pointer; /* Indicates it's clickable */
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+
+.nav-logo h2:hover {
+  color: var(--primary-brand-dark);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 25px; /* Space between nav items */
+}
+
+
+
+
