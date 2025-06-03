@@ -22,7 +22,10 @@ urlpatterns = [
     path('welcome/', WelcomeView.as_view(), name='welcome'),
 
     # New Authentication Endpoints
-    path('register/', RegisterView.as_view(), name='register'), # Maps to /api/register/
-    path('login/', LoginView.as_view(), name='login'),         # Maps to /api/login/
-    path('logout/', LogoutView.as_view(), name='logout'),       # Maps to /api/logout/
+    path('register/', RegisterView.as_view(), name='register'), 
+    path('login/', LoginView.as_view(), name='login'),        
+    path('logout/', LogoutView.as_view(), name='logout'), 
+    path('save-chatbot/', ChatbotConfigView.as_view(), name='save-chatbot'),
+    path('chatbot/<str:bot_name>/', ChatbotConfigView.as_view(), name='chatbot-config-detail'), # For GET by name
+     
 ]

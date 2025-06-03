@@ -1,3 +1,5 @@
+# chatbotapi/views.py
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -107,10 +109,9 @@ def get_correction_response(text_to_correct):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AIChatbotResponseView(APIView):
-    permission_classes = [AllowAny] # Allow anyone to interact with the AI chatbot
+    permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
         request_type = request.data.get('request_type', 'chatbot_response')
-
         if request_type == 'correct_input':
             input_text = request.data.get('input_text')
             if not input_text:
@@ -120,7 +121,6 @@ class AIChatbotResponseView(APIView):
                 )
             correction_data = get_correction_response(input_text)
             return Response(correction_data, status=status.HTTP_200_OK)
-
         elif request_type == 'chatbot_response':
             conversation_history = request.data.get('conversation_history', [])
             if not conversation_history:
@@ -128,10 +128,8 @@ class AIChatbotResponseView(APIView):
                     {"error": "conversation_history is required and should not be empty for chatbot_response."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
             ai_response_data = get_groq_response(conversation_history)
             return Response(ai_response_data, status=status.HTTP_200_OK)
-
         else:
             return Response(
                 {"error": "Invalid request_type provided."},
@@ -140,52 +138,57 @@ class AIChatbotResponseView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatbotListCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated] # Requires authentication for listing/creating chatbots
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         """
         Lists all chatbots owned by the authenticated user.
         """
-        chatbots = Chatbot.objects.filter(user=request.user) # Filter by current user
+        # Filter chatbots by the currently authenticated user
+        chatbots = Chatbot.objects.filter(user=request.user)
         serializer = ChatbotSerializer(chatbots, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         """
-        Creates a new chatbot.
+        Creates a new chatbot, associating it with the authenticated user.
         """
         serializer = ChatbotSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user) # Associate with the authenticated user
+            # Automatically set the 'user' field to the authenticated user
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CreateEmptyChatbotAPIView(APIView):
-    permission_classes = [IsAuthenticated] # Requires authentication
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         """
-        Creates a new chatbot with default empty configuration for nodes and connections.
+        Creates a new chatbot with default empty configuration for nodes and connections,
+        associating it with the authenticated user.
         """
         data = {
-            'botName': request.data.get('name', 'New Chatbot'), # Use name from frontend if provided, else default
-            'welcomeMessage': 'Hello! How can I help you today?',
-            'fallbackMessage': "I'm sorry, I don't understand. Can you please rephrase?",
-            'nodes': [{
-                'id': 'start-1',
-                'type': 'start',
-                'x': 100,
-                'y': 120,
-                'data': {
-                    'title': 'Start',
-                    'content': 'Start your chatbot flow here',
-                    'useAI': False,
-                },
-                'outputs': ['output-1'],
-            }],
-            'connections': [],
+            'name': request.data.get('name', 'New Chatbot'), # Use 'name' to match model field
+            'configuration': { # Store initial config in the JSONField
+                'welcomeMessage': 'Hello! How can I help you today?',
+                'fallbackMessage': "I'm sorry, I don't understand. Can you please rephrase?",
+                'nodes': [{
+                    'id': 'start-1',
+                    'type': 'start',
+                    'x': 100,
+                    'y': 120,
+                    'data': {
+                        'title': 'Start',
+                        'content': 'Start your chatbot flow here',
+                        'useAI': False,
+                    },
+                    'outputs': ['output-1'],
+                }],
+                'connections': [],
+            }
         }
         serializer = ChatbotSerializer(data=data)
         if serializer.is_valid():
@@ -195,18 +198,18 @@ class CreateEmptyChatbotAPIView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatbotRetrieveUpdateDestroyAPIView(APIView):
-    permission_classes = [IsAuthenticated] # Requires authentication
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         try:
             # Ensure the user can only access their own chatbots
             return Chatbot.objects.get(pk=pk, user=self.request.user)
         except Chatbot.DoesNotExist:
-            raise Http404 # Raise 404 if not found or not owned by user
+            raise Http404
 
     def get(self, request, pk, *args, **kwargs):
         """
-        Retrieves a single chatbot by its ID.
+        Retrieves a single chatbot by its ID for the authenticated user.
         """
         chatbot = self.get_object(pk)
         serializer = ChatbotSerializer(chatbot)
@@ -214,10 +217,10 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
 
     def put(self, request, pk, *args, **kwargs):
         """
-        Updates an existing chatbot by its ID.
+        Updates an existing chatbot by its ID for the authenticated user.
         """
         chatbot = self.get_object(pk)
-        serializer = ChatbotSerializer(chatbot, data=request.data, partial=True) # Allow partial updates
+        serializer = ChatbotSerializer(chatbot, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save(user=request.user) # Ensure user is still associated correctly
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -225,7 +228,7 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
 
     def delete(self, request, pk, *args, **kwargs):
         """
-        Deletes a chatbot by its ID.
+        Deletes a chatbot by its ID for the authenticated user.
         """
         chatbot = self.get_object(pk)
         chatbot.delete()
@@ -233,25 +236,31 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatbotConfigView(APIView):
-    permission_classes = [IsAuthenticated] # Requires authentication for the class
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         """
         API endpoint to save/update a chatbot's configuration by name.
-        Creates if not exists, updates if exists.
+        Creates if not exists, updates if exists, for the authenticated user.
         """
-        bot_name = request.data.get('botName')
+        bot_name = request.data.get('botName') # This name is from frontend, needs to map to 'name' in model
         if not bot_name:
             return Response(
                 {"error": "Chatbot name ('botName') is required in the request body."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Prepare data for serializer, mapping 'botName' to 'name'
+        data_for_serializer = request.data.copy()
+        data_for_serializer['name'] = bot_name # Map frontend 'botName' to model 'name'
+        if 'botName' in data_for_serializer: # Remove original botName if it conflicts with serializer
+            del data_for_serializer['botName']
+
         try:
-            chatbot_instance = Chatbot.objects.get(botName=bot_name, user=request.user)
-            serializer = ChatbotSerializer(instance=chatbot_instance, data=request.data, partial=True) # Allow partial updates
+            chatbot_instance = Chatbot.objects.get(name=bot_name, user=request.user) # Filter by 'name' and 'user'
+            serializer = ChatbotSerializer(instance=chatbot_instance, data=data_for_serializer, partial=True)
         except Chatbot.DoesNotExist:
-            serializer = ChatbotSerializer(data=request.data)
+            serializer = ChatbotSerializer(data=data_for_serializer)
 
         if serializer.is_valid():
             chatbot = serializer.save(user=request.user)
@@ -259,13 +268,12 @@ class ChatbotConfigView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, bot_name, *args, **kwargs): # Note: This GET method expects 'bot_name' in URL path
+    def get(self, request, bot_name, *args, **kwargs):
         """
         Handles loading a chatbot's configuration by its name for the authenticated user.
         """
-        # Removed redundant permission_classes = [IsAuthenticated] line inside the method
         try:
-            chatbot = Chatbot.objects.get(botName=bot_name, user=request.user) # Filter by user
+            chatbot = Chatbot.objects.get(name=bot_name, user=request.user) # Filter by 'name' and 'user'
             serializer = ChatbotSerializer(chatbot)
             return Response(serializer.data)
         except Chatbot.DoesNotExist:
@@ -280,7 +288,7 @@ class ChatbotConfigView(APIView):
             )
 
 class WelcomeView(APIView):
-    permission_classes = [AllowAny] # Allow anyone to access this welcome message
+    permission_classes = [AllowAny]
     def get(self, request):
         return JsonResponse({"message": "Welcome to the Chatbot Builder Backend API!"})
 
