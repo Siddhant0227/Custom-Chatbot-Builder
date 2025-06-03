@@ -1,43 +1,140 @@
 // src/components/DashboardPage.tsx
-import React, { useState, useEffect } from 'react'; // Import React for React.FC
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './DashboardPage.css'; // Ensure this points to your CSS file
+import { useAuth } from '../AuthContext.tsx';
+import './DashboardPage.css';
 
-// Define the Chatbot interface for type safety
+// Helper function to get CSRF token from cookies
+const getCookie = (name) => {
+  let cookieValue: string | null = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+};
+
 interface Chatbot {
   id: string;
   name: string;
-  lastUpdated: string;
+  configuration: {
+    welcomeMessage: string;
+    fallbackMessage: string;
+    nodes: Array<any>;
+    connections: Array<any>;
+  };
+  user: string;
+  created_at: string;
+  updated_at: string;
 }
 
 const DashboardPage: React.FC = () => {
-  // Use type annotations for useState
+  const { isAuthenticated } = useAuth();
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // Explicitly boolean
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Define the mock data with the Chatbot type
-    const mockData: Chatbot[] = [
-      { id: 'mock-1', name: 'HR Assistant Bot', lastUpdated: '2025-05-30' },
-      { id: 'mock-2', name: 'Customer Support Bot', lastUpdated: '2025-05-28' },
-      { id: 'mock-3', name: 'Sales Assistant Bot', lastUpdated: '2025-05-25' },
-      { id: 'mock-4', name: 'Technical Support Bot', lastUpdated: '2025-05-20' },
-    ];
+    const fetchChatbots = async () => {
+      if (!isAuthenticated) {
+        setLoading(false);
+        setError("You must be logged in to view chatbots.");
+        return;
+      }
 
-    const timer = setTimeout(() => {
-      setChatbots(mockData);
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch('/api/chatbots/', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data: Chatbot[] = await response.json();
+          setChatbots(data);
+        } else {
+          const errorData = await response.json();
+          setError(errorData.message || errorData.detail || "Failed to fetch chatbots.");
+          console.error("API Error fetching chatbots:", errorData);
+        }
+      } catch (err) {
+        console.error("Network error fetching chatbots:", err);
+        setError("Network error. Could not connect to the server to fetch chatbots.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChatbots();
+  }, [isAuthenticated]);
+
+  // --- REVERTED handleCreateNew FUNCTION TO MAKE API CALL ---
+  const handleCreateNew = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const csrftoken = getCookie('csrftoken'); // Get CSRF token for POST request
+      console.log('CSRF Token being sent:', csrftoken); // DEBUGGING LINE
+
+      const initialConfiguration = {
+        welcomeMessage: 'Hello! How can I help you today?',
+        fallbackMessage: "I'm sorry, I don't understand. Can you please rephrase?",
+        nodes: [{
+          id: 'start-1',
+          type: 'start',
+          x: 100,
+          y: 120,
+          data: {
+            title: 'Start',
+            content: 'Start your chatbot flow here',
+            useAI: false,
+          },
+          outputs: ['output-1'],
+        }],
+        connections: [],
+      };
+
+      const response = await fetch('/api/chatbots/create_empty/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken || '', // Include CSRF token
+        },
+        body: JSON.stringify({
+          name: `New Chatbot ${new Date().toLocaleString()}`,
+          configuration: initialConfiguration
+        })
+      });
+
+      if (response.ok) {
+        const newChatbot = await response.json();
+        navigate(`/build/${newChatbot.id}`);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || errorData.detail || "Failed to create new chatbot.");
+        console.error("API Error creating new chatbot:", errorData);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Network error creating chatbot:", err);
+      setError("Network error. Could not create chatbot.");
       setLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleCreateNew = () => {
-    navigate('/welcome');
+    }
   };
+  // --- END REVERTED handleCreateNew FUNCTION ---
 
-  // Add type annotation for the 'id' parameter
   const handleEditChatbot = (id: string) => {
     navigate(`/build/${id}`);
   };
@@ -56,10 +153,12 @@ const DashboardPage: React.FC = () => {
         </button>
       </div>
 
+      {error && <p className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '20px' }}>{error}</p>}
+
       {loading ? (
         <div className="loading-spinner">
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-loader animate-spin">
-            <line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="4.93" x2="7.76" y1="4.93" y2="7.76"/><line x1="16.24" x2="19.07" y1="16.24" y2="19.07"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/><line x1="4.93" x2="7.76" y1="19.07" y2="16.24"/><line x1="16.24" x2="19.07" y1="7.76" y2="4.93"/>
+            <line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="4.93" x2="7.76" y1="4.93" y2="7.76"/><line x1="16.24" x2="19.07" y1="16.24" y1="19.07"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/><line x1="4.93" x2="7.76" y1="19.07" y2="16.24"/><line x1="16.24" x2="19.07" y1="7.76" y2="4.93"/>
           </svg>
           <p>Loading chatbots...</p>
         </div>
@@ -82,12 +181,12 @@ const DashboardPage: React.FC = () => {
         </div>
       ) : (
         <div className="chatbot-grid">
-          {chatbots.map((chatbot: Chatbot) => ( 
+          {chatbots.map((chatbot: Chatbot) => (
             <div key={chatbot.id} className="chatbot-card">
               <div className="card-header">
                 <div className="chatbot-info">
                   <h3>{chatbot.name}</h3>
-                  <span className="status-badge status-active">Active</span>
+                  <span className="status-badge status-active">Owned by: {chatbot.user}</span>
                 </div>
                 <div className="card-actions">
                   <button onClick={() => handleEditChatbot(chatbot.id)} className="btn-edit">
@@ -103,20 +202,20 @@ const DashboardPage: React.FC = () => {
                 </div>
               </div>
               <div className="card-category">
-                <span className="category-tag">Customer Service</span>
+                <span className="category-tag">Owner: {chatbot.user}</span>
               </div>
               <div className="card-stats">
                 <div className="stat-item">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-square">
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
-                  <span>1,200 Interactions</span>
+                  <span>{chatbot.configuration?.nodes?.length || 0} Nodes</span>
                 </div>
                 <div className="stat-item">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users">
                       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
-                  <span>25 Active Users</span>
+                  <span>{chatbot.configuration?.connections?.length || 0} Connections</span>
                 </div>
               </div>
               <div className="card-footer">
@@ -124,7 +223,7 @@ const DashboardPage: React.FC = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-check">
                       <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/>
                   </svg>
-                  Last Updated: {chatbot.lastUpdated}
+                  Last Updated: {new Date(chatbot.updated_at).toLocaleDateString()}
                 </p>
               </div>
             </div>

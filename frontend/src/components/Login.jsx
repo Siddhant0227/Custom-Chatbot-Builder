@@ -1,8 +1,25 @@
-
-import { useState, useEffect } from 'react';
+// src/components/Login.jsx
+import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
 import './Login.css'
+
+// Helper function to get CSRF token from cookies
+const getCookie = (name) => { // Removed type annotation for 'name'
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+};
 
 const Login = () => {
   const { isAuthenticated, login } = useAuth();
@@ -13,10 +30,7 @@ const Login = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
-  // --- IMPORTANT: Removed the 'users' state and its useEffect for localStorage persistence. ---
-  // --- This logic is now handled by your Django backend. ---
-
-  const handleSubmit = async (e) => { // Make handleSubmit async
+  const handleSubmit = async (e) => { // Removed type annotation for 'e'
     e.preventDefault();
     setError('');
     setSuccessMessage('');
@@ -29,17 +43,16 @@ const Login = () => {
     try {
       let response;
       let data;
-      // Determine the API endpoint based on whether the user is registering or logging in
       const apiUrl = isRegistering ? '/api/register/' : '/api/login/';
+
+      // Get CSRF token
+      const csrftoken = getCookie('csrftoken');
 
       response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // If you need to send a CSRF token for Django (e.g., if not using token auth
-          // and Django's default session auth requires it for non-GET requests),
-          // you would fetch it from a cookie and include it here.
-          // Example: 'X-CSRFToken': getCookie('csrftoken'),
+          'X-CSRFToken': csrftoken || '', // Include CSRF token in header
         },
         body: JSON.stringify({ username, password }),
       });
@@ -86,6 +99,7 @@ const Login = () => {
 
   return (
     <>
+      {/* The CSS is assumed to be in Login.css or injected via a style tag as before */}
       <div className="login-container">
         <div className="login-card">
           <h2>{isRegistering ? 'Register' : 'Login'}</h2>
