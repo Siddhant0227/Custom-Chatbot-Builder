@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ChatbotPreview.css';
 import ReactDOM from 'react-dom/client';
 
@@ -7,9 +7,10 @@ import ReactDOM from 'react-dom/client';
  * @param {string} props.botName
  * @param {string} props.welcomeMessage
  * @param {string} props.fallbackMessage
- * @param {Array<Object>} props.nodes - The array of chatbot nodes
- * @param {Array<Object>} props.connections - The array of chatbot connections
+ * @param {Array<Object>} props.nodes 
+ * @param {Array<Object>} props.connections
  */
+
 function renderChatbotWidget(config) {
   const mountPoint = document.getElementById(config.mountId || 'my-chatbot-widget');
 
@@ -26,30 +27,28 @@ function renderChatbotWidget(config) {
         fallbackMessage={config.fallbackMessage}
         nodes={config.nodes}
         connections={config.connections}
-        // Add any other necessary props here
       />
     </React.StrictMode>
   );
 }
-
 window.MyChatbotWidget = {
   init: renderChatbotWidget,
 };
 
-export const getAIResponse = async (userMessage) => {
+export const getAIResponse = async (userMessage) => { // getAIResponse expects only userMessage
   try {
     console.log('Sending request to Groq API...');
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer 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`,
+        Authorization: `Bearer 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`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         model: "gemma2-9b-it",
         messages: [
           { role: "system", content: "You are a helpful chatbot assistant." },
-          { role: "user", content: userMessage },
+          { role: "user", content: userMessage }, 
         ],
         temperature: 0.7,
         max_tokens: 150,
@@ -77,6 +76,56 @@ export const getAIResponse = async (userMessage) => {
   } catch (error) {
     console.error("GROQ API error:", error);
     return `API Error: ${error.message || "Unknown error occurred"}`;
+  }
+};
+
+export const correctUserInputWithAI = async (userMessage) => {
+  try {
+    console.log('Sending user input to Groq API for correction...');
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer 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`, // <--- YOUR GROQ API KEY HERE
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gemma2-9b-it", // Or another suitable model
+        messages: [
+          {
+            role: "system",
+
+            content: "You are an AI assistant specialized in correcting grammatical mistakes, spelling errors, and awkward phrasing in user's input. Your sole task is to provide the grammatically correct and polished version of the user's message. Do NOT add any extra information, greetings, or explanations. Only return the corrected text. If the input is already perfect, return it as is."
+          },
+          { role: "user", content: userMessage },
+        ],
+        temperature: 0.1, 
+        max_tokens: 150,  
+      }),
+    }); if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Groq API Correction Error (${response.status}):`, errorText);
+     
+      return userMessage;
+    }
+
+    const data = await response.json();
+    console.log("Groq API Correction Response data:", data);
+
+    if (!data.choices || data.choices.length === 0) {
+      console.error("No choices in correction response:", data);
+      return userMessage; // Return original if no correction provided
+    }
+    let correctedText = data.choices[0].message.content.trim();
+
+    // The model might add markdown, so try to clean it if necessary
+    if (correctedText.startsWith('```') && correctedText.endsWith('```')) {
+        correctedText = correctedText.substring(correctedText.indexOf('\n') + 1, correctedText.lastIndexOf('```')).trim();
+    }
+    
+    return correctedText;
+  } catch (error) {
+    console.error("GROQ API correction error:", error);
+    return userMessage; // Return original message on error
   }
 };
 
@@ -125,15 +174,20 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
     setSelectedRating(0);
     setRatingMessage('');
   };
-
-  const startConversationHandler = () => {
+  
+ const startConversationHandler = () => {
+    console.log('startConversationHandler: Starting conversation...');
     setChatStarted(true);
-    // Find the 'start' node and begin the conversation from there
-    const startNode = nodes.find(node => node.id === 'start-1');
+
+    const startNode = nodes.find(node => node.id === 'start-1'); // Finds your 'Start' node
+    console.log('startConversationHandler: Found startNode:', startNode);
+
     if (startNode) {
-      setCurrentNodeId(startNode.id);
-      processNode(startNode);
+      setCurrentNodeId(startNode.id); // Sets current node to Start node
+      console.log('startConversationHandler: Setting currentNodeId to', startNode.id);
+      processNode(startNode);         // Processes the Start node
     } else {
+      console.warn('startConversationHandler: Start node with ID "start-1" not found. Falling back to welcome message.');
       addBotMessage(welcomeMessage || 'Hello! How can I help you with our ERP system today?', true);
     }
   };
@@ -144,64 +198,7 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
       { sender, message, isTyping, options, inputRequired },
     ]);
   };
-
-  const processUserMessage = async (message) => {
-    if (!message.trim()) return;
-
-    addMessageToConversation('user', message);
-    setUserMessage('');
-
-    addMessageToConversation('status', 'Delivered');
-    addMessageToConversation('bot', '', true); // Bot typing indicator
-
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate thinking time
-
-    setConversation((prevConv) =>
-      prevConv.filter((msg) => !(msg.sender === 'bot' && msg.isTyping))
-    ); // Remove typing indicator
-    let nextNode = null;
-    let aiResponse = null; // Initialize AI response variable
-
-    if (currentNodeId) {
-      const currentNode = nodes.find(node => node.id === currentNodeId);
-
-      if (currentNode) {
-        if (currentNode.data?.useAI) { // Check if 'useAI' is true for the current node
-          console.log("AI is enabled for this node. Getting AI response...");
-          aiResponse = await getAIResponse(message);
-          addBotMessage(aiResponse);
-          const singleConnection = connections.find(conn => conn.sourceId === currentNode.id);
-          if (singleConnection) {
-            nextNode = nodes.find(node => node.id === singleConnection.targetId);
-          }
-        } else {
-          if (currentNode.type === 'multichoice' || currentNode.type === 'button') {
-            const matchingConnection = connections.find(conn =>
-              conn.sourceId === currentNode.id && conn.sourceOutput === message
-            );
-            if (matchingConnection) {
-              nextNode = nodes.find(node => node.id === matchingConnection.targetId);
-            }
-          } else if (currentNode.type === 'textinput' || currentNode.type === 'message') {
-            const singleConnection = connections.find(conn => conn.sourceId === currentNode.id);
-            if (singleConnection) {
-              nextNode = nodes.find(node => node.id === singleConnection.targetId);
-            }
-          }
-        }
-      }
-    }
-
-    // Process the next node only if AI didn't take over or led to a next node
-    if (nextNode) {
-      setCurrentNodeId(nextNode.id);
-      processNode(nextNode, message);
-    } else if (!aiResponse) { 
-      addBotMessage(fallbackMessage || "I'm sorry, I didn't understand that. Can you please rephrase?");
-    }
-  };
-
-  const processNode = (node, userInputValue = '') => {
+    const processNode = (node, userInputValue = '') => {
     let messageContent = node.data?.content || '';
     let options = [];
     let inputRequired = false;
@@ -236,11 +233,103 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
         setShowRating(true);
         break;
       case 'end':
-        addBotMessage(messageContent);
-        addMessageToConversation('bot', 'Conversation ended. Would you like to start over?', false, [{ label: 'Restart', value: 'restart' }]);
+         addMessageToConversation(
+          'bot',  
+          messageContent + ' Would you like to start over?', // Combined message
+          false, // Not typing
+          [{ label: 'Restart', value: 'restart' }], // The restart option
+           false
+        );
         break;
       default:
         addBotMessage(`Unhandled node type: ${node.type}. Content: ${messageContent}`);
+    }
+  }
+
+  const processUserMessage = async (message) => {
+    
+    if (message.toLowerCase() === 'restart') {
+        console.log('Restart command detected. Executing close and open chat sequence.');
+        closeChatContainer();
+        openChatContainer();
+        return;
+    }
+
+    if (!message.trim()) return;
+
+    addMessageToConversation('user', message); // Add user's ORIGINAL message to conversation
+    setUserMessage(''); // Clear the input field
+
+    // --- NEW: Grammar correction step ---
+    addMessageToConversation('status', 'Correcting input...', false, [], false); // Show status
+    const correctedMessage = await correctUserInputWithAI(message); // Call the AI for correction
+
+    // Remove the "Correcting input..." status message
+    setConversation((prevConv) => prevConv.filter((msg, idx) => !(msg.sender === 'status' && msg.message === 'Correcting input...')));
+
+    // Optionally, show the user the corrected input (highly recommended for good UX)
+    if (correctedMessage.toLowerCase() !== message.toLowerCase()) { // Only show if a correction actually happened
+      addMessageToConversation('status', `(Corrected to: ${correctedMessage})`);
+     
+    }
+   
+
+    addMessageToConversation('status', 'Delivered'); // This status is for the original message flow
+    addMessageToConversation('bot', '', true); // Bot typing indicator
+
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate thinking time
+
+    setConversation((prevConv) =>
+        prevConv.filter((msg) => !(msg.sender === 'bot' && msg.isTyping))
+    ); // Remove typing indicator
+
+    let nextNode = null;
+    let aiResponseUsed = false;
+
+    if (currentNodeId) {
+        const currentNode = nodes.find(node => node.id === currentNodeId);
+
+        if (currentNode) {
+            // --- IMPORTANT: Use correctedMessage for all subsequent processing ---
+            if (currentNode.data?.useAI) {
+                console.log("AI is enabled for this node. Getting AI response...");
+                const ai_raw_response = await getAIResponse(correctedMessage); // Use corrected message here
+                addBotMessage(ai_raw_response);
+                aiResponseUsed = true;
+
+                const singleConnection = connections.find(conn => conn.sourceId === currentNode.id);
+                if (singleConnection) {
+                    nextNode = nodes.find(node => node.id === singleConnection.targetId);
+                }
+            } else {
+                // For non-AI nodes (multichoice, button, textinput), match against correctedMessage
+                if (currentNode.type === 'multichoice' || currentNode.type === 'button') {
+                    const matchingConnection = connections.find(conn =>
+                        conn.sourceId === currentNode.id && conn.sourceOutput === correctedMessage // Use corrected message here
+                    );
+                    if (matchingConnection) {
+                        nextNode = nodes.find(node => node.id === matchingConnection.targetId);
+                    }
+                } else if (currentNode.type === 'textinput' || currentNode.type === 'message') {
+                    const singleConnection = connections.find(conn => conn.sourceId === currentNode.id);
+                    if (singleConnection) {
+                        nextNode = nodes.find(node => node.id === singleConnection.targetId);
+                    }
+                }
+            }
+        }
+    }
+    if (nextNode) {
+        setCurrentNodeId(nextNode.id);
+        processNode(nextNode, correctedMessage); // Use corrected message here
+    } else if (!aiResponseUsed) {
+        addMessageToConversation(
+            'bot',
+            fallbackMessage || "I'm sorry, I didn't understand that. Would you like to start over?",
+            false,
+            [{ label: 'Restart', value: 'restart' }],
+            false
+        );
     }
   };
 
@@ -310,15 +399,19 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
   };
 
   const handleChatAgain = () => {
-    // Reset all states and restart the chat
+    console.log('handleChatAgain: Initiating full chatbot reset...');
     setShowRating(false);
     setRatingSubmitted(false);
     setSelectedRating(0);
     setRatingMessage('');
-    setConversation([]);
-    setCurrentNodeId(null);
-    setChatStarted(false);
-    startConversationHandler();
+    setConversation([]);       // Clears conversation history
+    setCurrentNodeId(null);    // Resets current node
+    setChatStarted(false);  
+    setTimeout(() => {
+        console.log('handleChatAgain: Calling startConversationHandler...');
+        startConversationHandler(); // This should initiate the conversation again
+    }, 100); // A small delay of 100ms
+   // This function will then re-initiate the conversation
   };
 
   return (
@@ -424,6 +517,7 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
                             key={optIndex}
                             className="predefined-btn"
                             onClick={() => handleOptionClick(option.value)}
+                            // Ensure disabled state matches your desired logic
                             disabled={index !== conversation.length - 1 || conversation[conversation.length - 1]?.inputRequired || showRating}
                           >
                             {option.label}
@@ -447,11 +541,13 @@ const ChatbotPreview = ({ botName, welcomeMessage, fallbackMessage, nodes, conne
                       handleUserTextInput();
                     }
                   }}
+                  // Ensure disabled state matches your desired logic
                   disabled={conversation.length > 0 && !conversation[conversation.length - 1].inputRequired && conversation[conversation.length - 1].options.length > 0}
                 />
                 <button
                   id="sendBtn"
                   onClick={handleUserTextInput}
+         
                   disabled={conversation.length > 0 && !conversation[conversation.length - 1].inputRequired && conversation[conversation.length - 1].options.length > 0}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

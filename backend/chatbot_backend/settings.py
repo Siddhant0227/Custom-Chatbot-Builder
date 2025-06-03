@@ -11,10 +11,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -40,12 +42,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'chatbotapi',
     'corsheaders',
+    'rest_framework.authtoken',
     # Remove 'Chatbot_builder' here because it's React, not Django
 ]
 
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Added for CORS support (must be first)
+    'corsheaders.middleware.CorsMiddleware',  # This should be the first one
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,7 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+  
 ]
 
 ROOT_URLCONF = 'chatbot_backend.urls'
@@ -129,4 +132,14 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings for React <> Django integration
-CORS_ALLOW_ALL_ORIGINS = True  # For development only — restrict in production!
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000", # Your React app's URL
+    "http://127.0.0.1:3000",
+    # Add any other origins your frontend might run on
+]
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]

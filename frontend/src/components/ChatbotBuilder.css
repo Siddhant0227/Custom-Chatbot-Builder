@@ -8,7 +8,7 @@
 }
 
 :root {
-  --primary-dark: #2c2c2c; /* Slightly softer dark for header */
+  --primary-dark: #2c2c2c; 
   --primary-blue: #2196F3;
   --accent-green: #4CAF50;
   --accent-red: #f44336;
@@ -26,8 +26,8 @@
   --bg-white: #ffffff;
   --bg-sidebar: #ffffff; /* Explicitly white for sidebar */
   --bg-chat-light: #f9f9f9;
-  --border-default: #e0e0e0; /* Use playful-border-light for default borders */
-  --text-dark: #333333; /* Darker text for readability */
+  --border-default: #e0e0e0; 
+  --text-dark: #333333;
   --text-medium: #555555;
   --text-light: #888888;
 
@@ -84,16 +84,16 @@ textarea,
 .app-header {
   background-color: var(--primary-dark);
   color: white;
-  padding: 15px 25px; /* Increased padding */
-  box-shadow: 0 4px 20px var(--playful-shadow-medium); /* More prominent shadow */
+  padding: 15px 25px; 
+  box-shadow: 0 4px 20px var(--playful-shadow-medium);
   z-index: 20;
   transition: all 0.3s ease;
   border-bottom: 1px solid var(--playful-purple);
 }
 
 .app-header:hover {
-    background-color: #383838; /* Slightly lighter on hover */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Stronger playful shadow */
+    background-color: #383838; 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); 
     border-color: var(--playful-light-purple);
 }
 
@@ -101,16 +101,16 @@ textarea,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1300px; /* Slightly wider content area */
+  max-width: 1300px; 
   margin: 0 auto;
 }
 
 .app-title {
   margin: 0;
-  font-size: 2rem; /* Larger title */
+  font-size: 2rem; 
   font-weight: 700;
   color: #fff;
-  letter-spacing: -0.03em; /* Tighter letter spacing */
+  letter-spacing: -0.03em; 
   transition: color 0.3s ease;
 }
 
@@ -1414,13 +1414,13 @@ opacity: 0.95;
 }
 
 
-/* Content areas for main view sub-sections (Chatbot Settings, Node Types) */
+
 .sidebar-settings-content,
 .sidebar-node-types-content {
-  flex-grow: 1; /* Allow content to take remaining space */
-  overflow-y: auto; /* Allow scrolling within content if it's too long */
-  padding-right: 10px; /* Added padding for scrollbar */
-  padding-left: 5px; /* Slight left padding for balance */
+  flex-grow: 1; 
+  overflow-y: auto; 
+  padding-right: 10px; 
+  padding-left: 5px; 
    align-items: center;
 }
 
@@ -2531,7 +2531,6 @@ textarea.input-box {
   transform: scale(0.95);
 }
 
-/* --- Node Options Display (for multichoice/button nodes) --- */
 .node-options-display {
   padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm);
   margin-top: var(--spacing-sm);
@@ -2746,4 +2745,79 @@ textarea.input-box {
     right: auto;
     padding: 8px 12px;
   }
+}
+
+.node-option-item {
+    /* Change from display: flex; if it was set */
+    display: flex; /* Keep flex, but change direction */
+    flex-direction: column; /* This is the key change */
+    align-items: flex-start; /* Align items to the start of the column */
+    gap: 5px; /* Adjust spacing between label and value inputs */
+    margin-bottom: 15px; /* Add more space between option rows */
+    padding: 8px; /* Optional: Add some padding around each option group */
+    border: 1px solid #eee; /* Optional: Visually separate each option */
+    border-radius: 4px;
+}
+
+.node-option-item .input-box.small-input {
+    width: 100%; /* Make inputs take full width of their container */
+    /* Remove or adjust fixed width/flex-grow if you set them previously */
+    min-height: 30px;
+    padding: 5px 8px;
+    box-sizing: border-box;
+}
+
+.node-option-item .btn-delete-option {
+    margin-top: 5px; /* Add some space above the delete button */
+    align-self: flex-end; /* Align delete button to the right if in a column */
+}/* Existing CSS */
+
+/* --- Flow Builder Connections --- */
+.connections-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allows clicks to pass through to canvas for drag/drop */
+  overflow: visible; /* Ensure paths are not clipped if they extend slightly */
+}
+
+.connection-path {
+  fill: none;
+  stroke: var(--connection-color, #888); /* Default greyish color */
+  stroke-width: 2;
+  stroke-dasharray: 6 4; /* Creates the dashed effect (dash length, gap length) */
+  pointer-events: all; /* Make path clickable for deletion */
+  transition: stroke-width 0.1s ease; /* Smooth hover effect */
+}
+
+.connection-path:hover {
+  stroke: var(--primary-blue); /* Highlight on hover */
+  stroke-width: 3; /* Thicker on hover */
+}
+
+.connection-dot {
+  fill: var(--connection-color, #888); /* Color of the dots */
+  pointer-events: none; /* Dots themselves are not clickable, the path handles deletion */
+}
+
+.output-dot {
+  /* No specific styling needed beyond .connection-dot if they are identical */
+}
+
+.input-dot {
+  fill: var(--primary-blue); /* Filled blue circle for input */
+}
+
+/* Style for the temporary connection line while dragging */
+.flow-canvas-container .connections-layer line[stroke="#2196F3"] {
+  stroke-dasharray: 5 5; /* Dashed */
+}
+
+.connection-label {
+  font-size: 10px;
+  fill: #555; /* Color for the text label */
+  user-select: none;
+  pointer-events: none; /* Make text non-interactive */
 }
