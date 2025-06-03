@@ -1,13 +1,12 @@
-
+# chatbotapi/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated # You'll need this for authentication
-# from rest_framework.authentication import TokenAuthentication # If you are using TokenAuthentication
-from django.contrib.auth import authenticate # Keep if you use it for login, though DRF Simple JWT often handles this
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.http import JsonResponse, Http404 # Import Http404 for handling object not found
+from django.http import JsonResponse, Http404
 
 import json
 import os
@@ -16,19 +15,19 @@ from groq import Groq
 from .models import Chatbot
 from .serializers import ChatbotSerializer
 
+# Load GROQ_API_KEY from environment variables
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 if not GROQ_API_KEY:
     print("WARNING: GROQ_API_KEY not found in environment variables.")
 
-client = Groq(api_key=GROQ_API_KEY)
+# Initialize Groq client only if API key is available
+client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
-# --- Existing get_groq_response for Chatbot Replies (Scenario B) ---
+# --- AI Helper Functions ---
 def get_groq_response(full_conversation_messages):
-    if not GROQ_API_KEY:
-        return {"ai_response": "AI service not configured (API key missing)."}
-    if not client:
-        return {"ai_response": "AI service client not initialized properly."}
+    if not GROQ_API_KEY or not client:
+        return {"ai_response": "AI service not configured or client not initialized."}
 
     messages = [
         {"role": "system", "content": "You are a helpful chatbot. Based on the user's intent, decide if you need to route them to a specific part of the conversation flow. If no clear routing is needed, provide a direct text response. If you route, use the 'route_to_node' function and provide a clear, concise 'node_keyword' from the available options. Available node keywords are: 'loan_info', 'course_details', 'support_agent', 'general_greeting', 'thank_you'."}
@@ -81,12 +80,9 @@ def get_groq_response(full_conversation_messages):
         print(f"Error calling Groq API for chatbot response: {e}")
         return {"ai_response": f"Sorry, I'm having trouble connecting to the AI for a response: {e}"}
 
-# --- NEW: get_correction_response for Input Correction (Scenario A) ---
 def get_correction_response(text_to_correct):
-    if not GROQ_API_KEY:
+    if not GROQ_API_KEY or not client:
         return {"corrected_text": text_to_correct, "error": "AI service not configured."}
-    if not client:
-        return {"corrected_text": text_to_correct, "error": "AI service client not initialized."}
 
     try:
         chat_completion = client.chat.completions.create(
@@ -106,9 +102,11 @@ def get_correction_response(text_to_correct):
         return {"corrected_text": text_to_correct, "error": f"Correction service error: {e}"}
 
 
+# --- API Views ---
+
 @method_decorator(csrf_exempt, name='dispatch')
 class AIChatbotResponseView(APIView):
-    # Consider adding permission_classes=[IsAuthenticated]
+    permission_classes = [AllowAny] # Allow anyone to interact with the AI chatbot
     def post(self, request, *args, **kwargs):
         request_type = request.data.get('request_type', 'chatbot_response')
 
@@ -139,10 +137,9 @@ class AIChatbotResponseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-# --- NEW: View for Listing and Creating Chatbots (GET /api/chatbots/, POST /api/chatbots/) ---
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatbotListCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated] # Add this for authentication
+    permission_classes = [IsAuthenticated] # Requires authentication for listing/creating chatbots
 
     def get(self, request, *args, **kwargs):
         """
@@ -154,33 +151,23 @@ class ChatbotListCreateAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         """
-        Creates a new chatbot (can be used for general creation if needed,
-        though frontend uses create_empty for a specific flow).
+        Creates a new chatbot.
         """
-        # Frontend is sending { name: "New Chatbot X" } to create_empty, but this view
-        # is for a general list/create. If you want this endpoint to create,
-        # it should accept the full chatbot config, not just a name.
-        # For now, let's keep it simple and assume `create_empty` handles default creation.
-        # If your frontend tries to POST full config to /api/chatbots/, this is where it goes.
-        # For simplicity, if this is only for listing, you can remove the `post` method here.
-        # Or you can make it accept full config:
         serializer = ChatbotSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save(user=request.user) # Associate with the authenticated user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# --- NEW: View for Creating an Empty Chatbot (POST /api/chatbots/create_empty/) ---
 @method_decorator(csrf_exempt, name='dispatch')
 class CreateEmptyChatbotAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] # Requires authentication
 
     def post(self, request, *args, **kwargs):
         """
         Creates a new chatbot with default empty configuration for nodes and connections.
         """
-        # Default data for a new chatbot
         data = {
             'botName': request.data.get('name', 'New Chatbot'), # Use name from frontend if provided, else default
             'welcomeMessage': 'Hello! How can I help you today?',
@@ -198,7 +185,6 @@ class CreateEmptyChatbotAPIView(APIView):
                 'outputs': ['output-1'],
             }],
             'connections': [],
-            # 'user' will be set by serializer.save()
         }
         serializer = ChatbotSerializer(data=data)
         if serializer.is_valid():
@@ -206,17 +192,16 @@ class CreateEmptyChatbotAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# --- NEW: View for Retrieve, Update, Destroy (GET/PUT/DELETE /api/chatbots/<pk>/) ---
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatbotRetrieveUpdateDestroyAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] # Requires authentication
 
     def get_object(self, pk):
         try:
             # Ensure the user can only access their own chatbots
             return Chatbot.objects.get(pk=pk, user=self.request.user)
         except Chatbot.DoesNotExist:
-            raise Http404
+            raise Http404 # Raise 404 if not found or not owned by user
 
     def get(self, request, pk, *args, **kwargs):
         """
@@ -231,11 +216,9 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
         Updates an existing chatbot by its ID.
         """
         chatbot = self.get_object(pk)
-        # Ensure that the 'user' field is not updated by the client and
-        # any other read-only fields are handled by the serializer's meta options.
-        serializer = ChatbotSerializer(chatbot, data=request.data, partial=True) # Use partial=True for partial updates
+        serializer = ChatbotSerializer(chatbot, data=request.data, partial=True) # Allow partial updates
         if serializer.is_valid():
-            serializer.save(user=request.user) # Re-associate with user in case of partial or full update
+            serializer.save(user=request.user) # Ensure user is still associated correctly
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -247,21 +230,14 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
         chatbot.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-# --- Original ChatbotConfigView (Review its purpose) ---
-# If this is still used for POST to /api/save-chatbot/ or GET to /api/chatbot/<bot_name>/
-# it can remain, but its functionality might now overlap with ChatbotListCreateAPIView and
-# ChatbotRetrieveUpdateDestroyAPIView.
-# The frontend uses /api/chatbots/ for list/create and /api/chatbots/<id>/ for detail.
-# So, the 'save-chatbot' and 'chatbot/<bot_name>' paths likely need adjustment or removal.
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatbotConfigView(APIView):
-    permission_classes = [IsAuthenticated] # Add authentication here too if used
+    permission_classes = [IsAuthenticated] # Requires authentication for the class
 
     def post(self, request, *args, **kwargs):
         """
         API endpoint to save/update a chatbot's configuration by name.
-        This endpoint might be redundant if /api/chatbots/<id>/ (PUT) is used for updates.
+        Creates if not exists, updates if exists.
         """
         bot_name = request.data.get('botName')
         if not bot_name:
@@ -269,32 +245,24 @@ class ChatbotConfigView(APIView):
                 {"error": "Chatbot name ('botName') is required in the request body."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # In your serializer, ensure 'name' maps to 'botName' if needed.
-        # Assuming request.data contains all fields for the serializer
-        data_for_serializer = request.data.copy() # Use .copy() to modify request.data
-        data_for_serializer['botName'] = bot_name # Ensure botName is correctly mapped
 
         try:
-            # If using ID for lookup, retrieve by ID, not name
-            # Assuming you want to look up by name for this specific view
             chatbot_instance = Chatbot.objects.get(botName=bot_name, user=request.user)
-            serializer = ChatbotSerializer(instance=chatbot_instance, data=data_for_serializer, partial=False)
+            serializer = ChatbotSerializer(instance=chatbot_instance, data=request.data, partial=True) # Allow partial updates
         except Chatbot.DoesNotExist:
-            serializer = ChatbotSerializer(data=data_for_serializer)
+            serializer = ChatbotSerializer(data=request.data)
 
         if serializer.is_valid():
-            chatbot = serializer.save(user=request.user) # Link to current user
+            chatbot = serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED if serializer.instance._state.adding else status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, bot_name, *args, **kwargs):
+    def get(self, request, bot_name, *args, **kwargs): # Note: This GET method expects 'bot_name' in URL path
         """
-        Handles loading a chatbot's configuration by its name.
-        This endpoint might be redundant if /api/chatbots/<id>/ (GET) is used for retrieval.
+        Handles loading a chatbot's configuration by its name for the authenticated user.
         """
-        permission_classes = [IsAuthenticated]
+        # Removed redundant permission_classes = [IsAuthenticated] line inside the method
         try:
             chatbot = Chatbot.objects.get(botName=bot_name, user=request.user) # Filter by user
             serializer = ChatbotSerializer(chatbot)
@@ -310,8 +278,63 @@ class ChatbotConfigView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
 class WelcomeView(APIView):
-    # This view doesn't need authentication if it's just a public welcome message
+    permission_classes = [AllowAny] # Allow anyone to access this welcome message
     def get(self, request):
         return JsonResponse({"message": "Welcome to the Chatbot Builder Backend API!"})
+
+# --- Authentication Views ---
+class RegisterView(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        if not username or not password:
+            return Response(
+                {'message': 'Username and password are required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {'message': 'Username already exists. Please choose a different one.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            user = User.objects.create_user(username=username, password=password)
+            user.save()
+            return Response(
+                {'message': 'Registration successful!'},
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response(
+                {'message': f'Registration failed: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return Response(
+                {'message': 'Login successful!', 'username': user.username},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {'message': 'Invalid username or password.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        logout(request)
+        return Response(
+            {'message': 'Logged out successfully.'},
+            status=status.HTTP_200_OK
+        )

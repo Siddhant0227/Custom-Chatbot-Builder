@@ -1,4 +1,4 @@
-// src/components/Login.jsx
+
 import { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
@@ -10,32 +10,13 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false); // State to toggle between login and register
+  const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
-  // Load users from localStorage on component mount
-  // No type annotation needed for useState in JSX
-  const [users, setUsers] = useState(() => {
-    try {
-      const storedUsers = localStorage.getItem('users');
-      return storedUsers ? JSON.parse(storedUsers) : [];
-    } catch (e) {
-      console.error("Failed to parse users from localStorage:", e);
-      return [];
-    }
-  });
+  // --- IMPORTANT: Removed the 'users' state and its useEffect for localStorage persistence. ---
+  // --- This logic is now handled by your Django backend. ---
 
-  // Save users to localStorage whenever the users state changes
-  useEffect(() => {
-    try {
-      localStorage.setItem('users', JSON.stringify(users));
-    } catch (e) {
-      console.error("Failed to save users to localStorage:", e);
-    }
-  }, [users]);
-
-  // Removed type annotation for 'e' in handleSubmit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { // Make handleSubmit async
     e.preventDefault();
     setError('');
     setSuccessMessage('');
@@ -45,36 +26,60 @@ const Login = () => {
       return;
     }
 
-    if (isRegistering) {
-      // Registration logic
-      const userExists = users.some(user => user.username === username);
-      if (userExists) {
-        setError('Username already exists. Please choose a different one.');
-      } else {
-        // In a real app, hash the password before storing
-        // Removed explicit type for newUser
-        const newUser = { username, passwordHash: password }; // Using plain password for simplicity
-        setUsers(prevUsers => [...prevUsers, newUser]);
-        setSuccessMessage('Registration successful! You can now log in.');
-        setIsRegistering(false); // Switch to login mode after successful registration
-        setUsername(''); // Clear form fields
-        setPassword('');
-      }
-    } else {
-      // Login logic
-      const foundUser = users.find(
-        user => user.username === username && user.passwordHash === password
-      );
+    try {
+      let response;
+      let data;
+      // Determine the API endpoint based on whether the user is registering or logging in
+      const apiUrl = isRegistering ? '/api/register/' : '/api/login/';
 
-      if (foundUser) {
-        login(); // Mark as authenticated
-        navigate('/dashboard'); // Redirect to dashboard
+      response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // If you need to send a CSRF token for Django (e.g., if not using token auth
+          // and Django's default session auth requires it for non-GET requests),
+          // you would fetch it from a cookie and include it here.
+          // Example: 'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      // Check if the response is OK (status 2xx)
+      if (response.ok) {
+        data = await response.json(); // Parse JSON only if response is OK
+        if (isRegistering) {
+          setSuccessMessage('Registration successful! You can now log in.');
+          setIsRegistering(false); // Switch to login mode after successful registration
+          setUsername(''); // Clear form fields
+          setPassword('');
+        } else {
+          // On successful login, call the login function from AuthContext
+          // Pass the username so AuthContext can store it.
+          login(username);
+          navigate('/dashboard'); // Redirect to dashboard
+        }
       } else {
-        setError('Invalid username or password.');
+        // If response is not OK, try to parse error message from JSON
+        // Django REST Framework often returns errors in 'detail' or 'message' fields,
+        // or as an object with field-specific errors.
+        try {
+          data = await response.json();
+          setError(data.message || data.detail || JSON.stringify(data));
+        } catch (jsonError) {
+          // Fallback if the response is not valid JSON (e.g., HTML redirect page)
+          setError(`Request failed with status: ${response.status}. Please check server logs.`);
+          console.error("Failed to parse error response JSON:", jsonError);
+          console.error("Raw response:", await response.text()); // Log raw response for debugging
+        }
       }
+    } catch (error) {
+      // Catch network errors (e.g., server not running, CORS issues)
+      console.error('Network or API error:', error);
+      setError('An unexpected error occurred. Please check your network connection or server status.');
     }
   };
 
+  // If already authenticated, redirect to dashboard
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -109,12 +114,12 @@ const Login = () => {
             {isRegistering ? (
               <>
                 Already have an account?{' '}
-                <button onClick={() => setIsRegistering(false)}>Login</button>
+                <button type="button" onClick={() => setIsRegistering(false)}>Login</button>
               </>
             ) : (
               <>
                 Don't have an account?{' '}
-                <button onClick={() => setIsRegistering(true)}>Register</button>
+                <button type="button" onClick={() => setIsRegistering(true)}>Register</button>
               </>
             )}
           </div>
