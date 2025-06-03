@@ -3,6 +3,7 @@
 import './ChatbotBuilder.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ChatbotPreview from './ChatbotPreview';
+import { useNavigate } from 'react-router-dom';
 
 interface Rule {
   id: string;
@@ -84,9 +85,10 @@ const ChatbotBuilder = () => {
   ]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
 
-  const toggleSidebar = () => {
+  const toggleSidebar = () => { 
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
@@ -95,6 +97,10 @@ const ChatbotBuilder = () => {
     setSelectedNode(null);
     setActiveMainSidebarSubView('settings'); 
   };
+  const BacktoDashboard = () => {
+    navigate('/dashboard');
+
+  }
 
   useEffect(() => {
     if (nodes.length === 0) {
@@ -667,6 +673,10 @@ const exportChatbot = () => {
         <div className="header-content">
           <h1 className="app-title">No-Code Chatbot Builder</h1>
           <div className="header-buttons">
+            <button onClick={BacktoDashboard} className="btn btn-export">
+              Back
+            </button>
+
             <button onClick={exportChatbot} className="btn btn-export">
               Export Chatbot
             </button>
