@@ -1,38 +1,55 @@
-// Example of how your AuthContext.tsx might need to be structured
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+// src/AuthContext.tsx
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+// Define the shape of the AuthContext
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (username: string) => void; // login function should accept username
+  username: string | null;
+  login: (username: string, token: string) => void;
   logout: () => void;
-  username: string | null; // Add username to the context type
 }
 
+// Create the AuthContext with a default (null) value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [currentUsername, setCurrentUsername] = useState<string | null>(null); // State to hold the username
+// Define the AuthProvider component
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Initialize state from localStorage
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('authToken') ? true : false;
+  });
+  const [username, setUsername] = useState<string | null>(() => {
+    return localStorage.getItem('username') || null;
+  });
 
-  const login = (user: string) => {
+  // Login function: stores token and username in localStorage
+  const login = (newUsername: string, token: string) => {
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('username', newUsername);
     setIsAuthenticated(true);
-    setCurrentUsername(user); // Store the username when logging in
-    // You might also store tokens or user data in localStorage/sessionStorage here
+    setUsername(newUsername);
   };
 
+  // Logout function: removes token and username from localStorage
   const logout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
     setIsAuthenticated(false);
-    setCurrentUsername(null); // Clear username on logout
-    // Clear any stored tokens/user data
+    setUsername(null);
   };
+
+  // Optional: A useEffect to check token validity (e.g., if token expires, logout)
+  // For simplicity, we'll omit explicit token validation here, assuming tokens are long-lived
+  // or that backend will return 401/403 for invalid tokens.
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, username: currentUsername }}>
+    <AuthContext.Provider value={{ isAuthenticated, username, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// Custom hook to use the AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

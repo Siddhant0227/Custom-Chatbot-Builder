@@ -5,24 +5,12 @@ import { useAuth } from '../AuthContext.tsx';
 import './DashboardPage.css';
 
 // Define your API base URL
-const API_BASE_URL = 'http://127.0.0.1:8000'; // Make this a constant for easier management
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
-// Helper function to get CSRF token from cookies
-const getCookie = (name: string): string | null => { // Added type annotation for 'name'
-  let cookieValue: string | null = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-};
+// getCookie is no longer needed for token authentication in this file.
+// It can be safely removed.
 
+// Define interface for Chatbot for TypeScript clarity
 interface Chatbot {
   id: string;
   name: string;
@@ -32,16 +20,17 @@ interface Chatbot {
     nodes: Array<any>;
     connections: Array<any>;
   };
-  user: string;
+  user: string; // Assuming 'user' is a string (username) received from backend
   created_at: string;
   updated_at: string;
 }
 
-const DashboardPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const [chatbots, setChatbots] = useState<Chatbot[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const DashboardPage: React.FC = () => { // Explicitly typing the functional component
+  const { isAuthenticated, logout } = useAuth();
+  // Fix 1: Explicitly type 'error' state as string | null
+  const [chatbots, setChatbots] = useState<Chatbot[]>([]); // Fix 2: Explicitly type 'chatbots' state as Chatbot[]
+  const [loading, setLoading] = useState<boolean>(true); // Explicitly type 'loading' state
+  const [error, setError] = useState<string | null>(null); // Explicitly type 'error' state
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,35 +38,48 @@ const DashboardPage: React.FC = () => {
       if (!isAuthenticated) {
         setLoading(false);
         setError("You must be logged in to view chatbots.");
+        // Redirect to login if not authenticated
+        // navigate('/login');
         return;
       }
 
       setLoading(true);
       setError(null);
 
+      const authToken = localStorage.getItem('authToken'); // Get the authentication token
+      if (!authToken) {
+        setError("Authentication token not found. Please log in again.");
+        setLoading(false);
+        logout(); // Clear potentially stale auth state
+        navigate('/login'); // Redirect to login
+        return;
+      }
+
       try {
         const response = await fetch(`${API_BASE_URL}/api/chatbots/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            // CSRF token is generally not required for GET requests by Django's CSRF middleware,
-            // but including `credentials: 'include'` is still essential for session authentication.
-            // You can optionally remove 'X-CSRFToken' for GET requests if you wish,
-            // but it won't cause issues if left in.
-            'X-CSRFToken': getCookie('csrftoken') || '',
+            'Authorization': `Token ${authToken}`, // CRUCIAL: Send token in Authorization header
           },
-          credentials: 'include', // <--- Crucial: Ensures session cookie is sent
+          // credentials: 'include' is not needed for token auth.
         });
 
         if (response.ok) {
-          const data: Chatbot[] = await response.json();
+          const data: Chatbot[] = await response.json(); // Explicitly cast the response data
           setChatbots(data);
+        } else if (response.status === 401 || response.status === 403) {
+          const errorData = await response.json();
+          setError(errorData.detail || "Session expired or unauthorized. Please log in again.");
+          console.error("Authentication Error fetching chatbots:", errorData);
+          logout(); // Clear auth state in frontend
+          navigate('/login'); // Redirect to login
         } else {
           const errorData = await response.json();
           setError(errorData.message || errorData.detail || "Failed to fetch chatbots.");
           console.error("API Error fetching chatbots:", errorData);
         }
-      } catch (err) {
+      } catch (err: any) { // Catching err as any for network errors
         console.error("Network error fetching chatbots:", err);
         setError("Network error. Could not connect to the server to fetch chatbots.");
       } finally {
@@ -86,16 +88,22 @@ const DashboardPage: React.FC = () => {
     };
 
     fetchChatbots();
-  }, [isAuthenticated]); // Rerun effect if authentication status changes
+  }, [isAuthenticated, navigate, logout]); // Dependency array for useEffect
 
   const handleCreateNew = async () => {
     setLoading(true);
     setError(null);
 
-    try {
-      const csrftoken = getCookie('csrftoken');
-      console.log('CSRF Token being sent:', csrftoken); // DEBUGGING LINE
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      setError("Authentication token not found. Please log in to create a chatbot.");
+      setLoading(false);
+      logout();
+      navigate('/login');
+      return;
+    }
 
+    try {
       const initialConfiguration = {
         welcomeMessage: 'Hello! How can I help you today?',
         fallbackMessage: "I'm sorry, I don't understand. Can you please rephrase?",
@@ -118,32 +126,40 @@ const DashboardPage: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken || '', // Include CSRF token for POST
+          'Authorization': `Token ${authToken}`, // CRUCIAL: Send token in Authorization header
         },
         body: JSON.stringify({
           name: `New Chatbot ${new Date().toLocaleString()}`,
           configuration: initialConfiguration
         }),
-        credentials: 'include', // <--- Crucial: Ensures session cookie is sent
+        // credentials: 'include' is not needed for token auth.
       });
 
       if (response.ok) {
-        const newChatbot = await response.json();
-        navigate(`/build/${newChatbot.id}`); // Redirect to the builder page
+        const newChatbot: Chatbot = await response.json(); // Explicitly cast newChatbot
+        setChatbots(prevChatbots => [...prevChatbots, newChatbot]); // Add new chatbot to state
+        setLoading(false);
+        navigate(`/build/${newChatbot.id}`);
+      } else if (response.status === 401 || response.status === 403) {
+        const errorData = await response.json();
+        setError(errorData.detail || "Session expired or unauthorized. Please log in again.");
+        console.error("Authentication Error creating new chatbot:", errorData);
+        logout();
+        navigate('/login');
       } else {
         const errorData = await response.json();
         setError(errorData.message || errorData.detail || "Failed to create new chatbot.");
         console.error("API Error creating new chatbot:", errorData);
-        setLoading(false);
       }
-    } catch (err) {
+    } catch (err: any) { // Catching err as any for network errors
       console.error("Network error creating chatbot:", err);
       setError("Network error. Could not create chatbot.");
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleEditChatbot = (id: string) => {
+  const handleEditChatbot = (id: string) => { // Added type annotation for id
     navigate(`/build/${id}`);
   };
 
@@ -189,7 +205,7 @@ const DashboardPage: React.FC = () => {
         </div>
       ) : (
         <div className="chatbot-grid">
-          {chatbots.map((chatbot: Chatbot) => (
+          {chatbots.map((chatbot: Chatbot) => ( // Explicitly cast chatbot in map callback
             <div key={chatbot.id} className="chatbot-card">
               <div className="card-header">
                 <div className="chatbot-info">
@@ -204,7 +220,7 @@ const DashboardPage: React.FC = () => {
                   </button>
                   <button className="btn-settings">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-settings">
-                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.75 1.3a2 2 0 0 0 .73 2.73l.04.04a2 2 0 0 1 0 2.83l-.04.04a2 2 0 0 0-.73 2.73l.75 1.3a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.75-1.3a2 2 0 0 0-.73-2.73l-.04-.04a2 2 0 0 1 0-2.83l.04-.04a2 2 0 0 0 .73-2.73l-.75-1.3a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.75 1.3a2 2 0 0 0 .73 2.73l.04.04a2 2 0 0 1 0 2.83l-.04.04a2 2 0 0 0-.73 2.73l.75 1.3a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l-.75-1.3a2 2 0 0 0-.73-2.73l-.04-.04a2 2 0 0 1 0-2.83l.04-.04a2 2 0 0 0 .73-2.73l-.75-1.3a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
                     </svg>
                   </button>
                 </div>

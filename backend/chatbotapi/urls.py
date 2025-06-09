@@ -10,34 +10,26 @@ from .views import (
     RegisterView,
     LoginView,
     LogoutView,
-    WelcomeView, # Needed for the initial GET request from frontend to get CSRF token
+    WelcomeView, # Still useful for a simple API status check if needed
 )
 
 urlpatterns = [
-    # This endpoint is primarily used by the frontend to fetch the CSRF token
-    # (e.g., by hitting http://127.0.0.1:8000/api/)
+    # This endpoint is generally not used for authentication in Token Auth
+    # but can serve as a simple API endpoint for status checks or initial setup.
     path('', WelcomeView.as_view(), name='welcome_api'),
 
-    # Authentication Endpoints
+    # Authentication Endpoints - These return/consume tokens
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
 
-    # Chatbot Management Endpoints
-    # Lists all chatbots for the authenticated user and allows creating new ones
+    # Chatbot Management Endpoints - These require an authentication token
     path('chatbots/', ChatbotListCreateAPIView.as_view(), name='chatbot_list_create'),
-
-    # Creates a new empty chatbot for the authenticated user
     path('chatbots/create_empty/', CreateEmptyChatbotAPIView.as_view(), name='chatbot_create_empty'),
-
-    # Retrieves, Updates, or Deletes a specific chatbot by its ID
     path('chatbots/<str:pk>/', ChatbotRetrieveUpdateDestroyAPIView.as_view(), name='chatbot_detail'),
-
-    # Saves/Updates a chatbot's configuration (POST request)
     path('chatbots/config/', ChatbotConfigView.as_view(), name='chatbot_config_post'),
-    # Retrieves a chatbot's configuration by name (GET request)
     path('chatbots/config/<str:bot_name>/', ChatbotConfigView.as_view(), name='chatbot_config_get'),
 
-    # AI Response Endpoint
+    # AI Response Endpoint - Does not require authentication by default
     path('ai/response/', AIChatbotResponseView.as_view(), name='ai_chatbot_response'),
 ]

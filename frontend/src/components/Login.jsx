@@ -1,29 +1,15 @@
 // src/components/Login.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react'; // Removed useEffect as it's no longer needed for CSRF token fetching
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
 import './Login.css';
 
 // Define your API base URL for consistency
-// IMPORTANT: Ensure this matches how your Django server is actually running (localhost vs 127.0.0.1)
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
-// Helper function to get CSRF token from cookies
-const getCookie = (name) => {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-};
+// getCookie is no longer needed in Login.jsx for authentication tokens
+// You can remove this function entirely if no other part of Login.jsx uses it.
+// const getCookie = (name) => { ... };
 
 const Login = () => {
   const { isAuthenticated, login } = useAuth();
@@ -34,33 +20,8 @@ const Login = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
-  // useEffect to fetch CSRF token on component mount
-  // This sends an initial GET request to Django to ensure the 'csrftoken' cookie is set in the browser.
-  // This is crucial for subsequent POST requests that require CSRF token.
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      try {
-        // Hitting a simple Django endpoint like '/' or '/api/' which the WelcomeView handles
-        // will trigger Django's CSRF middleware to set the csrftoken cookie.
-        const response = await fetch(`${API_BASE_URL}/api/`, {
-          method: 'GET',
-          credentials: 'include', // Important: Tells the browser to send/accept cookies
-        });
-        if (response.ok) {
-          console.log("Initial GET to Django backend performed to get CSRF token.");
-          // At this point, the csrftoken cookie should be available in document.cookie
-        } else {
-          console.error("Failed initial GET to Django backend:", response.status);
-          // You might want to display a user-friendly error about backend connectivity
-        }
-      } catch (err) {
-        console.error("Network error during initial CSRF token fetch:", err);
-        setError("Could not connect to the backend to initialize. Please check server status.");
-      }
-    };
-
-    fetchCsrfToken();
-  }, []); // Empty dependency array ensures this effect runs only once on mount
+  // No useEffect needed here for fetching CSRF token.
+  // Token authentication doesn't rely on CSRF cookies being set for authentication.
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,17 +35,19 @@ const Login = () => {
 
     try {
       const apiUrl = isRegistering ? `${API_BASE_URL}/api/register/` : `${API_BASE_URL}/api/login/`;
-      const csrftoken = getCookie('csrftoken'); // Now, this should successfully retrieve the token!
-      console.log('CSRF Token being sent (Login/Register):', csrftoken); // Debugging line
 
+      // With token auth, we don't send CSRF token for login/register POSTs directly,
+      // as they are typically public endpoints designed to issue a token.
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken || '', // Include CSRF token in header for POST requests
         },
         body: JSON.stringify({ username, password }),
-        credentials: 'include', // Crucial: Ensures cookies are sent with cross-origin requests
+        // credentials: 'include' is not strictly necessary for token auth login/register
+        // as we are not relying on session cookies being sent/received by the browser.
+        // However, keeping it doesn't hurt.
+        // credentials: 'include',
       });
 
       if (response.ok) {
@@ -94,12 +57,21 @@ const Login = () => {
           setIsRegistering(false);
           setUsername('');
           setPassword('');
+          // Optional: automatically log in after registration if backend returns token
+          if (data.token) {
+              login(data.username, data.token);
+              navigate('/dashboard');
+          }
         } else {
-          login(username); // Call the login function from AuthContext to update UI state
-          navigate('/dashboard'); // Redirect to dashboard on successful login
+          if (data.token) { // Ensure the token is in the response
+            login(data.username, data.token); // Store token and username
+            navigate('/dashboard'); // Redirect to dashboard
+          } else {
+            setError('Login successful, but no token received.');
+            console.error('Login successful, but no token received:', data);
+          }
         }
       } else {
-        // Handle API errors (e.g., invalid credentials, registration errors)
         try {
           const errorData = await response.json();
           setError(errorData.message || errorData.detail || JSON.stringify(errorData));
@@ -107,17 +79,15 @@ const Login = () => {
         } catch (jsonError) {
           setError(`Request failed with status: ${response.status}. Failed to parse error response.`);
           console.error("Failed to parse error response JSON:", jsonError);
-          console.error("Raw response:", await response.text()); // Log raw response for debugging
+          console.error("Raw response:", await response.text());
         }
       }
     } catch (err) {
-      // Catch network errors (e.g., server not running, CORS issues before response)
       console.error('Network or API error during login/register:', err);
       setError('An unexpected error occurred. Please check your network connection or server status.');
     }
   };
 
-  // If already authenticated, redirect to dashboard
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }

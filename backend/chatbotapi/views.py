@@ -6,10 +6,16 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+# Import Token model
+from rest_framework.authtoken.models import Token # <--- NEW IMPORT
 
-# Ensure this import is present!
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie # Added ensure_csrf_cookie
-from django.utils.decorators import method_decorator
+# No need for csrf_exempt or ensure_csrf_cookie on these APIViews
+# as authentication will primarily be via TokenAuthentication
+# and CSRF becomes less of a concern for these endpoints.
+# You can remove these imports if they are no longer used anywhere else in the file.
+# from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+# from django.utils.decorators import method_decorator
+
 
 from django.http import JsonResponse, Http404
 
@@ -29,7 +35,7 @@ if not GROQ_API_KEY:
 client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
-# --- AI Helper Functions ---
+# --- AI Helper Functions (No change here) ---
 def get_groq_response(full_conversation_messages):
     """
     Interacts with the Groq API to generate a chatbot response or route to a specific node.
@@ -117,9 +123,9 @@ def get_correction_response(text_to_correct):
 
 # --- API Views ---
 
-# This view is publicly accessible (AllowAny) and doesn't require session authentication
-# for its primary function. Keeping csrf_exempt here is acceptable if it's a public API.
-@method_decorator(csrf_exempt, name='dispatch')
+# This view is publicly accessible (AllowAny) and doesn't require authentication.
+# No @method_decorator(csrf_exempt, name='dispatch') needed here
+# as it's not performing any session-modifying actions.
 class AIChatbotResponseView(APIView):
     permission_classes = [AllowAny]
 
@@ -152,9 +158,8 @@ class AIChatbotResponseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-# Removed @method_decorator(csrf_exempt, name='dispatch')
-# This view requires authentication (IsAuthenticated) and needs Django's session/CSRF middleware
-# to correctly identify the user based on the sessionid cookie and validate the CSRF token.
+# All authenticated views below use IsAuthenticated, relying on TokenAuthentication from settings.
+# No @method_decorator(csrf_exempt, name='dispatch') is needed for these.
 class ChatbotListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -162,7 +167,6 @@ class ChatbotListCreateAPIView(APIView):
         """
         Lists all chatbots owned by the authenticated user.
         """
-        # Filter chatbots by the currently authenticated user
         chatbots = Chatbot.objects.filter(user=request.user)
         serializer = ChatbotSerializer(chatbots, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -173,14 +177,10 @@ class ChatbotListCreateAPIView(APIView):
         """
         serializer = ChatbotSerializer(data=request.data)
         if serializer.is_valid():
-            # Automatically set the 'user' field to the authenticated user
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# Removed @method_decorator(csrf_exempt, name='dispatch')
-# This view requires authentication (IsAuthenticated) and needs Django's session/CSRF middleware.
 class CreateEmptyChatbotAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -190,8 +190,8 @@ class CreateEmptyChatbotAPIView(APIView):
         associating it with the authenticated user.
         """
         data = {
-            'name': request.data.get('name', 'New Chatbot'), # Use 'name' to match model field
-            'configuration': { # Store initial config in the JSONField
+            'name': request.data.get('name', 'New Chatbot'),
+            'configuration': {
                 'welcomeMessage': 'Hello! How can I help you today?',
                 'fallbackMessage': "I'm sorry, I don't understand. Can you please rephrase?",
                 'nodes': [{
@@ -211,19 +211,16 @@ class CreateEmptyChatbotAPIView(APIView):
         }
         serializer = ChatbotSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=request.user) # Associate with the authenticated user
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Removed @method_decorator(csrf_exempt, name='dispatch')
-# This view requires authentication (IsAuthenticated) and needs Django's session/CSRF middleware.
 class ChatbotRetrieveUpdateDestroyAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         """Helper to get a chatbot instance ensuring it belongs to the authenticated user."""
         try:
-            # Ensure the user can only access their own chatbots
             return Chatbot.objects.get(pk=pk, user=self.request.user)
         except Chatbot.DoesNotExist:
             raise Http404
@@ -243,7 +240,7 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
         chatbot = self.get_object(pk)
         serializer = ChatbotSerializer(chatbot, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save(user=request.user) # Ensure user is still associated correctly
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -255,8 +252,6 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
         chatbot.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# Removed @method_decorator(csrf_exempt, name='dispatch')
-# This view requires authentication (IsAuthenticated) and needs Django's session/CSRF middleware.
 class ChatbotConfigView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -265,21 +260,20 @@ class ChatbotConfigView(APIView):
         API endpoint to save/update a chatbot's configuration by name.
         Creates if not exists, updates if exists, for the authenticated user.
         """
-        bot_name = request.data.get('botName') # This name is from frontend, needs to map to 'name' in model
+        bot_name = request.data.get('botName')
         if not bot_name:
             return Response(
                 {"error": "Chatbot name ('botName') is required in the request body."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Prepare data for serializer, mapping 'botName' to 'name'
         data_for_serializer = request.data.copy()
-        data_for_serializer['name'] = bot_name # Map frontend 'botName' to model 'name'
-        if 'botName' in data_for_serializer: # Remove original botName if it conflicts with serializer
+        data_for_serializer['name'] = bot_name
+        if 'botName' in data_for_serializer:
             del data_for_serializer['botName']
 
         try:
-            chatbot_instance = Chatbot.objects.get(name=bot_name, user=request.user) # Filter by 'name' and 'user'
+            chatbot_instance = Chatbot.objects.get(name=bot_name, user=request.user)
             serializer = ChatbotSerializer(instance=chatbot_instance, data=data_for_serializer, partial=True)
         except Chatbot.DoesNotExist:
             serializer = ChatbotSerializer(data=data_for_serializer)
@@ -292,10 +286,10 @@ class ChatbotConfigView(APIView):
 
     def get(self, request, bot_name, *args, **kwargs):
         """
-        Handles loading a chatbot's configuration by its name for the authenticated user.
+        Retrieves a chatbot's configuration by its name for the authenticated user.
         """
         try:
-            chatbot = Chatbot.objects.get(name=bot_name, user=request.user) # Filter by 'name' and 'user'
+            chatbot = Chatbot.objects.get(name=bot_name, user=request.user)
             serializer = ChatbotSerializer(chatbot)
             return Response(serializer.data)
         except Chatbot.DoesNotExist:
@@ -309,26 +303,20 @@ class ChatbotConfigView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-# Added @method_decorator(ensure_csrf_cookie, name='dispatch')
-# This decorator forces Django to set the csrftoken cookie in the response header.
-# This is crucial for the frontend to retrieve it before making POST requests.
-@method_decorator(ensure_csrf_cookie, name='dispatch')
+# This is a simple welcome endpoint, generally for checking if the backend is live.
+# No specific authentication or CSRF handling needed as it's not a modifying operation.
 class WelcomeView(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
-        """A simple welcome endpoint."""
-        return JsonResponse({"message": "Welcome to the Chatbot Builder Backend API! This endpoint sets CSRF cookie."})
+        return JsonResponse({"message": "Welcome to the Chatbot Builder Backend API!"})
 
 # --- Authentication Views ---
-# These views are for establishing sessions (login/register).
-# Keeping @method_decorator(csrf_exempt, name='dispatch') is standard practice here
-# as the frontend typically handles CSRF tokens for these initial non-authenticated POSTs.
-@method_decorator(csrf_exempt, name='dispatch')
+
 class RegisterView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny] # Anyone can register
 
     def post(self, request):
-        """Registers a new user."""
+        """Registers a new user and creates an authentication token for them."""
         username = request.data.get('username')
         password = request.data.get('password')
         if not username or not password:
@@ -344,8 +332,10 @@ class RegisterView(APIView):
         try:
             user = User.objects.create_user(username=username, password=password)
             user.save()
+            # <--- NEW: Create a token for the newly registered user
+            token, created = Token.objects.get_or_create(user=user)
             return Response(
-                {'message': 'Registration successful!'},
+                {'message': 'Registration successful!', 'token': token.key, 'username': user.username},
                 status=status.HTTP_201_CREATED
             )
         except Exception as e:
@@ -354,20 +344,19 @@ class RegisterView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-# Keep @method_decorator(csrf_exempt, name='dispatch') here.
-@method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny] # Anyone can attempt to login
 
     def post(self, request):
-        """Authenticates a user and establishes a session."""
+        """Authenticates a user and returns an authentication token."""
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user) # This successfully sets the sessionid cookie!
+            # <--- NEW: Get or create the token for the authenticated user
+            token, created = Token.objects.get_or_create(user=user)
             return Response(
-                {'message': 'Login successful!', 'username': user.username},
+                {'message': 'Login successful!', 'token': token.key, 'username': user.username}, # <--- Send the token back
                 status=status.HTTP_200_OK
             )
         else:
@@ -376,16 +365,21 @@ class LoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-# Removed @method_decorator(csrf_exempt, name='dispatch')
-# This view requires authentication (IsAuthenticated) to log out the correct user.
-# It needs Django's session/CSRF middleware to correctly identify the session.
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] # Only logged-in users can log out
 
     def post(self, request):
-        """Logs out the authenticated user."""
-        logout(request)
-        return Response(
-            {'message': 'Logged out successfully.'},
-            status=status.HTTP_200_OK
-        )
+        """Deletes the authentication token, effectively logging out the user."""
+        try:
+            # <--- NEW: Delete the user's token
+            request.user.auth_token.delete()
+            return Response(
+                {'message': 'Logged out successfully.'},
+                status=status.HTTP_200_OK
+            )
+        except AttributeError:
+            # User might not have a token or already logged out
+            return Response(
+                {'message': 'No active token found for this user.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
