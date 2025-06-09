@@ -1,15 +1,11 @@
 // src/components/Login.jsx
-import React, { useState } from 'react'; // Removed useEffect as it's no longer needed for CSRF token fetching
+import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
 import './Login.css';
 
 // Define your API base URL for consistency
 const API_BASE_URL = 'http://127.0.0.1:8000';
-
-// getCookie is no longer needed in Login.jsx for authentication tokens
-// You can remove this function entirely if no other part of Login.jsx uses it.
-// const getCookie = (name) => { ... };
 
 const Login = () => {
   const { isAuthenticated, login } = useAuth();
@@ -19,9 +15,6 @@ const Login = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
-
-  // No useEffect needed here for fetching CSRF token.
-  // Token authentication doesn't rely on CSRF cookies being set for authentication.
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,18 +29,12 @@ const Login = () => {
     try {
       const apiUrl = isRegistering ? `${API_BASE_URL}/api/register/` : `${API_BASE_URL}/api/login/`;
 
-      // With token auth, we don't send CSRF token for login/register POSTs directly,
-      // as they are typically public endpoints designed to issue a token.
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
-        // credentials: 'include' is not strictly necessary for token auth login/register
-        // as we are not relying on session cookies being sent/received by the browser.
-        // However, keeping it doesn't hurt.
-        // credentials: 'include',
       });
 
       if (response.ok) {

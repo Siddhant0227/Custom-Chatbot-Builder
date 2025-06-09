@@ -6,15 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-# Import Token model
-from rest_framework.authtoken.models import Token # <--- NEW IMPORT
-
-# No need for csrf_exempt or ensure_csrf_cookie on these APIViews
-# as authentication will primarily be via TokenAuthentication
-# and CSRF becomes less of a concern for these endpoints.
-# You can remove these imports if they are no longer used anywhere else in the file.
-# from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-# from django.utils.decorators import method_decorator
+from rest_framework.authtoken.models import Token
 
 
 from django.http import JsonResponse, Http404
@@ -123,9 +115,6 @@ def get_correction_response(text_to_correct):
 
 # --- API Views ---
 
-# This view is publicly accessible (AllowAny) and doesn't require authentication.
-# No @method_decorator(csrf_exempt, name='dispatch') needed here
-# as it's not performing any session-modifying actions.
 class AIChatbotResponseView(APIView):
     permission_classes = [AllowAny]
 
@@ -158,8 +147,6 @@ class AIChatbotResponseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-# All authenticated views below use IsAuthenticated, relying on TokenAuthentication from settings.
-# No @method_decorator(csrf_exempt, name='dispatch') is needed for these.
 class ChatbotListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -267,19 +254,39 @@ class ChatbotConfigView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        data_for_serializer = request.data.copy()
-        data_for_serializer['name'] = bot_name
-        if 'botName' in data_for_serializer:
-            del data_for_serializer['botName']
+        # --- START OF MODIFIED SECTION ---
+        # Extract the fields that belong in the 'configuration' dictionary
+        configuration_data = {
+            'welcomeMessage': request.data.get('welcomeMessage'),
+            'fallbackMessage': request.data.get('fallbackMessage'),
+            'nodes': request.data.get('nodes'),
+            'connections': request.data.get('connections'),
+            'mountId': request.data.get('mountId'),
+            # Add any other fields from frontend that should be part of the chatbot's configuration
+            # If your frontend sends other root-level properties that should be part of
+            # the configuration JSON, include them here.
+        }
+
+        # Construct the final data structure that matches what ChatbotSerializer expects
+        data_for_serializer = {
+            'name': bot_name, # This maps to the 'name' field in your Chatbot model
+            'configuration': configuration_data # This maps to the 'configuration' JSONField in your Chatbot model
+        }
+        # --- END OF MODIFIED SECTION ---
+
 
         try:
             chatbot_instance = Chatbot.objects.get(name=bot_name, user=request.user)
+            # When updating, partial=True allows sending only a subset of fields.
+            # However, if 'configuration' is a JSONField, sending the whole object is typical.
             serializer = ChatbotSerializer(instance=chatbot_instance, data=data_for_serializer, partial=True)
         except Chatbot.DoesNotExist:
+            # If chatbot doesn't exist, create a new one
             serializer = ChatbotSerializer(data=data_for_serializer)
 
         if serializer.is_valid():
             chatbot = serializer.save(user=request.user)
+            # Determine status based on whether it was created or updated
             return Response(serializer.data, status=status.HTTP_201_CREATED if serializer.instance._state.adding else status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -303,8 +310,6 @@ class ChatbotConfigView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-# This is a simple welcome endpoint, generally for checking if the backend is live.
-# No specific authentication or CSRF handling needed as it's not a modifying operation.
 class WelcomeView(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
@@ -313,10 +318,9 @@ class WelcomeView(APIView):
 # --- Authentication Views ---
 
 class RegisterView(APIView):
-    permission_classes = [AllowAny] # Anyone can register
+    permission_classes = [AllowAny]
 
     def post(self, request):
-        """Registers a new user and creates an authentication token for them."""
         username = request.data.get('username')
         password = request.data.get('password')
         if not username or not password:
@@ -332,7 +336,6 @@ class RegisterView(APIView):
         try:
             user = User.objects.create_user(username=username, password=password)
             user.save()
-            # <--- NEW: Create a token for the newly registered user
             token, created = Token.objects.get_or_create(user=user)
             return Response(
                 {'message': 'Registration successful!', 'token': token.key, 'username': user.username},
@@ -345,18 +348,16 @@ class RegisterView(APIView):
             )
 
 class LoginView(APIView):
-    permission_classes = [AllowAny] # Anyone can attempt to login
+    permission_classes = [AllowAny]
 
     def post(self, request):
-        """Authenticates a user and returns an authentication token."""
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            # <--- NEW: Get or create the token for the authenticated user
             token, created = Token.objects.get_or_create(user=user)
             return Response(
-                {'message': 'Login successful!', 'token': token.key, 'username': user.username}, # <--- Send the token back
+                {'message': 'Login successful!', 'token': token.key, 'username': user.username},
                 status=status.HTTP_200_OK
             )
         else:
@@ -366,19 +367,16 @@ class LoginView(APIView):
             )
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated] # Only logged-in users can log out
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """Deletes the authentication token, effectively logging out the user."""
         try:
-            # <--- NEW: Delete the user's token
             request.user.auth_token.delete()
             return Response(
                 {'message': 'Logged out successfully.'},
                 status=status.HTTP_200_OK
             )
         except AttributeError:
-            # User might not have a token or already logged out
             return Response(
                 {'message': 'No active token found for this user.'},
                 status=status.HTTP_400_BAD_REQUEST
