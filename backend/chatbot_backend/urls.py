@@ -1,9 +1,10 @@
+
 # chatbot_backend/urls.py
 
 from django.contrib import admin
 from django.urls import path, include
 # WelcomeView imported here if you want a top-level welcome page for the entire Django project
-from chatbotapi.views import WelcomeView 
+from chatbotapi.views import WelcomeView # This is fine if you want WelcomeView at the root
 
 urlpatterns = [
     path('admin/', admin.site.urls), # Django Admin panel
@@ -12,7 +13,8 @@ urlpatterns = [
     # So, paths like '/api/login/', '/api/chatbots/', etc., will work
     path('api/', include('chatbotapi.urls')),
 
-    # This path is for the root of your Django project (e.g., http://127.0.0.1:8000/)
-    # It serves a simple welcome message if accessed directly.
+    # Optional: A welcome page at the root of your Django project (e.g., http://127.0.0.1:8000/)
     path('', WelcomeView.as_view(), name='welcome_root'),
+    # REMOVE THIS LINE:
+    # path('save-chatbot/', views.save_chatbot, name='save-chatbot'),
 ]

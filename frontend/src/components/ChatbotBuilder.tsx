@@ -213,7 +213,7 @@ const exportChatbot = () => {
     };
 
     // 1. --- Send data to Django Backend ---
-    fetch('http://localhost:8000/api/save-chatbot/', { // <-- IMPORTANT: This is your Django backend URL
+    fetch('http://localhost:8000/api/chatbots/config/', { // Correct endpoint for saving chatbot config
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
