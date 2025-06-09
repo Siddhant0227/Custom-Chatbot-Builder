@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-# Import AllowAny for temporary insecure testing
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 
@@ -149,12 +148,11 @@ class AIChatbotResponseView(APIView):
             )
 
 class ChatbotListCreateAPIView(APIView):
-    # TEMPORARY: AllowAny for testing. REVERT THIS FOR PRODUCTION.
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         """
-        Lists chatbots belonging to the authenticated user.
+        Lists all chatbots owned by the authenticated user.
         """
         chatbots = Chatbot.objects.filter(user=request.user)
         serializer = ChatbotSerializer(chatbots, many=True)
@@ -162,7 +160,7 @@ class ChatbotListCreateAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         """
-        Creates a new chatbot, associated with the authenticated user.
+        Creates a new chatbot, associating it with the authenticated user.
         """
         serializer = ChatbotSerializer(data=request.data)
         if serializer.is_valid():
@@ -171,8 +169,7 @@ class ChatbotListCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CreateEmptyChatbotAPIView(APIView):
-    # TEMPORARY: AllowAny for testing. REVERT THIS FOR PRODUCTION.
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         """
@@ -206,8 +203,7 @@ class CreateEmptyChatbotAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ChatbotRetrieveUpdateDestroyAPIView(APIView):
-    # TEMPORARY: AllowAny for testing. REVERT THIS FOR PRODUCTION.
-    permission_classes = [IsAuthenticated] # Changed to IsAuthenticated
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         """Helper to get a chatbot instance ensuring it belongs to the authenticated user."""
@@ -218,7 +214,7 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
 
     def get(self, request, pk, *args, **kwargs):
         """
-        Retrieves a single chatbot by its ID. For insecure testing, this will retrieve any.
+        Retrieves a single chatbot by its ID for the authenticated user.
         """
         chatbot = self.get_object(pk)
         serializer = ChatbotSerializer(chatbot)
@@ -226,9 +222,9 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
 
     def put(self, request, pk, *args, **kwargs):
         """
-        Updates an existing chatbot by its ID, ensuring it belongs to the authenticated user.
+        Updates an existing chatbot by its ID for the authenticated user.
         """
-        chatbot = self.get_object(pk) # get_object already filters by user
+        chatbot = self.get_object(pk)
         serializer = ChatbotSerializer(chatbot, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -237,9 +233,9 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
 
     def delete(self, request, pk, *args, **kwargs):
         """
-        Deletes a chatbot by its ID, ensuring it belongs to the authenticated user.
+        Deletes a chatbot by its ID for the authenticated user.
         """
-        chatbot = self.get_object(pk) # get_object already filters by user
+        chatbot = self.get_object(pk)
         chatbot.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -294,6 +290,7 @@ class ChatbotConfigView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED if serializer.instance._state.adding else status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def get(self, request, bot_name, *args, **kwargs):
         """
         Retrieves a chatbot's configuration by its name for the authenticated user.

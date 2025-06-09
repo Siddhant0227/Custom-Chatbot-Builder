@@ -1,103 +1,881 @@
+/* --- Base Styles & Variables --- */
+:root {
+    /* NEW COLOR PALETTE - Deep Earth, Sunset & Ember Accents */
+    --primary-gradient: linear-gradient(135deg, #FF4500 0%, #FFD700 100%); /* OrangeRed to Gold */
+    --secondary-gradient: linear-gradient(135deg, #E65100 0%, #FFAB00 100%); /* Deep Orange to Amber */
+    --accent-color: #FF8C00; /* Dark Orange - for highlights */
+    --background-dark: #1A1A1A; /* Very dark charcoal */
+    --background-medium: #2C2C2C; /* Slightly lighter dark gray */
+    --surface-color: #3F3F3F; /* Dark gray for cards/panels */
+    --text-lightest: #F5F5F5; /* Near white for primary text */
+    --text-light: #D0D0D0; /* Lighter gray for secondary text */
+    --text-medium: #A0A0A0; /* Even lighter gray */
+    --border-dark: #505050;
+    --border-light: #6A6A6A;
+
+    /* Shadows remain similar, but might look better on dark backgrounds */
+    --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 12px 25px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.6);
+
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* --- Global & Utility Styles --- */
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    background: var(--background-dark); /* Darker background */
+    color: var(--text-lightest); /* Light text on dark background */
+    overflow-x: hidden; /* Prevent horizontal scroll on some animations */
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transitions */
+}
+
+/* --- Top Navigation Bar --- */
+.top-nav-bar {
+    background: rgba(26, 26, 26, 0.8); /* Semi-transparent dark background */
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border-dark);
+    backdrop-filter: blur(12px); /* Stronger blur for modern look */
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.nav-logo h1 {
+    font-size: 1.6rem; /* Slightly larger logo */
+    font-weight: 800;
+    margin: 0;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: var(--primary-gradient); /* Accent gradient for logo */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 10px rgba(255, 69, 0, 0.5); /* Subtle glow from gradient */
+}
+
+.nav-logo h1:hover {
+    transform: scale(1.08); /* More pronounced scale */
+    background: var(--secondary-gradient); /* Different gradient on hover */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 15px var(--accent-color); /* Stronger glow */
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* More spacing */
+}
+
+.btn-logout {
+    background: rgba(239, 68, 68, 0.9); /* Red is fine for logout */
+    color: white;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-logout:hover {
+    background: rgba(255, 99, 71, 1); /* Slightly brighter red on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 99, 71, 0.4);
+    border-color: rgba(255, 99, 71, 0.8);
+}
+
+.btn-logout:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(255, 99, 71, 0.2);
+}
+
+/* --- Dashboard Page Container --- */
+.dashboard-page {
+    max-width: 1500px; /* Slightly wider max-width */
+    margin: 0 auto;
+    padding: 3rem 2rem; /* More vertical padding */
+    min-height: calc(100vh - 60px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem; /* Increased spacing */
+}
+
+/* --- Loading Spinner --- */
+.loading-spinner, .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh; /* More central */
+    gap: 1.5rem;
+    color: var(--text-light);
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+.loading-spinner .lucide, .empty-state .lucide {
+    color: var(--accent-color); /* Vibrant icon color */
+    opacity: 0.8;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* --- Dashboard Header Section --- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 2.5rem; /* More generous padding */
+    background: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md); /* Stronger shadow */
+    border: 1px solid var(--border-dark);
+    gap: 2rem;
+    flex-wrap: wrap;
+    position: relative; /* For pseudo-elements / glow */
+    overflow: hidden;
+}
+
+/* Subtle border glow effect */
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: var(--primary-gradient);
+    filter: blur(15px); /* Glow effect */
+    border-radius: var(--border-radius-lg);
+    z-index: -1;
+    opacity: 0.3;
+    transition: opacity 0.5s ease;
+}
+
+.dashboard-header:hover::before {
+    opacity: 0.5; /* Stronger glow on hover */
+}
+
+
+.dashboard-header h1 {
+    font-size: 3rem; /* Larger, more impactful heading */
+    font-weight: 900; /* Extra bold */
+    margin: 0;
+    background: var(--primary-gradient); /* Use a warm, vibrant gradient */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    text-shadow: 0 2px 10px rgba(255, 69, 0, 0.4); /* Glow from the gradient */
+}
+
+.btn-create-chatbot {
+    background: var(--secondary-gradient); /* Use secondary for main CTA */
+    color: white;
+    padding: 1.2rem 2.5rem; /* Even more prominent */
+    border-radius: 50px;
+    font-size: 1.2rem; /* Larger font */
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px; /* More prominent letter spacing */
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Button hover animation: subtle internal shimmer/glow */
+.btn-create-chatbot::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: -1;
+}
+
+.btn-create-chatbot:hover::before {
+    left: 100%;
+}
+
+.btn-create-chatbot:hover {
+    transform: translateY(-5px); /* More dramatic lift */
+    box-shadow: var(--shadow-lg); /* Larger shadow on hover */
+    background: var(--secondary-gradient); /* Keep the same gradient or slightly adjust for effect */
+}
+
+.btn-create-chatbot svg {
+    stroke: white;
+    width: 22px; /* Larger icon */
+    height: 22px;
+}
+
+/* --- Stats Grid Section --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Slightly larger min-width */
+    gap: 2rem; /* Consistent spacing */
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: var(--surface-color);
+    padding: 2rem; /* More padding */
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-dark);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px); /* More lift */
+    box-shadow: var(--shadow-md); /* Stronger shadow */
+    border-color: var(--border-light);
+}
+
+.stat-icon {
+    background: var(--primary-gradient); /* Use primary gradient for icon background */
+    color: white;
+    padding: 0.9rem; /* Larger icon container */
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+/* Stat icon subtle pulse/glow on hover */
+.stat-card:hover .stat-icon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--accent-color);
+    border-radius: inherit;
+    filter: blur(10px);
+    opacity: 0.4;
+    transition: opacity 0.3s ease-in-out;
+    z-index: -1;
+}
+
+.stat-content h3 {
+    font-size: 2rem; /* Larger stat numbers */
+    font-weight: 800;
+    color: var(--text-lightest); /* Light text on dark card */
+    margin: 0;
+    background: var(--secondary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 1px 5px rgba(255, 171, 0, 0.3);
+}
+
+.stat-content p {
+    color: var(--text-light); /* Lighter gray */
+    font-size: 0.95rem;
+    margin: 0.4rem 0 0 0;
+    font-weight: 500;
+}
+
+/* --- Chatbots Section --- */
+.chatbot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* Larger min-width for cards */
+    gap: 2.5rem; /* Increased gap */
+    padding: 0 0 3rem 0;
+}
+
+.chatbot-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--border-radius-lg);
+    padding: 2.5rem; /* More internal padding */
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.chatbot-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px; /* Thicker accent line */
+    background: var(--primary-gradient);
+    border-top-left-radius: var(--border-radius-lg);
+    border-top-right-radius: var(--border-radius-lg);
+    transform: translateY(-100%); /* Start off-screen */
+    transition: transform 0.4s ease-out; /* Slide in on hover */
+}
+
+.chatbot-card:hover::before {
+    transform: translateY(0); /* Slide into view */
+}
+
+.chatbot-card:hover {
+    transform: translateY(-10px); /* Even more significant lift on hover */
+    box-shadow: 0 35px 50px -10px rgba(0, 0, 0, 0.4), 0 20px 30px -10px rgba(0, 0, 0, 0.15); /* More impactful shadow */
+    border-color: var(--border-light);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem; /* Adjusted spacing */
+    gap: 1.5rem;
+}
+
+.chatbot-info h3 {
+    font-size: 1.6rem; /* Larger title */
+    font-weight: 800;
+    color: var(--text-lightest);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+}
+
+.status-badge {
+    font-size: 0.8rem; /* Slightly larger badge text */
+    font-weight: 700;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em; /* More prominent spacing */
+    white-space: nowrap;
+}
+
+.status-active {
+    background: rgba(0, 150, 0, 0.15); /* Green for active status */
+    color: #00FF64; /* Electric green */
+}
+
+.status-inactive {
+    background: rgba(255, 50, 50, 0.15); /* Bright red for inactive */
+    color: #FF3232;
+}
+
+.status-draft {
+    background: rgba(255, 200, 0, 0.15); /* Golden yellow for draft */
+    color: #FFC800;
+}
+
+.card-actions {
+    display: flex;
+    gap: 1rem; /* Increased gap between buttons */
+    flex-shrink: 0;
+}
+
+.btn-edit, .btn-settings {
+    background: var(--background-medium); /* Darker background for buttons */
+    border: 1px solid var(--border-dark);
+    padding: 0.75rem; /* Larger buttons */
+    border-radius: 10px; /* Slightly more rounded */
+    color: var(--text-light); /* Lighter text color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+}
+
+.btn-edit:hover {
+    background: var(--primary-gradient); /* Gradient hover */
+    color: white;
+    border-color: transparent;
+    transform: translateY(-3px) scale(1.05); /* Lift and subtle scale */
+    box-shadow: 0 8px 20px rgba(255, 69, 0, 0.4); /* Glow shadow */
+}
+
+.btn-settings:hover {
+    background: var(--secondary-gradient); /* Different gradient for settings */
+    color: white;
+    border-color: transparent;
+    transform: translateY(-3px) scale(1.05); /* Lift and subtle scale */
+    box-shadow: 0 8px 20px rgba(255, 171, 0, 0.4); /* Glow shadow */
+}
+
+.card-category {
+    margin-bottom: 1.5rem;
+}
+
+.category-tag {
+    background: var(--background-medium); /* Darker tag background */
+    color: var(--text-light);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px; /* More rounded */
+    border: 1px solid var(--border-dark);
+    transition: all 0.3s ease;
+}
+
+.category-tag:hover {
+    background: var(--border-light);
+    color: var(--text-lightest);
+}
+
+.card-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Increased gap */
+    margin-bottom: 2rem; /* More spacing before footer */
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem; /* Consistent gap for icons and text */
+    color: var(--text-light);
+    font-size: 1rem; /* Slightly larger text */
+}
+
+.stat-item svg {
+    stroke: var(--text-light);
+    opacity: 0.7;
+    width: 20px; /* Larger icons */
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.card-footer {
+    border-top: 1px solid var(--border-dark); /* Darker border */
+    padding-top: 1.5rem; /* More padding */
+}
+
+.last-updated {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--text-medium); /* Slightly darker text for less prominence */
+    font-size: 0.95rem;
+}
+
+.last-updated svg {
+    stroke: var(--text-medium);
+    opacity: 0.7;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* --- Empty State --- */
+.empty-state h3 {
+    font-size: 2rem; /* More prominent message */
+    font-weight: 800;
+    color: var(--text-lightest);
+    margin: 0 0 1rem 0;
+}
+
+.empty-state p {
+    margin: 0 0 2.5rem 0; /* More spacing before button */
+    max-width: 600px; /* Wider text block */
+    line-height: 1.7;
+    color: var(--text-light);
+}
+
+.btn-create-empty {
+    background: var(--secondary-gradient);
+    color: white;
+    padding: 1.2rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Empty state button hover animation */
+.btn-create-empty::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: -1;
+}
+
+.btn-create-empty:hover::before {
+    left: 100%;
+}
+
+.btn-create-empty:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    background: var(--secondary-gradient);
+}
+
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .dashboard-page {
+        padding: 2rem 1.5rem;
+        gap: 2rem;
+    }
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem;
+        text-align: left;
+    }
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1.25rem;
+    }
+    .btn-create-chatbot {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem 1.8rem;
+        font-size: 1.1rem;
+    }
+    .chatbot-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    .chatbot-card {
+        padding: 2rem;
+    }
+    .chatbot-info h3 {
+        font-size: 1.4rem;
+    }
+    .empty-state h3 {
+        font-size: 1.75rem;
+    }
+    .empty-state p {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .top-nav-bar {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .nav-logo h1 {
+        font-size: 1.4rem;
+    }
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+    .btn-logout {
+        width: auto; /* Revert to auto width for smaller buttons */
+        padding: 0.6rem 1rem;
+    }
+    .dashboard-page {
+        padding: 1.5rem 1rem;
+    }
+    .dashboard-header {
+        padding: 1.25rem;
+    }
+    .dashboard-header h1 {
+        font-size: 2.2rem;
+    }
+    .chatbot-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .chatbot-card {
+        padding: 1.8rem;
+    }
+    .card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+    .card-actions {
+        justify-content: flex-end;
+    }
+    .btn-edit, .btn-settings {
+        padding: 0.6rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-nav-bar {
+        padding: 0.75rem;
+    }
+    .nav-logo h1 {
+        font-size: 1.25rem;
+    }
+    .dashboard-page {
+        padding: 1rem 0.75rem;
+    }
+    .dashboard-header h1 {
+        font-size: 1.75rem;
+    }
+    .btn-create-chatbot {
+        font-size: 1rem;
+        padding: 0.85rem 1.2rem;
+    }
+    .chatbot-card {
+        padding: 1.5rem;
+    }
+    .chatbot-info h3 {
+        font-size: 1.25rem;
+    }
+    .status-badge, .category-tag, .stat-item, .last-updated {
+        font-size: 0.8rem;
+    }
+    .empty-state h3 {
+        font-size: 1.5rem;
+    }
+    .empty-state p {
+        font-size: 0.95rem;
+    }
+    .btn-create-empty {
+        font-size: 1rem;
+        padding: 0.85rem 1.2rem;
+    }
+}
+
+/* --- Login Page Styles (Reimagined with NO BLUE SHADES) --- */
+
+/* Make sure your login page CSS file also has access to these :root variables,
+   or copy them into this file if it's separate. */
 
 .login-container {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Main background for the entire login page */
+    background: var(--background-dark); /* Using the deep almost black background */
+    min-height: 100vh; /* Ensures it takes full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    font-family: var(--font-family); /* Use consistent font family */
+    position: relative; /* For the background glow */
+    overflow: hidden; /* Ensure overflow from glow is hidden */
 }
+
+/* Add a subtle background glow to the container */
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255, 69, 0, 0.1) 0%, transparent 70%); /* Primary gradient glow */
+    animation: backgroundGlow 15s infinite alternate ease-in-out; /* Slow, pulsating glow */
+    z-index: -1; /* Behind other content */
+}
+
+@keyframes backgroundGlow {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
 
 .login-card {
-  background-color: #ffffff;
-  padding: 2.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  animation: slideFadeIn 0.6s ease-out;
+    background-color: var(--surface-color); /* Dark gray for the card */
+    padding: 3rem; /* More generous padding */
+    border-radius: var(--border-radius-lg); /* Larger border radius */
+    box-shadow: var(--shadow-lg); /* More impactful shadow */
+    width: 100%;
+    max-width: 450px; /* Slightly wider card */
+    animation: slideFadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother animation */
+    border: 1px solid var(--border-dark); /* Subtle dark border */
+    position: relative;
+    overflow: hidden; /* For the top accent line */
+    z-index: 10; /* Ensure it's above the background glow */
 }
 
+/* Top accent line for the card */
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px; /* Thicker accent line */
+    background: var(--primary-gradient); /* Use a vibrant gradient for the accent */
+    border-top-left-radius: var(--border-radius-lg);
+    border-top-right-radius: var(--border-radius-lg);
+    transform: translateY(-100%); /* Start off-screen */
+    animation: slideInTopAccent 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; /* Animate in on load */
+}
+
+@keyframes slideInTopAccent {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+
 .login-card h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: #4c51bf;
+    font-size: 2.2rem; /* Larger, more impactful heading */
+    margin-bottom: 2rem; /* More spacing */
+    text-align: center;
+    background: var(--primary-gradient); /* Gradient text for the title */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800; /* Bolder */
+    line-height: 1.2;
+    text-shadow: 0 2px 10px rgba(255, 69, 0, 0.4); /* Glow from the primary gradient */
 }
 
 .login-card input[type="text"],
 .login-card input[type="password"] {
-  width: 100%;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border: 1px solid #dcdcdc;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  transition: border-color 0.3s;
+    width: 100%;
+    padding: 1rem; /* More padding for inputs */
+    margin-bottom: 1.25rem; /* More spacing between inputs */
+    border: 1px solid var(--border-dark); /* Darker border */
+    border-radius: var(--border-radius-sm); /* Consistent radius */
+    font-size: 1.1rem; /* Larger font size for inputs */
+    background-color: var(--background-medium); /* Slightly darker background for inputs */
+    color: var(--text-lightest); /* Light text in inputs */
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .login-card input:focus {
-  border-color: #764ba2;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.2);
+    border-color: var(--accent-color); /* Bright Orange on focus */
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(255, 140, 0, 0.3); /* Electric glow on focus */
+    background-color: var(--surface-color); /* Slightly lighter on focus */
 }
 
-.login-card button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #5a67d8;
-  color: white;
-  font-size: 1rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.login-card button[type="submit"] { /* Explicitly target submit button */
+    width: 100%;
+    padding: 1rem; /* More prominent button */
+    background: var(--secondary-gradient); /* Use secondary gradient */
+    color: white;
+    font-size: 1.15rem; /* Larger font */
+    font-weight: 700;
+    border: none;
+    border-radius: var(--border-radius-sm); /* Consistent radius */
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
 }
 
-.login-card button:hover {
-  background-color: #434190;
+/* Button hover animation: subtle internal shimmer/glow */
+.login-card button[type="submit"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: -1;
+}
+
+.login-card button[type="submit"]:hover::before {
+    left: 100%;
+}
+
+.login-card button[type="submit"]:hover {
+    transform: translateY(-5px); /* More dramatic lift */
+    box-shadow: 0 15px 30px rgba(230, 81, 0, 0.4); /* Stronger glow shadow from secondary gradient */
+    background: var(--secondary-gradient); /* Keep the same gradient or slightly adjust for effect */
 }
 
 .login-card .error {
-  color: #e53e3e;
-  margin-bottom: 1rem;
-  text-align: center;
-  font-size: 0.95rem;
+    color: #FF3232; /* Bright red */
+    margin-top: 1rem; /* Add top margin for error */
+    margin-bottom: 1.5rem; /* More spacing */
+    text-align: center;
+    font-size: 1rem; /* Slightly larger error text */
+    font-weight: 500;
 }
 
 @keyframes slideFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(50px); /* Larger initial translateY */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
-.login-card button[type="submit"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(106, 5, 114, 0.4);
-  }
 
-  .login-card .toggle-mode {
-    margin-top: 1.5rem;
-    font-size: 0.95rem;
-    color: #555;
-  }
+.login-card .toggle-mode {
+    margin-top: 2rem; /* More spacing */
+    font-size: 1rem; /* Slightly larger font */
+    color: var(--text-light); /* Use text-light from new palette */
+    text-align: center;
+}
 
-  .login-card .toggle-mode button {
+.login-card .toggle-mode button {
     background: none;
     border: none;
-    color: #6a0572;
-    font-weight: 600;
+    background: var(--primary-gradient); /* Use primary gradient for toggle button text */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700; /* Bolder */
     cursor: pointer;
     text-decoration: underline;
-    transition: color 0.3s ease;
-  }
+    transition: all 0.3s ease;
+}
 
-  .login-card .toggle-mode button:hover {
-    color: #9a06a0;
-  }
-  
+.login-card .toggle-mode button:hover {
+    background: var(--accent-color); /* Hover effect using accent color */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 8px rgba(255, 140, 0, 0.5); /* Subtle glow on hover */
+    transform: scale(1.05); /* Slight scale for interaction */
+}

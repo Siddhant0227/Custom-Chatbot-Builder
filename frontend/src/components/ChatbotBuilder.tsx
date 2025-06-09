@@ -1,7 +1,8 @@
 import './ChatbotBuilder.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ChatbotPreview from './ChatbotPreview';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useParams } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 interface Rule {
   id: string;
@@ -48,6 +49,8 @@ interface NodeTypeDefinition {
   label: string;
 }
 
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 const ChatbotBuilder = () => {
   const [rules, setRules] = useState<Rule[]>([]); // This will now be dynamically generated for preview
   const [botName, setBotName] = useState('My Chatbot');
@@ -71,6 +74,7 @@ const ChatbotBuilder = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activeMainSidebarSubView, setActiveMainSidebarSubView] = useState<'settings' | 'nodeTypes'>('settings');
+  const [isLoadingChatbotData, setIsLoadingChatbotData] = useState(true);
   const [availableNodeTypes] = useState<NodeTypeDefinition[]>([
     { type: 'start', label: 'Start' },
     { type: 'message', label: 'Message' },
@@ -100,33 +104,34 @@ const ChatbotBuilder = () => {
   }
 
   useEffect(() => {
-    if (nodes.length === 0) {
-      setNodes([
-        {
-          id: 'start-1',
-          type: 'start',
-          x: 100,
-          y: 120,
-          data: {
-            title: 'Start',
-            content: 'Start your chatbot flow here',
-            useAI: false,
-          },
-          outputs: ['output-1'],
+  if (nodes.length === 0) {
+    setNodes([
+      {
+        id: 'start-1',
+        type: 'start',
+        x: 100,
+        y: 120,
+        data: {
+          title: 'Start',
+          content: 'Start your chatbot flow here',
+          useAI: false,
         },
-      ]);
-    }
-  }, [nodes.length, setNodes]); 
+        outputs: ['output-1'],
+      },
+    ]);
+  }
+}, [nodes.length, setNodes]);
 
 
-  useEffect(() => {
+
+useEffect(() => {
     if (canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
       setCanvasOffset({ x: rect.left, y: rect.top });
     }
   }, [canvasRef]);
 
-  useEffect(() => {
+useEffect(() => {
     if (isPreviewMode) {
       setIsInitialLoading(true);
       setConversation([{ sender: 'bot', message: '...', isTyping: true }]);
@@ -672,6 +677,7 @@ const exportChatbot = () => {
       reader.readAsText(file);
     }
   };
+  
 
 
   return (
