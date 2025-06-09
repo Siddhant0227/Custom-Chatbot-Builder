@@ -4,8 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
 import './DashboardPage.css';
 
+<<<<<<< Updated upstream
 // Define your API base URL
 const API_BASE_URL = 'http://127.0.0.1:8000';
+=======
+>>>>>>> Stashed changes
 
 // getCookie is no longer needed for token authentication in this file.
 // It can be safely removed.
@@ -20,7 +23,11 @@ interface Chatbot {
     nodes: Array<any>;
     connections: Array<any>;
   };
+<<<<<<< Updated upstream
   user: string; // Assuming 'user' is a string (username) received from backend
+=======
+  user: string; // This will be the username string from the backend
+>>>>>>> Stashed changes
   created_at: string;
   updated_at: string;
 }
@@ -33,9 +40,13 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
   const [error, setError] = useState<string | null>(null); // Explicitly type 'error' state
   const navigate = useNavigate();
 
+  // --- Removed hardcoded testUsername from here ---
+  // The 'Akash' username will be used when saving/exporting from the builder page.
+
   useEffect(() => {
     const fetchChatbots = async () => {
-      if (!isAuthenticated) {
+    if (!isAuthenticated) {
+
         setLoading(false);
         setError("You must be logged in to view chatbots.");
         // Redirect to login if not authenticated
@@ -56,24 +67,40 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
       }
 
       try {
+<<<<<<< Updated upstream
         const response = await fetch(`${API_BASE_URL}/api/chatbots/`, {
+=======
+        // Note: This GET request might still require authentication if backend is IsAuthenticated
+        // If you want it to work without login, you'd need to set ChatbotListCreateAPIView to AllowAny
+        // and ensure your backend handles GET requests without a 'user' query param if it's public.
+        const response = await fetch('/api/chatbots/', {
+>>>>>>> Stashed changes
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Token ${authToken}`, // CRUCIAL: Send token in Authorization header
           },
+<<<<<<< Updated upstream
           // credentials: 'include' is not needed for token auth.
+=======
+            credentials: 'include',
+>>>>>>> Stashed changes
         });
 
         if (response.ok) {
           const data: Chatbot[] = await response.json(); // Explicitly cast the response data
           setChatbots(data);
+<<<<<<< Updated upstream
         } else if (response.status === 401 || response.status === 403) {
           const errorData = await response.json();
           setError(errorData.detail || "Session expired or unauthorized. Please log in again.");
           console.error("Authentication Error fetching chatbots:", errorData);
           logout(); // Clear auth state in frontend
           navigate('/login'); // Redirect to login
+=======
+        } else if (response.status === 403 || response.status === 401) {
+            setError("Authentication required or session expired. Please log in again.");
+>>>>>>> Stashed changes
         } else {
           const errorData = await response.json();
           setError(errorData.message || errorData.detail || "Failed to fetch chatbots.");
@@ -86,6 +113,7 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
         setLoading(false);
       }
     };
+<<<<<<< Updated upstream
 
     fetchChatbots();
   }, [isAuthenticated, navigate, logout]); // Dependency array for useEffect
@@ -155,9 +183,25 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
       console.error("Network error creating chatbot:", err);
       setError("Network error. Could not create chatbot.");
     } finally {
+=======
+    // Fetch chatbots only if authenticated
+    if (isAuthenticated) {
+      fetchChatbots();
+    } else {
+>>>>>>> Stashed changes
       setLoading(false);
+      setError("Please log in to view your chatbots.");
     }
+  }, [isAuthenticated]); // Depend on isAuthenticated for fetching
+
+  const handleCreateNew = () => {
+       const mockChatbotId = 'new-mock-chatbot-id'; // A placeholder ID for the new chatbot
+    navigate(`/build/${mockChatbotId}`);
   };
+<<<<<<< Updated upstream
+=======
+  // --- END SIMPLIFIED handleCreateNew ---
+>>>>>>> Stashed changes
 
   const handleEditChatbot = (id: string) => { // Added type annotation for id
     navigate(`/build/${id}`);
