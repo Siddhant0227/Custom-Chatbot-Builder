@@ -1,3 +1,5 @@
+/* src/components/DashboardPage.css */
+
 /* --- Base Styles & Variables --- */
 :root {
     /* NEW COLOR PALETTE - Deep Ocean & Electric Accents */
@@ -40,84 +42,115 @@ button {
     transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transitions */
 }
 
-/* --- Top Navigation Bar --- */
-.top-nav-bar {
-    background: rgba(10, 25, 47, 0.8); /* Semi-transparent dark background */
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid var(--border-dark);
-    backdrop-filter: blur(12px); /* Stronger blur for modern look */
-    -webkit-backdrop-filter: blur(12px);
-}
-
-.nav-logo h1 {
-    font-size: 1.6rem; /* Slightly larger logo */
-    font-weight: 800;
-    margin: 0;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-    background: var(--secondary-gradient); /* Accent gradient for logo */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); /* Subtle glow */
-}
-
-.nav-logo h1:hover {
-    transform: scale(1.08); /* More pronounced scale */
-    background: var(--primary-gradient); /* Different gradient on hover */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 0 15px var(--accent-color); /* Stronger glow */
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem; /* More spacing */
-}
-
-.btn-logout {
-    background: rgba(239, 68, 68, 0.9); /* Red is fine for logout */
-    color: white;
-    border: 1px solid rgba(239, 68, 68, 0.5);
-    padding: 0.6rem 1.2rem;
-    border-radius: var(--border-radius-sm);
-    font-size: 0.9rem;
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-}
-
-.btn-logout:hover {
-    background: rgba(255, 99, 71, 1); /* Slightly brighter red on hover */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(255, 99, 71, 0.4);
-    border-color: rgba(255, 99, 71, 0.8);
-}
-
-.btn-logout:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(255, 99, 71, 0.2);
-}
-
 /* --- Dashboard Page Container --- */
 .dashboard-page {
     max-width: 1500px; /* Slightly wider max-width */
     margin: 0 auto;
-    padding: 3rem 2rem; /* More vertical padding */
-    min-height: calc(100vh - 60px);
+    padding: 0 2rem 3rem 2rem; /* Adjusted padding-top (moved to .dashboard-header) */
+    min-height: 100vh; /* Ensure it takes full viewport height */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 2.5rem; /* Increased spacing */
 }
+
+/* --- Dashboard Header Section (NOW STICKY) --- */
+.dashboard-header {
+    background: var(--background-dark); /* Solid background to prevent content show-through */
+    padding: 2rem 2.5rem; /* More generous padding */
+    border-radius: var(--border-radius-lg); /* Maintain rounded corners */
+    box-shadow: var(--shadow-md); /* Stronger shadow */
+    border: 1px solid var(--border-dark);
+    position: sticky; /* Makes the header stick to the top */
+    top: 0; /* Sticks to the very top of the viewport */
+    z-index: 50; /* Ensures it's above other content when scrolling */
+    display: flex; /* Arrange title and button side-by-side */
+    justify-content: space-between; /* Space between title and button */
+    align-items: center; /* Vertically align them */
+    margin-bottom: 2.5rem; /* Space between header and content below it */
+    overflow: hidden; /* For glow effect */
+}
+
+/* Subtle border glow effect for header */
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: var(--primary-gradient);
+    filter: blur(15px); /* Glow effect */
+    border-radius: var(--border-radius-lg);
+    z-index: -1;
+    opacity: 0.3;
+    transition: opacity 0.5s ease;
+}
+
+.dashboard-header:hover::before {
+    opacity: 0.5; /* Stronger glow on hover */
+}
+
+.dashboard-header h1 {
+    font-size: 3rem; /* Larger, more impactful heading */
+    font-weight: 900; /* Extra bold */
+    margin: 0;
+    background: var(--secondary-gradient); /* Use a fresh, vibrant gradient */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    text-shadow: 0 2px 10px rgba(146, 254, 157, 0.4); /* Glow from the gradient */
+}
+
+/* Styling for the Create New Chatbot button (inside dashboard-header) */
+.dashboard-header .btn-create-chatbot {
+    background: var(--primary-gradient); /* Use primary for main CTA */
+    color: white;
+    padding: 0.8rem 1.8rem; /* Adjusted padding */
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem; /* Space for icon and text */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1; /* Above pseudo-element */
+    text-decoration: none; /* In case it was an <a> in previous thoughts */
+}
+
+.dashboard-header .btn-create-chatbot::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: -1;
+}
+
+.dashboard-header .btn-create-chatbot:hover::before {
+    left: 100%;
+}
+
+.dashboard-header .btn-create-chatbot:hover {
+    transform: translateY(-2px); /* Subtle lift on hover */
+    box-shadow: var(--shadow-md); /* Stronger shadow on hover */
+    background: var(--primary-gradient); /* Keep the same gradient */
+}
+
+.dashboard-header .btn-create-chatbot svg {
+    stroke: white;
+    width: 20px;
+    height: 20px;
+}
+
 
 /* --- Loading Spinner --- */
 .loading-spinner, .empty-state {
@@ -146,103 +179,7 @@ button {
     to { transform: rotate(360deg); }
 }
 
-/* --- Dashboard Header Section --- */
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem 2.5rem; /* More generous padding */
-    background: var(--surface-color);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md); /* Stronger shadow */
-    border: 1px solid var(--border-dark);
-    gap: 2rem;
-    flex-wrap: wrap;
-    position: relative; /* For pseudo-elements / glow */
-    overflow: hidden;
-}
-
-/* Subtle border glow effect */
-.dashboard-header::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
-    background: var(--primary-gradient);
-    filter: blur(15px); /* Glow effect */
-    border-radius: var(--border-radius-lg);
-    z-index: -1;
-    opacity: 0.3;
-    transition: opacity 0.5s ease;
-}
-
-.dashboard-header:hover::before {
-    opacity: 0.5; /* Stronger glow on hover */
-}
-
-
-.dashboard-header h1 {
-    font-size: 3rem; /* Larger, more impactful heading */
-    font-weight: 900; /* Extra bold */
-    margin: 0;
-    background: var(--secondary-gradient); /* Use a fresh, vibrant gradient */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.1;
-    text-shadow: 0 2px 10px rgba(146, 254, 157, 0.4); /* Glow from the gradient */
-}
-
-.btn-create-chatbot {
-    background: var(--primary-gradient); /* Use primary for main CTA */
-    color: white;
-    padding: 1.2rem 2.5rem; /* Even more prominent */
-    border-radius: 50px;
-    font-size: 1.2rem; /* Larger font */
-    font-weight: 700;
-    box-shadow: var(--shadow-md);
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px; /* More prominent letter spacing */
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-}
-
-/* Button hover animation: subtle internal shimmer/glow */
-.btn-create-chatbot::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-    z-index: -1;
-}
-
-.btn-create-chatbot:hover::before {
-    left: 100%;
-}
-
-.btn-create-chatbot:hover {
-    transform: translateY(-5px); /* More dramatic lift */
-    box-shadow: var(--shadow-lg); /* Larger shadow on hover */
-    background: var(--primary-gradient); /* Keep the same gradient or slightly adjust for effect */
-}
-
-.btn-create-chatbot svg {
-    stroke: white;
-    width: 22px; /* Larger icon */
-    height: 22px;
-}
-
-/* --- Stats Grid Section --- */
+/* --- Stats Grid Section (Add this section to your HTML if desired) --- */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Slightly larger min-width */
@@ -503,6 +440,10 @@ button {
 }
 
 /* --- Empty State --- */
+.empty-state {
+    min-height: 70vh; /* Make it more prominent when no chatbots exist */
+}
+
 .empty-state h3 {
     font-size: 2rem; /* More prominent message */
     font-weight: 800;
@@ -535,7 +476,6 @@ button {
     z-index: 1;
 }
 
-/* Empty state button hover animation */
 .btn-create-empty::before {
     content: '';
     position: absolute;
@@ -562,24 +502,15 @@ button {
 /* --- Responsive Design --- */
 @media (max-width: 992px) {
     .dashboard-page {
-        padding: 2rem 1.5rem;
+        padding: 0 1.5rem 2rem 1.5rem; /* Adjusted padding */
         gap: 2rem;
     }
     .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start;
         padding: 1.5rem;
-        text-align: left;
+        margin-bottom: 2rem;
     }
     .dashboard-header h1 {
         font-size: 2.5rem;
-        margin-bottom: 1.25rem;
-    }
-    .btn-create-chatbot {
-        width: 100%;
-        justify-content: center;
-        padding: 1rem 1.8rem;
-        font-size: 1.1rem;
     }
     .chatbot-grid {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -600,46 +531,44 @@ button {
 }
 
 @media (max-width: 768px) {
-    .top-nav-bar {
-        padding: 1rem;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    .nav-logo h1 {
-        font-size: 1.4rem;
-    }
-    .nav-links {
-        width: 100%;
-        justify-content: center;
-        gap: 0.75rem;
-    }
-    .btn-logout {
-        width: auto; /* Revert to auto width for smaller buttons */
-        padding: 0.6rem 1rem;
-    }
     .dashboard-page {
-        padding: 1.5rem 1rem;
+        padding: 0 1rem 1.5rem 1rem; /* Adjusted padding */
     }
     .dashboard-header {
+        flex-direction: column; /* Stack title and button vertically */
+        align-items: flex-start; /* Align header content to the left */
         padding: 1.25rem;
+        gap: 1rem; /* Space between title and button */
+        margin-bottom: 1.5rem;
     }
     .dashboard-header h1 {
         font-size: 2.2rem;
     }
+    .dashboard-header .btn-create-chatbot {
+        width: auto; /* Allow button to size naturally */
+        padding: 0.7rem 1.4rem;
+        font-size: 0.85rem;
+        gap: 0.5rem;
+        align-self: flex-end; /* Push button to the right */
+    }
+    .dashboard-header .btn-create-chatbot svg {
+        width: 18px;
+        height: 18px;
+    }
     .chatbot-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Single column layout */
         gap: 1.5rem;
     }
     .chatbot-card {
         padding: 1.8rem;
     }
     .card-header {
-        flex-direction: column;
+        flex-direction: column; /* Stack card header elements */
         align-items: stretch;
         gap: 1rem;
     }
     .card-actions {
-        justify-content: flex-end;
+        justify-content: flex-end; /* Push action buttons to the right */
     }
     .btn-edit, .btn-settings {
         padding: 0.6rem;
@@ -648,21 +577,22 @@ button {
 }
 
 @media (max-width: 480px) {
-    .top-nav-bar {
-        padding: 0.75rem;
-    }
-    .nav-logo h1 {
-        font-size: 1.25rem;
-    }
     .dashboard-page {
-        padding: 1rem 0.75rem;
+        padding: 0 0.75rem 1rem 0.75rem; /* Adjusted padding */
+    }
+    .dashboard-header {
+        padding: 1rem;
     }
     .dashboard-header h1 {
         font-size: 2rem;
     }
-    .btn-create-chatbot {
-        font-size: 1rem;
-        padding: 0.85rem 1.2rem;
+    .dashboard-header .btn-create-chatbot {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.8rem;
+    }
+    .dashboard-header .btn-create-chatbot svg {
+        width: 16px;
+        height: 16px;
     }
     .chatbot-card {
         padding: 1.5rem;
