@@ -9,7 +9,7 @@ module.exports = function override(config, env) {
     config.output = {
       ...config.output,
       filename: 'my-chatbot-widget.bundle.js',
-      path: path.resolve(__dirname, 'build'), // Changed: Output path directly to 'build' folder
+      path: path.resolve(__dirname, 'build'), 
       library: 'MyChatbotWidget',
       libraryTarget: 'window',
       publicPath: '',
