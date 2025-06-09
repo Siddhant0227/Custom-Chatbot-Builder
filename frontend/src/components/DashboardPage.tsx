@@ -4,8 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
 import './DashboardPage.css';
 
+// Define your API base URL
+const API_BASE_URL = 'http://127.0.0.1:8000'; // Make this a constant for easier management
+
 // Helper function to get CSRF token from cookies
-const getCookie = (name) => {
+const getCookie = (name: string): string | null => { // Added type annotation for 'name'
   let cookieValue: string | null = null;
   if (document.cookie && document.cookie !== '') {
     const cookies = document.cookie.split(';');
@@ -53,11 +56,17 @@ const DashboardPage: React.FC = () => {
       setError(null);
 
       try {
-        const response = await fetch('/api/chatbots/', {
+        const response = await fetch(`${API_BASE_URL}/api/chatbots/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            // CSRF token is generally not required for GET requests by Django's CSRF middleware,
+            // but including `credentials: 'include'` is still essential for session authentication.
+            // You can optionally remove 'X-CSRFToken' for GET requests if you wish,
+            // but it won't cause issues if left in.
+            'X-CSRFToken': getCookie('csrftoken') || '',
           },
+          credentials: 'include', // <--- Crucial: Ensures session cookie is sent
         });
 
         if (response.ok) {
@@ -77,15 +86,14 @@ const DashboardPage: React.FC = () => {
     };
 
     fetchChatbots();
-  }, [isAuthenticated]);
+  }, [isAuthenticated]); // Rerun effect if authentication status changes
 
-  // --- REVERTED handleCreateNew FUNCTION TO MAKE API CALL ---
   const handleCreateNew = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const csrftoken = getCookie('csrftoken'); // Get CSRF token for POST request
+      const csrftoken = getCookie('csrftoken');
       console.log('CSRF Token being sent:', csrftoken); // DEBUGGING LINE
 
       const initialConfiguration = {
@@ -106,21 +114,22 @@ const DashboardPage: React.FC = () => {
         connections: [],
       };
 
-      const response = await fetch('/api/chatbots/create_empty/', {
+      const response = await fetch(`${API_BASE_URL}/api/chatbots/create_empty/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken || '', // Include CSRF token
+          'X-CSRFToken': csrftoken || '', // Include CSRF token for POST
         },
         body: JSON.stringify({
           name: `New Chatbot ${new Date().toLocaleString()}`,
           configuration: initialConfiguration
-        })
+        }),
+        credentials: 'include', // <--- Crucial: Ensures session cookie is sent
       });
 
       if (response.ok) {
         const newChatbot = await response.json();
-        navigate(`/build/${newChatbot.id}`);
+        navigate(`/build/${newChatbot.id}`); // Redirect to the builder page
       } else {
         const errorData = await response.json();
         setError(errorData.message || errorData.detail || "Failed to create new chatbot.");
@@ -133,7 +142,6 @@ const DashboardPage: React.FC = () => {
       setLoading(false);
     }
   };
-  // --- END REVERTED handleCreateNew FUNCTION ---
 
   const handleEditChatbot = (id: string) => {
     navigate(`/build/${id}`);
@@ -145,9 +153,9 @@ const DashboardPage: React.FC = () => {
         <h1>Your Chatbots</h1>
         <button onClick={handleCreateNew} className="btn-create-chatbot">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus-circle">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M8 12h8"/>
-              <path d="M12 8v8"/>
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12h8"/>
+            <path d="M12 8v8"/>
           </svg>
           Create New Chatbot
         </button>
@@ -158,15 +166,15 @@ const DashboardPage: React.FC = () => {
       {loading ? (
         <div className="loading-spinner">
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-loader animate-spin">
-            <line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="4.93" x2="7.76" y1="4.93" y2="7.76"/><line x1="16.24" x2="19.07" y1="16.24" y1="19.07"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/><line x1="4.93" x2="7.76" y1="19.07" y2="16.24"/><line x1="16.24" x2="19.07" y1="7.76" y2="4.93"/>
+            <line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="4.93" x2="7.76" y1="4.93" y2="7.76"/><line x1="16.24" x2="19.07" y1="16.24" y2="19.07"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/><line x1="4.93" x2="7.76" y1="19.07" y2="16.24"/><line x1="16.24" x2="19.07" y1="7.76" y2="4.93"/>
           </svg>
           <p>Loading chatbots...</p>
         </div>
       ) : chatbots.length === 0 ? (
         <div className="empty-state">
           <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-inbox-zero empty-icon">
-              <path d="M22 12h-4l-3 9L7 3l-3 9H2"/>
-              <path d="M5.45 12.91 2 22h20l-3.45-9.09C18.56 11.72 19 11.19 19 10.5c0-.9-.7-1.5-1.5-1.5h-11C5.7 9 5 9.6 5 10.5c0 .69.44 1.22.95 1.41z"/>
+            <path d="M22 12h-4l-3 9L7 3l-3 9H2"/>
+            <path d="M5.45 12.91 2 22h20l-3.45-9.09C18.56 11.72 19 11.19 19 10.5c0-.9-.7-1.5-1.5-1.5h-11C5.7 9 5 9.6 5 10.5c0 .69.44 1.22.95 1.41z"/>
           </svg>
           <h3>No Chatbots Yet!</h3>
           <p>It looks like you haven't created any chatbots. Start building your first one now!</p>

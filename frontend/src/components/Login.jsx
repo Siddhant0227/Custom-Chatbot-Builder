@@ -1,11 +1,15 @@
 // src/components/Login.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
-import './Login.css'
+import './Login.css';
+
+// Define your API base URL for consistency
+// IMPORTANT: Ensure this matches how your Django server is actually running (localhost vs 127.0.0.1)
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
 // Helper function to get CSRF token from cookies
-const getCookie = (name) => { // Removed type annotation for 'name'
+const getCookie = (name) => {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
     const cookies = document.cookie.split(';');
@@ -30,7 +34,35 @@ const Login = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => { // Removed type annotation for 'e'
+  // useEffect to fetch CSRF token on component mount
+  // This sends an initial GET request to Django to ensure the 'csrftoken' cookie is set in the browser.
+  // This is crucial for subsequent POST requests that require CSRF token.
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        // Hitting a simple Django endpoint like '/' or '/api/' which the WelcomeView handles
+        // will trigger Django's CSRF middleware to set the csrftoken cookie.
+        const response = await fetch(`${API_BASE_URL}/api/`, {
+          method: 'GET',
+          credentials: 'include', // Important: Tells the browser to send/accept cookies
+        });
+        if (response.ok) {
+          console.log("Initial GET to Django backend performed to get CSRF token.");
+          // At this point, the csrftoken cookie should be available in document.cookie
+        } else {
+          console.error("Failed initial GET to Django backend:", response.status);
+          // You might want to display a user-friendly error about backend connectivity
+        }
+      } catch (err) {
+        console.error("Network error during initial CSRF token fetch:", err);
+        setError("Could not connect to the backend to initialize. Please check server status.");
+      }
+    };
+
+    fetchCsrfToken();
+  }, []); // Empty dependency array ensures this effect runs only once on mount
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
@@ -41,53 +73,46 @@ const Login = () => {
     }
 
     try {
-      let response;
-      let data;
-      const apiUrl = isRegistering ? '/api/register/' : '/api/login/';
+      const apiUrl = isRegistering ? `${API_BASE_URL}/api/register/` : `${API_BASE_URL}/api/login/`;
+      const csrftoken = getCookie('csrftoken'); // Now, this should successfully retrieve the token!
+      console.log('CSRF Token being sent (Login/Register):', csrftoken); // Debugging line
 
-      // Get CSRF token
-      const csrftoken = getCookie('csrftoken');
-
-      response = await fetch(apiUrl, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken || '', // Include CSRF token in header
+          'X-CSRFToken': csrftoken || '', // Include CSRF token in header for POST requests
         },
         body: JSON.stringify({ username, password }),
+        credentials: 'include', // Crucial: Ensures cookies are sent with cross-origin requests
       });
 
-      // Check if the response is OK (status 2xx)
       if (response.ok) {
-        data = await response.json(); // Parse JSON only if response is OK
+        const data = await response.json();
         if (isRegistering) {
           setSuccessMessage('Registration successful! You can now log in.');
-          setIsRegistering(false); // Switch to login mode after successful registration
-          setUsername(''); // Clear form fields
+          setIsRegistering(false);
+          setUsername('');
           setPassword('');
         } else {
-          // On successful login, call the login function from AuthContext
-          // Pass the username so AuthContext can store it.
-          login(username);
-          navigate('/dashboard'); // Redirect to dashboard
+          login(username); // Call the login function from AuthContext to update UI state
+          navigate('/dashboard'); // Redirect to dashboard on successful login
         }
       } else {
-        // If response is not OK, try to parse error message from JSON
-        // Django REST Framework often returns errors in 'detail' or 'message' fields,
-        // or as an object with field-specific errors.
+        // Handle API errors (e.g., invalid credentials, registration errors)
         try {
-          data = await response.json();
-          setError(data.message || data.detail || JSON.stringify(data));
+          const errorData = await response.json();
+          setError(errorData.message || errorData.detail || JSON.stringify(errorData));
+          console.error("API Error during authentication:", errorData);
         } catch (jsonError) {
-          // Fallback if the response is not valid JSON (e.g., HTML redirect page)
-          setError(`Request failed with status: ${response.status}. Please check server logs.`);
+          setError(`Request failed with status: ${response.status}. Failed to parse error response.`);
           console.error("Failed to parse error response JSON:", jsonError);
           console.error("Raw response:", await response.text()); // Log raw response for debugging
         }
       }
-    } catch (error) {
-      // Catch network errors (e.g., server not running, CORS issues)
-      console.error('Network or API error:', error);
+    } catch (err) {
+      // Catch network errors (e.g., server not running, CORS issues before response)
+      console.error('Network or API error during login/register:', err);
       setError('An unexpected error occurred. Please check your network connection or server status.');
     }
   };
@@ -99,7 +124,6 @@ const Login = () => {
 
   return (
     <>
-      {/* The CSS is assumed to be in Login.css or injected via a style tag as before */}
       <div className="login-container">
         <div className="login-card">
           <h2>{isRegistering ? 'Register' : 'Login'}</h2>

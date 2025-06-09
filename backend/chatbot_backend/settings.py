@@ -16,7 +16,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(os.path.join(BASE_DIR, '.env'))
+load_dotenv(os.path.join(BASE_DIR, '.env')) # Loads environment variables from .env file
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -36,27 +36,27 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.sessions', # Essential for session-based authentication
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'chatbotapi',
-    'corsheaders',
-    'rest_framework.authtoken',
-    # Remove 'Chatbot_builder' here because it's React, not Django
+    'rest_framework',        # Django REST Framework
+    'chatbotapi',            # Your application
+    'corsheaders',           # For handling Cross-Origin Resource Sharing
+    'rest_framework.authtoken', # Optional, only needed if you explicitly enable TokenAuthentication later
 ]
 
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # This should be the first one
+    # CORS middleware should be placed as high as possible, preferably before any middleware
+    # that can generate responses (like CommonMiddleware or AuthenticationMiddleware)
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',       # Manages user sessions - MUST BE BEFORE AUTHENTICATION AND CSRF
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',                  # Handles CSRF protection - MUST BE AFTER SessionMiddleware
+    'django.contrib.auth.middleware.AuthenticationMiddleware',    # Handles user authentication - MUST BE AFTER Session AND CSRF
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-  
 ]
 
 ROOT_URLCONF = 'chatbot_backend.urls'
@@ -131,15 +131,56 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS settings for React <> Django integration
+# --- CORS and Session Handling Settings ---
+# These settings are critical for your React frontend to communicate with Django.
+
+# Specifies which origins (your frontend URLs) are allowed to make requests.
+# Make sure these are the exact URLs/ports your React app runs on.
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000", # Your React app's URL
-    "http://127.0.0.1:3000",
-    # Add any other origins your frontend might run on
+    "http://localhost:3000", # Your React app's development URL
+    "http://127.0.0.1:3000", # Alternative for your React app
 ]
 
+# Essential to allow browsers to send credentials (like cookies) cross-origin.
+CORS_ALLOW_CREDENTIALS = True
 
+# --- CSRF Trusted Origins for Django 4.0+ ---
+# For Django 4.0 and later, entries in CSRF_TRUSTED_ORIGINS MUST include the scheme (http:// or https://).
+# This prevents the "(4_0.E001)" system check error you were seeing.
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://localhost:3000",   # Correct: Includes 'http://'
+    "http://127.0.0.1:3000",   # Correct: Includes 'http://'
 ]
+
+# --- Session Cookie Configuration for Cross-Origin HTTP Development ---
+# These settings manage how the 'sessionid' cookie behaves.
+# Setting SameSite to None allows the browser to send the session cookie with all requests,
+# including cross-site AJAX requests. This is crucial for your setup.
+SESSION_COOKIE_SAMESITE = None
+
+# When SESSION_COOKIE_SAMESITE is None, the cookie *must* be marked as Secure (sent only over HTTPS)
+# UNLESS you explicitly set SESSION_COOKIE_SECURE to False.
+# IMPORTANT: Setting SESSION_COOKIE_SECURE = False is ONLY for local HTTP development.
+# In production, when using HTTPS, this should be set to True.
+SESSION_COOKIE_SECURE = False
+
+# --- CSRF Cookie Configuration for HTTP Development ---
+# These settings manage how the 'csrftoken' cookie behaves.
+# 'Lax' is typically sufficient for CSRF as it's sent on top-level navigations (like POST requests).
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Similar to SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE must be False for local HTTP development.
+CSRF_COOKIE_SECURE = False
+
+# --- Django REST Framework (DRF) Settings ---
+# Configure default authentication and permission classes for your DRF views.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication', # Enables session-based authentication
+        'rest_framework.authentication.BasicAuthentication',   # Useful for browser's browsable API login
+    ],
+    # By default, all DRF views will require the user to be authenticated.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}

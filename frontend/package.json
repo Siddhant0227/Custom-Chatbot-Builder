@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "https://Hrishita017.github.io/Custom-Chatbot-Builder/",
-  "proxy": "http://127.0.0.1:8000", 
+  "proxy": "http://127.0.0.1:8000",
   "dependencies": {
     "@craco/craco": "^7.1.0",
     "@headlessui/react": "^2.2.3",
