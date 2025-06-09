@@ -1,5 +1,3 @@
-// ChatbotBuilder.tsx
-
 import './ChatbotBuilder.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ChatbotPreview from './ChatbotPreview';
@@ -49,7 +47,6 @@ interface NodeTypeDefinition {
   type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating' | 'end'; // Added 'end' type
   label: string;
 }
-
 
 const ChatbotBuilder = () => {
   const [rules, setRules] = useState<Rule[]>([]); // This will now be dynamically generated for preview
@@ -119,7 +116,7 @@ const ChatbotBuilder = () => {
         },
       ]);
     }
-  }, [nodes.length, setNodes]); // Added setNodes to dependency array
+  }, [nodes.length, setNodes]); 
 
 
   useEffect(() => {
@@ -181,18 +178,18 @@ const ChatbotBuilder = () => {
           if (targetNode) {
             generatedRules.push({
               id: generateId('rule'),
-              trigger: conn.sourceOutput, // Connection label is the trigger
-              response: targetNode.data.content, // Target node content is the response
-              isExactMatch: true, // Assuming exact match for flow triggers
-              useAI: targetNode.data.useAI || false, // Use AI setting from target node
+              trigger: conn.sourceOutput, 
+              response: targetNode.data.content,
+              isExactMatch: true, 
+              useAI: targetNode.data.useAI || false,
             });
           }
         });
 
-        setRules(generatedRules); // Set the dynamically generated rules
-      }, 1000); // 1 second loading delay
+        setRules(generatedRules); 
+      }, 1000); 
     } else {
-      setConversation([]); // Clear conversation when exiting preview
+      setConversation([]); 
       setCurrentNodeId(null);
       setIsInitialLoading(false);
     }
@@ -212,16 +209,26 @@ const exportChatbot = () => {
       mountId: 'my-chatbot-widget',
     };
 
-    // 1. --- Send data to Django Backend ---
-    fetch('http://localhost:8000/api/chatbots/config/', { // Correct endpoint for saving chatbot config
+    // Retrieve the authentication token from localStorage
+    const authToken = localStorage.getItem('authToken');
+
+    // If no token is found, prevent the request and alert the user
+    if (!authToken) {
+      alert('Authentication token not found. Please log in first.');
+      return; // Stop the function execution
+    }
+
+    fetch('http://localhost:8000/api/chatbots/config/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Token ${authToken}`, 
       },
       body: JSON.stringify(chatbotConfig),
     })
       .then(response => {
         if (!response.ok) {
+          // If the response is not OK (e.g., 401, 400, 500), parse the error data
           return response.json().then(errorData => {
             throw new Error(errorData.detail || JSON.stringify(errorData));
           });
@@ -233,8 +240,8 @@ const exportChatbot = () => {
         alert(`Chatbot '${chatbotConfig.botName}' saved successfully to Django!`);
         const configJsonString = JSON.stringify(chatbotConfig, null, 2); // null, 2 for pretty-printing
 
-        const jsBundleUrl = 'https://your-domain.com/path/to/my-chatbot-widget.bundle.js'; 
-    
+        const jsBundleUrl = 'https://your-domain.com/path/to/my-chatbot-widget.bundle.js';
+
         const cssBundleUrl = 'https://your-domain.com/path/to/static/css/main.6c9faa1e.css'; // <<<--- !!! UPDATE HASHED FILENAME AFTER EACH BUILD !!! --->>>
 
         const generatedScript = `
@@ -396,7 +403,7 @@ const exportChatbot = () => {
     let title: string, content: string;
     let options: { label: string; value: string; nextNodeId?: string }[] | undefined;
     let useAI: boolean = false;
-    let outputs: string[] = ['output-1']; // Default output for most nodes
+    let outputs: string[] = ['output-1']; 
 
     switch (type) {
       case 'start':
@@ -428,17 +435,17 @@ const exportChatbot = () => {
       case 'textinput':
         title = 'Text Input Card';
         content = 'Please type your response.';
-        useAI = true; // Example: Text input might often lead to AI processing
+        useAI = true; 
         break;
       case 'rating':
         title = 'Rating Card';
         content = 'Please rate your experience (1-5).';
-        outputs = []; // Rating nodes usually don't have outgoing connections from the node itself
+        outputs = [];
         break;
       case 'end':
         title = 'End';
         content = 'Thank you for your time!';
-        outputs = []; // End nodes don't have outgoing connections
+        outputs = [];
         break;
       default:
         title = 'New Card';
