@@ -1,127 +1,104 @@
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 import './ChatbotBuilder.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ChatbotPreview from './ChatbotPreview';
-import { useParams, useNavigate } from 'react-router-dom';
-import { authenticatedFetch } from '../api/api';
-import { useAuth } from '../AuthContext';
-
-interface ChatbotConfig {
-  welcomeMessage: string;
-  fallbackMessage: string;
-  nodes: Array<any>;
-  connections: Array<any>;
-}
+import { useNavigate } from 'react-router-dom';
 
 interface Rule {
-id: string;
-trigger: string;
-response: string;
-isExactMatch: boolean;
-useAI: boolean;
+  id: string;
+  trigger: string;
+  response: string;
+  isExactMatch: boolean;
+  useAI: boolean;
 }
 
 interface NodeData {
-title: string;
-content: string;
-options?: { label: string; value: string; nextNodeId?: string }[];
-useAI?: boolean;
+  title: string;
+  content: string;
+  options?: { label: string; value: string; nextNodeId?: string }[];
+  useAI?: boolean;
 }
 
 interface Node {
-id: string;
-type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating' | 'end'; // Added 'end' type
-x: number;
-y: number;
-data: NodeData;
-outputs: string[];
+  id: string;
+  type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating' | 'end'; // Added 'end' type
+  x: number;
+  y: number;
+  data: NodeData;
+  outputs: string[];
 }
 
 interface Connection {
-id: string;
-sourceId: string;
-sourceOutput: string; // The value that triggers this connection (e.g., 'yes', 'option1')
-targetId: string;
-// No aiIntent here based on your provided connection structure
+  id: string;
+  sourceId: string;
+  sourceOutput: string; // The value that triggers this connection (e.g., 'yes', 'option1')
+  targetId: string;
+  // No aiIntent here based on your provided connection structure
 }
 
 interface Message {
-sender: string;
-message: string;
-isTyping?: boolean;
-options?: { label: string; value: string }[];
-nodeId?: string;
+  sender: string;
+  message: string;
+  isTyping?: boolean;
+  options?: { label: string; value: string }[];
+  nodeId?: string;
 }
 
 interface NodeTypeDefinition {
-type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating' | 'end'; // Added 'end' type
-label: string;
+  type: 'start' | 'message' | 'multichoice' | 'button' | 'textinput' | 'rating' | 'end'; // Added 'end' type
+  label: string;
 }
 
 const ChatbotBuilder = () => {
-const [rules, setRules] = useState<Rule[]>([]); // This will now be dynamically generated for preview
-const [botName, setBotName] = useState('My Chatbot');
-const [welcomeMessage, setWelcomeMessage] = useState('Hello! How can I help you today?');
-const [fallbackMessage, setFallbackMessage] = useState("I'm sorry, I don't understand. Can you please rephrase?");
-const [isPreviewMode, setIsPreviewMode] = useState(false);
-const [conversation, setConversation] = useState<Message[]>([]);
-const { chatbotId } = useParams<{ chatbotId: string }>();
-const [nodes, setNodes] = useState<Node[]>([]);
-const [chatbotName, setChatbotName] = useState<string>('');
-const [connections, setConnections] = useState<Connection[]>([]);
-const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-const [draggingNode, setDraggingNode] = useState<Node | null>(null);
-const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-const [creatingConnection, setCreatingConnection] = useState<any | null>(null); // This holds connection info
-const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-const [activeSidebarView, setActiveSidebarView] = useState<'main' | 'nodeProperties'>('main');
-const canvasRef = useRef<HTMLDivElement>(null);
-const { isAuthenticated, username } = useAuth();
-const [error, setError] = useState<string | null>(null);
-const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
-const [zoom, setZoom] = useState(1);
-const [loading, setLoading] = useState(true);
-const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
-const [isInitialLoading, setIsInitialLoading] = useState(false);
-const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-const [activeMainSidebarSubView, setActiveMainSidebarSubView] = useState<'settings' | 'nodeTypes'>('settings');
-const [availableNodeTypes] = useState<NodeTypeDefinition[]>([
-{ type: 'start', label: 'Start' },
-{ type: 'message', label: 'Message' },
-{ type: 'multichoice', label: 'Multi Choice' },
-{ type: 'button', label: 'Button' },
-{ type: 'textinput', label: 'Text Input' },
-{ type: 'rating', label: 'Rating' },
-{ type: 'end', label: 'End' }, // Added 'end' node type
-]);
-const [chatbotConfig, setChatbotConfig] = useState<ChatbotConfig>({
-    welcomeMessage: "Hello! How can I help you?",
-    fallbackMessage: "I'm sorry, I didn't understand that.",
-    nodes: [],
-    connections: [],
-  });
-const fileInputRef = useRef<HTMLInputElement>(null);
-const navigate = useNavigate();
+  const [rules, setRules] = useState<Rule[]>([]); // This will now be dynamically generated for preview
+  const [botName, setBotName] = useState('My Chatbot');
+  const [welcomeMessage, setWelcomeMessage] = useState('Hello! How can I help you today?');
+  const [fallbackMessage, setFallbackMessage] = useState("I'm sorry, I don't understand. Can you please rephrase?");
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [conversation, setConversation] = useState<Message[]>([]);
+  // Adjusted useNodesState and useEdgesState from React Flow to standard useState
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [draggingNode, setDraggingNode] = useState<Node | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [creatingConnection, setCreatingConnection] = useState<any | null>(null); // This holds connection info
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeSidebarView, setActiveSidebarView] = useState<'main' | 'nodeProperties'>('main');
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [activeMainSidebarSubView, setActiveMainSidebarSubView] = useState<'settings' | 'nodeTypes'>('settings');
+  const [availableNodeTypes] = useState<NodeTypeDefinition[]>([
+    { type: 'start', label: 'Start' },
+    { type: 'message', label: 'Message' },
+    { type: 'multichoice', label: 'Multi Choice' },
+    { type: 'button', label: 'Button' },
+    { type: 'textinput', label: 'Text Input' },
+    { type: 'rating', label: 'Rating' },
+    { type: 'end', label: 'End' }, // Added 'end' node type
+  ]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
 
-const toggleSidebar = () => {
-setIsSidebarCollapsed(!isSidebarCollapsed);
-};
+  const toggleSidebar = () => { 
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
 
-const backToMainSidebar = () => {
-setActiveSidebarView('main');
-setSelectedNode(null);
-setActiveMainSidebarSubView('settings');
-};
-const BacktoDashboard = () => {
-navigate('/dashboard');
+  const backToMainSidebar = () => {
+    setActiveSidebarView('main');
+    setSelectedNode(null);
+    setActiveMainSidebarSubView('settings'); 
+  };
+  const BacktoDashboard = () => {
+    navigate('/dashboard');
 
-}
+  }
 
-<<<<<<< Updated upstream
   useEffect(() => {
     if (nodes.length === 0) {
       setNodes([
@@ -140,71 +117,62 @@ navigate('/dashboard');
       ]);
     }
   }, [nodes.length, setNodes]); 
-=======
-useEffect(() => {
-if (nodes.length === 0) {
-setNodes([
-{
-id: 'start-1',
-type: 'start',
-x: 100,
-y: 120,
-data: {
-title: 'Start',
-content: 'Start your chatbot flow here',
-useAI: false,
-},
-outputs: ['output-1'],
-},
-]);
-}
-}, [nodes.length, setNodes]); // Added setNodes to dependency array
->>>>>>> Stashed changes
 
-useEffect(() => {
-    const fetchChatbot = async () => {
-      if (!isAuthenticated) {
-        setError("You must be logged in to build chatbots.");
-        setLoading(false);
-        return;
-      }
 
-      if (chatbotId && chatbotId !== 'new-mock-chatbot-id') { // If it's an existing chatbot
-        setLoading(true);
-        setError(null);
-        try {
-          // Use authenticatedFetch for GET requests that need credentials
-          const response = await authenticatedFetch(`/api/chatbots/${chatbotId}/`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            // credentials: 'include' is handled by authenticatedFetch
-          });
+  useEffect(() => {
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      setCanvasOffset({ x: rect.left, y: rect.top });
+    }
+  }, [canvasRef]);
 
-          if (response.ok) {
-            const data = await response.json();
-            setChatbotName(data.name);
-            setChatbotConfig(data.configuration);
-          } else {
-            const errorData = await response.json();
-            setError(errorData.message || errorData.detail || "Failed to load chatbot.");
+  useEffect(() => {
+    if (isPreviewMode) {
+      setIsInitialLoading(true);
+      setConversation([{ sender: 'bot', message: '...', isTyping: true }]);
+
+      const generatedRules: Rule[] = [];
+      const startNode = nodes.find(node => node.type === 'start');
+      let initialCurrentNodeId: string | null = null;
+
+      // Simulate loading delay
+      setTimeout(() => {
+        let initialMessages: Message[] = [];
+
+        if (startNode) {
+          initialMessages.push({ sender: 'bot', message: startNode.data.content });
+          initialCurrentNodeId = startNode.id;
+
+          const firstStartConnection = connections.find(conn => conn.sourceId === startNode.id);
+          if (firstStartConnection) {
+            const nextNode = nodes.find(node => node.id === firstStartConnection.targetId);
+            if (nextNode) {
+              const messageData: Message = {
+                sender: 'bot',
+                message: nextNode.data.content,
+                nodeId: nextNode.id
+              };
+
+            
+              if ((nextNode.type === 'multichoice' || nextNode.type === 'button') && nextNode.data.options) {
+                messageData.options = nextNode.data.options.map(opt => ({
+                  label: opt.label,
+                  value: opt.value
+                }));
+              }
+
+              initialMessages.push(messageData);
+              initialCurrentNodeId = nextNode.id; // Set current node to the first connected node
+            }
           }
-        } catch (err) {
-          console.error("Network error loading chatbot:", err);
-          setError("Network error. Could not load chatbot.");
-        } finally {
-          setLoading(false);
+        } else {
+          initialMessages.push({ sender: 'bot', message: welcomeMessage });
         }
-      } else { // It's a new chatbot, initialize empty
-        setLoading(false);
-      }
-    };
 
-    fetchChatbot();
-  }, [chatbotId, isAuthenticated]);
+        setConversation(initialMessages);
+        setCurrentNodeId(initialCurrentNodeId);
+        setIsInitialLoading(false);
 
-<<<<<<< Updated upstream
         connections.forEach(conn => {
           const targetNode = nodes.find(node => node.id === conn.targetId);
           if (targetNode) {
@@ -226,99 +194,21 @@ useEffect(() => {
       setIsInitialLoading(false);
     }
   }, [isPreviewMode, nodes, connections, welcomeMessage]);
-=======
 
-useEffect(() => {
-if (canvasRef.current) {
-const rect = canvasRef.current.getBoundingClientRect();
-setCanvasOffset({ x: rect.left, y: rect.top });
-}
-}, [canvasRef]);
->>>>>>> Stashed changes
-
-useEffect(() => {
-if (isPreviewMode) {
-setIsInitialLoading(true);
-setConversation([{ sender: 'bot', message: '...', isTyping: true }]);
-
-const generatedRules: Rule[] = [];
-const startNode = nodes.find(node => node.type === 'start');
-let initialCurrentNodeId: string | null = null;
-
-// Simulate loading delay
-setTimeout(() => {
-let initialMessages: Message[] = [];
-
-if (startNode) {
-initialMessages.push({ sender: 'bot', message: startNode.data.content });
-initialCurrentNodeId = startNode.id;
-
-const firstStartConnection = connections.find(conn => conn.sourceId === startNode.id);
-if (firstStartConnection) {
-const nextNode = nodes.find(node => node.id === firstStartConnection.targetId);
-if (nextNode) {
-const messageData: Message = {
-sender: 'bot',
-message: nextNode.data.content,
-nodeId: nextNode.id
-};
-
-if ((nextNode.type === 'multichoice' || nextNode.type === 'button') && nextNode.data.options) {
-messageData.options = nextNode.data.options.map(opt => ({
-label: opt.label,
-value: opt.value
-}));
-}
-
-initialMessages.push(messageData);
-initialCurrentNodeId = nextNode.id; // Set current node to the first connected node
-}
-}
-} else {
-initialMessages.push({ sender: 'bot', message: welcomeMessage });
-}
-
-setConversation(initialMessages);
-setCurrentNodeId(initialCurrentNodeId);
-setIsInitialLoading(false);
-
-connections.forEach(conn => {
-const targetNode = nodes.find(node => node.id === conn.targetId);
-if (targetNode) {
-generatedRules.push({
-id: generateId('rule'),
-trigger: conn.sourceOutput, // Connection label is the trigger
-response: targetNode.data.content, // Target node content is the response
-isExactMatch: true, // Assuming exact match for flow triggers
-useAI: targetNode.data.useAI || false, // Use AI setting from target node
-});
-}
-});
-
-setRules(generatedRules); // Set the dynamically generated rules
-}, 1000); // 1 second loading delay
-} else {
-setConversation([]); // Clear conversation when exiting preview
-setCurrentNodeId(null);
-setIsInitialLoading(false);
-}
-}, [isPreviewMode, nodes, connections, welcomeMessage]);
-
-const generateId = (prefix: string) => {
-return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-};
+  const generateId = (prefix: string) => {
+    return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  };
 
 const exportChatbot = () => {
-const chatbotConfig = {
-botName,
-welcomeMessage,
-fallbackMessage,
-nodes,
-connections,
-mountId: 'my-chatbot-widget',
-};
+    const chatbotConfig = {
+      botName,
+      welcomeMessage,
+      fallbackMessage,
+      nodes,
+      connections,
+      mountId: 'my-chatbot-widget',
+    };
 
-<<<<<<< Updated upstream
     // Retrieve the authentication token from localStorage
     const authToken = localStorage.getItem('authToken');
 
@@ -332,7 +222,7 @@ mountId: 'my-chatbot-widget',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Token ${authToken}`, // <--- ADDED: Include the authentication token
+        'Authorization': `Token ${authToken}`, 
       },
       body: JSON.stringify(chatbotConfig),
     })
@@ -353,186 +243,160 @@ mountId: 'my-chatbot-widget',
         const jsBundleUrl = 'https://your-domain.com/path/to/my-chatbot-widget.bundle.js';
 
         const cssBundleUrl = 'https://your-domain.com/path/to/static/css/main.6c9faa1e.css'; // <<<--- !!! UPDATE HASHED FILENAME AFTER EACH BUILD !!! --->>>
-=======
-// 1. --- Send data to Django Backend ---
-fetch('http://localhost:8000/api/save-chatbot/', { // <-- IMPORTANT: This is your Django backend URL
-method: 'POST',
-headers: {
-'Content-Type': 'application/json',
-},
-body: JSON.stringify(chatbotConfig),
-})
-.then(response => {
-if (!response.ok) {
-return response.json().then(errorData => {
-throw new Error(errorData.detail || JSON.stringify(errorData));
-});
-}
-return response.json();
-})
-.then(data => {
-console.log('Chatbot saved successfully to Django:', data);
-alert(`Chatbot '${chatbotConfig.botName}' saved successfully to Django!`);
-const configJsonString = JSON.stringify(chatbotConfig, null, 2); // null, 2 for pretty-printing
 
-const jsBundleUrl = 'https://your-domain.com/path/to/my-chatbot-widget.bundle.js';
-const cssBundleUrl = 'https://your-domain.com/path/to/static/css/main.6c9faa1e.css'; // <<<--- !!! UPDATE HASHED FILENAME AFTER EACH BUILD !!! --->>>
->>>>>>> Stashed changes
+        const generatedScript = `
+    <link rel="stylesheet" href="${cssBundleUrl}">
 
-const generatedScript = `
-<link rel="stylesheet" href="${cssBundleUrl}">
+    <div id="${chatbotConfig.mountId}"></div>
 
-<div id="${chatbotConfig.mountId}"></div>
+    <script>
+    window.myChatbotConfig = ${configJsonString};
 
-<script>
-window.myChatbotConfig = ${configJsonString};
+    const script = document.createElement('script');
+    script.id = 'my-chatbot-script';
+    script.src = '${jsBundleUrl}';
+    script.defer = true;
 
-const script = document.createElement('script');
-script.id = 'my-chatbot-script';
-script.src = '${jsBundleUrl}';
-script.defer = true;
+    script.onload = () => {
+        if (window.MyChatbotWidget && window.MyChatbotWidget.init) {
+            window.MyChatbotWidget.init(window.myChatbotConfig);
+        } else {
+            console.error('MyChatbotWidget or its init method not found after script load. Ensure the widget bundle is loaded correctly and window.MyChatbotWidget is exposed globally.');
+        }
+    };
 
-script.onload = () => {
-if (window.MyChatbotWidget && window.MyChatbotWidget.init) {
-window.MyChatbotWidget.init(window.myChatbotConfig);
-} else {
-console.error('MyChatbotWidget or its init method not found after script load. Ensure the widget bundle is loaded correctly and window.MyChatbotWidget is exposed globally.');
-}
-};
+    document.body.appendChild(script);
+    </script>
+    `;
 
-document.body.appendChild(script);
-</script>
-`;
+        console.log("Generated Chatbot Script:\n", generatedScript);
 
-console.log("Generated Chatbot Script:\n", generatedScript);
+        navigator.clipboard.writeText(generatedScript)
+          .then(() => {
+            alert('Chatbot script also copied to clipboard for embedding!');
+          })
+          .catch(err => {
+            console.error('Failed to copy script to clipboard: ', err);
+            alert('Failed to copy script to clipboard. Please copy it manually from the console.');
+          });
 
-navigator.clipboard.writeText(generatedScript)
-.then(() => {
-alert('Chatbot script also copied to clipboard for embedding!');
-})
-.catch(err => {
-console.error('Failed to copy script to clipboard: ', err);
-alert('Failed to copy script to clipboard. Please copy it manually from the console.');
-});
+      })
+      .catch(error => {
+        console.error('Error saving chatbot to Django:', error);
+        alert(`Failed to save chatbot to Django: ${error.message || 'An unknown error occurred.'}`);
+      });
+  };
 
-})
-.catch(error => {
-console.error('Error saving chatbot to Django:', error);
-alert(`Failed to save chatbot to Django: ${error.message || 'An unknown error occurred.'}`);
-});
-};
+  const handleCanvasMouseDown = (e: React.MouseEvent) => {
+    if (!canvasRef.current) return;
 
-const handleCanvasMouseDown = (e: React.MouseEvent) => {
-if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
 
-const rect = canvasRef.current.getBoundingClientRect();
-const x = (e.clientX - rect.left) / zoom;
-const y = (e.clientY - rect.top) / zoom;
+    const clickedNode = nodes.find((node) => {
+      // Check if click is within node bounds
+      return x >= node.x && x <= node.x + 200 && y >= node.y && y <= node.y + 80;
+    });
 
-const clickedNode = nodes.find((node) => {
-// Check if click is within node bounds
-return x >= node.x && x <= node.x + 200 && y >= node.y && y <= node.y + 80;
-});
+    if (clickedNode) {
+      setSelectedNode(clickedNode);
+      setActiveSidebarView('nodeProperties'); // Switch to node properties view
+      setDraggingNode(clickedNode);
+      setDragOffset({
+        x: x - clickedNode.x,
+        y: y - clickedNode.y,
+      });
+    } else {
+      setSelectedNode(null);
+      setActiveSidebarView('main'); // Go back to main view if no node is clicked
+      setActiveMainSidebarSubView('settings'); // Default to settings
+    }
+  };
 
-if (clickedNode) {
-setSelectedNode(clickedNode);
-setActiveSidebarView('nodeProperties'); // Switch to node properties view
-setDraggingNode(clickedNode);
-setDragOffset({
-x: x - clickedNode.x,
-y: y - clickedNode.y,
-});
-} else {
-setSelectedNode(null);
-setActiveSidebarView('main'); // Go back to main view if no node is clicked
-setActiveMainSidebarSubView('settings'); // Default to settings
-}
-};
+  const handleCanvasMouseMove = (e: React.MouseEvent) => {
+    if (!draggingNode) {
+      if (creatingConnection) {
+        if (!canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / zoom;
+        const y = (e.clientY - rect.top) / zoom;
 
-const handleCanvasMouseMove = (e: React.MouseEvent) => {
-if (!draggingNode) {
-if (creatingConnection) {
-if (!canvasRef.current) return;
-const rect = canvasRef.current.getBoundingClientRect();
-const x = (e.clientX - rect.left) / zoom;
-const y = (e.clientY - rect.top) / zoom;
+        setCreatingConnection({
+          ...creatingConnection,
+          endX: x,
+          endY: y,
+        });
+      }
+      return;
+    }
 
-setCreatingConnection({
-...creatingConnection,
-endX: x,
-endY: y,
-});
-}
-return;
-}
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
 
-if (!canvasRef.current) return;
-const rect = canvasRef.current.getBoundingClientRect();
-const x = (e.clientX - rect.left) / zoom;
-const y = (e.clientY - rect.top) / zoom;
+    setNodes((prevNodes) =>
+      prevNodes.map((node) =>
+        node.id === draggingNode.id ? { ...node, x: x - dragOffset.x, y: y - dragOffset.y } : node
+      )
+    );
+  };
 
-setNodes((prevNodes) =>
-prevNodes.map((node) =>
-node.id === draggingNode.id ? { ...node, x: x - dragOffset.x, y: y - dragOffset.y } : node
-)
-);
-};
+  const handleCanvasMouseUp = () => {
+    setDraggingNode(null);
 
-const handleCanvasMouseUp = () => {
-setDraggingNode(null);
+    if (creatingConnection) {
+      const targetNode = nodes.find((node) => {
+        if (node.id === creatingConnection.sourceNodeId) return false;
 
-if (creatingConnection) {
-const targetNode = nodes.find((node) => {
-if (node.id === creatingConnection.sourceNodeId) return false;
+        const inputX = node.x; 
+        const inputY = node.y + 40;
+        const distance = Math.sqrt(
+          Math.pow(inputX - creatingConnection.endX, 2) + Math.pow(inputY - creatingConnection.endY, 2)
+        )
+        return distance < 20; 
+      });
 
-const inputX = node.x;
-const inputY = node.y + 40;
-const distance = Math.sqrt(
-Math.pow(inputX - creatingConnection.endX, 2) + Math.pow(inputY - creatingConnection.endY, 2)
-)
-return distance < 20;
-});
+      if (targetNode) {
+        let sourceOutputIdentifier = 'output-1';
+        const sourceNode = nodes.find(n => n.id === creatingConnection.sourceNodeId);
+        if (sourceNode && (sourceNode.type === 'multichoice' || sourceNode.type === 'button')) {
+          sourceOutputIdentifier = prompt("Enter the text/value that triggers this connection (e.g., 'Yes', 'Option A'):") || 'output-1';
+        }
+        setConnections([
+          ...connections,
+          {
+            id: generateId('conn'),
+            sourceId: creatingConnection.sourceNodeId,
+            sourceOutput: sourceOutputIdentifier,
+            targetId: targetNode.id,
+          },
+        ]);
+      }
+      setCreatingConnection(null);
+    }
+  };
 
-if (targetNode) {
-let sourceOutputIdentifier = 'output-1';
-const sourceNode = nodes.find(n => n.id === creatingConnection.sourceNodeId);
-if (sourceNode && (sourceNode.type === 'multichoice' || sourceNode.type === 'button')) {
-sourceOutputIdentifier = prompt("Enter the text/value that triggers this connection (e.g., 'Yes', 'Option A'):") || 'output-1';
-}
-setConnections([
-...connections,
-{
-id: generateId('conn'),
-sourceId: creatingConnection.sourceNodeId,
-sourceOutput: sourceOutputIdentifier,
-targetId: targetNode.id,
-},
-]);
-}
-setCreatingConnection(null);
-}
-};
+  const startConnection = (nodeId: string, outputId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
 
-const startConnection = (nodeId: string, outputId: string, e: React.MouseEvent) => {
-e.stopPropagation();
+    const sourceNode = nodes.find((node) => node.id === nodeId);
+    if (!sourceNode) return;
 
-const sourceNode = nodes.find((node) => node.id === nodeId);
-if (!sourceNode) return;
+    const outputX = sourceNode.x + 200; 
+    const outputY = sourceNode.y + 40; 
 
-const outputX = sourceNode.x + 200;
-const outputY = sourceNode.y + 40;
+    setCreatingConnection({
+      sourceNodeId: nodeId,
+      sourceOutput: outputId, 
+      startX: outputX,
+      startY: outputY,
+      endX: outputX,
+      endY: outputY,
+    });
+  };
 
-setCreatingConnection({
-sourceNodeId: nodeId,
-sourceOutput: outputId,
-startX: outputX,
-startY: outputY,
-endX: outputX,
-endY: outputY,
-});
-};
-
-<<<<<<< Updated upstream
   const addNewNode = (type: Node['type']) => {
     const nodeType = availableNodeTypes.find((nt) => nt.type === type);
     if (!nodeType) return;
@@ -588,283 +452,226 @@ endY: outputY,
         content = 'Card content';
         break;
     }
-=======
-const addNewNode = (type: Node['type']) => {
-const nodeType = availableNodeTypes.find((nt) => nt.type === type);
-if (!nodeType) return;
-let title: string, content: string;
-let options: { label: string; value: string; nextNodeId?: string }[] | undefined;
-let useAI: boolean = false;
-let outputs: string[] = ['output-1']; // Default output for most nodes
 
-switch (type) {
-case 'start':
-title = 'Start';
-content = 'Start your chatbot flow here';
-break;
-case 'message':
-title = 'Message Card'; // Changed title to be more generic
-content = 'This is a general message.';
-break;
-case 'multichoice':
-title = 'Multi Choice Card';
-content = 'Please choose an option:';
-options = [
-{ label: 'Option 1', value: 'option1' },
-{ label: 'Option 2', value: 'option2' },
-];
-outputs = options.map(opt => opt.value);
-break;
-case 'button':
-title = 'Button Card';
-content = 'Click a button to continue:';
-options = [
-{ label: 'Yes', value: 'yes' },
-{ label: 'No', value: 'no' },
-];
-outputs = options.map(opt => opt.value);
-break;
-case 'textinput':
-title = 'Text Input Card';
-content = 'Please type your response.';
-useAI = true; // Example: Text input might often lead to AI processing
-break;
-case 'rating':
-title = 'Rating Card';
-content = 'Please rate your experience (1-5).';
-outputs = []; // Rating nodes usually don't have outgoing connections from the node itself
-break;
-case 'end':
-title = 'End';
-content = 'Thank you for your time!';
-outputs = []; // End nodes don't have outgoing connections
-break;
-default:
-title = 'New Card';
-content = 'Card content';
-break;
-}
->>>>>>> Stashed changes
+    const newNode: Node = {
+      id: generateId(type),
+      type,
+      x: 300,
+      y: 200,
+      data: {
+        title,
+        content,
+        options,
+        useAI,
+      },
+      outputs: outputs, // Assign calculated outputs
+    };
 
-const newNode: Node = {
-id: generateId(type),
-type,
-x: 300,
-y: 200,
-data: {
-title,
-content,
-options,
-useAI,
-},
-outputs: outputs, // Assign calculated outputs
-};
+    setNodes([...nodes, newNode]);
+    setSelectedNode(newNode);
+    setActiveSidebarView('nodeProperties'); // Automatically switch to node properties
+  };
 
-setNodes([...nodes, newNode]);
-setSelectedNode(newNode);
-setActiveSidebarView('nodeProperties'); // Automatically switch to node properties
-};
+  const updateNodeData = (nodeId: string, field: keyof NodeData, value: any) => {
+    setNodes((prevNodes) =>
+      prevNodes.map((node) =>
+        node.id === nodeId ? { ...node, data: { ...node.data, [field]: value } } : node
+      )
+    );
 
-const updateNodeData = (nodeId: string, field: keyof NodeData, value: any) => {
-setNodes((prevNodes) =>
-prevNodes.map((node) =>
-node.id === nodeId ? { ...node, data: { ...node.data, [field]: value } } : node
-)
-);
+    if (selectedNode && selectedNode.id === nodeId) {
+      setSelectedNode({
+        ...selectedNode,
+        data: { ...selectedNode.data, [field]: value },
+      });
+    }
+  };
 
-if (selectedNode && selectedNode.id === nodeId) {
-setSelectedNode({
-...selectedNode,
-data: { ...selectedNode.data, [field]: value },
-});
-}
-};
+  const addNodeOption = (nodeId: string) => {
+    setNodes(prevNodes => prevNodes.map(node => {
+      if (node.id === nodeId && (node.type === 'multichoice' || node.type === 'button')) {
+        const newOption = { label: `New Option ${node.data.options ? node.data.options.length + 1 : 1}`, value: `option${Date.now()}` };
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            options: [...(node.data.options || []), newOption]
+          }
+        };
+      }
+      return node;
+    }));
+    if (selectedNode && selectedNode.id === nodeId) {
+      setSelectedNode(prevSelected => {
+        if (prevSelected && (prevSelected.type === 'multichoice' || prevSelected.type === 'button')) {
+          const newOption = { label: `New Option ${prevSelected.data.options ? prevSelected.data.options.length + 1 : 1}`, value: `option${Date.now()}` };
+          return {
+            ...prevSelected,
+            data: {
+              ...prevSelected.data,
+              options: [...(prevSelected.data.options || []), newOption]
+            }
+          };
+        }
+        return prevSelected;
+      });
+    }
+  };
 
-const addNodeOption = (nodeId: string) => {
-setNodes(prevNodes => prevNodes.map(node => {
-if (node.id === nodeId && (node.type === 'multichoice' || node.type === 'button')) {
-const newOption = { label: `New Option ${node.data.options ? node.data.options.length + 1 : 1}`, value: `option${Date.now()}` };
-return {
-...node,
-data: {
-...node.data,
-options: [...(node.data.options || []), newOption]
-}
-};
-}
-return node;
-}));
-if (selectedNode && selectedNode.id === nodeId) {
-setSelectedNode(prevSelected => {
-if (prevSelected && (prevSelected.type === 'multichoice' || prevSelected.type === 'button')) {
-const newOption = { label: `New Option ${prevSelected.data.options ? prevSelected.data.options.length + 1 : 1}`, value: `option${Date.now()}` };
-return {
-...prevSelected,
-data: {
-...prevSelected.data,
-options: [...(prevSelected.data.options || []), newOption]
-}
-};
-}
-return prevSelected;
-});
-}
-};
+  const updateNodeOption = (nodeId: string, optionIndex: number, field: 'label' | 'value', value: string) => {
+    setNodes(prevNodes => prevNodes.map(node => {
+      if (node.id === nodeId && (node.type === 'multichoice' || node.type === 'button') && node.data.options) {
+        const updatedOptions = [...node.data.options];
+        updatedOptions[optionIndex] = { ...updatedOptions[optionIndex], [field]: value };
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            options: updatedOptions
+          }
+        };
+      }
+      return node;
+    }));
+    if (selectedNode && selectedNode.id === nodeId && (selectedNode.type === 'multichoice' || selectedNode.type === 'button') && selectedNode.data.options) {
+      setSelectedNode(prevSelected => {
+        if (prevSelected) {
+          const updatedOptions = [...prevSelected.data.options!];
+          updatedOptions[optionIndex] = { ...updatedOptions[optionIndex], [field]: value };
+          return {
+            ...prevSelected,
+            data: {
+              ...prevSelected.data,
+              options: updatedOptions
+            }
+          };
+        }
+        return prevSelected;
+      });
+    }
+  };
 
-const updateNodeOption = (nodeId: string, optionIndex: number, field: 'label' | 'value', value: string) => {
-setNodes(prevNodes => prevNodes.map(node => {
-if (node.id === nodeId && (node.type === 'multichoice' || node.type === 'button') && node.data.options) {
-const updatedOptions = [...node.data.options];
-updatedOptions[optionIndex] = { ...updatedOptions[optionIndex], [field]: value };
-return {
-...node,
-data: {
-...node.data,
-options: updatedOptions
-}
-};
-}
-return node;
-}));
-if (selectedNode && selectedNode.id === nodeId && (selectedNode.type === 'multichoice' || selectedNode.type === 'button') && selectedNode.data.options) {
-setSelectedNode(prevSelected => {
-if (prevSelected) {
-const updatedOptions = [...prevSelected.data.options!];
-updatedOptions[optionIndex] = { ...updatedOptions[optionIndex], [field]: value };
-return {
-...prevSelected,
-data: {
-...prevSelected.data,
-options: updatedOptions
-}
-};
-}
-return prevSelected;
-});
-}
-};
-
-const deleteNodeOption = (nodeId: string, optionIndex: number) => {
-setNodes(prevNodes => prevNodes.map(node => {
-if (node.id === nodeId && (node.type === 'multichoice' || node.type === 'button') && node.data.options) {
-const updatedOptions = node.data.options.filter((_, index) => index !== optionIndex);
-return {
-...node,
-data: {
-...node.data,
-options: updatedOptions
-}
-};
-}
-return node;
-}));
-if (selectedNode && selectedNode.id === nodeId && (selectedNode.type === 'multichoice' || selectedNode.type === 'button') && selectedNode.data.options) {
-setSelectedNode(prevSelected => {
-if (prevSelected) {
-const updatedOptions = prevSelected.data.options!.filter((_, index) => index !== optionIndex);
-return {
-...prevSelected,
-data: {
-...prevSelected.data,
-options: updatedOptions
-}
-};
-}
-return prevSelected;
-});
-}
-};
-const deleteNode = (nodeId: string) => {
-if (nodeId === 'start-1') {
-alert("The 'Start' node cannot be deleted.");
-return;
-}
-setNodes((prevNodes) => prevNodes.filter((node) => node.id !== nodeId));
-setConnections((prevConnections) =>
-prevConnections.filter((conn) => conn.sourceId !== nodeId && conn.targetId !== nodeId)
-);
-if (selectedNode && selectedNode.id === nodeId) {
-setSelectedNode(null);
-setActiveSidebarView('main'); // Go back to main view after deleting
-setActiveMainSidebarSubView('settings'); // Reset to settings
-}
-};
+  const deleteNodeOption = (nodeId: string, optionIndex: number) => {
+    setNodes(prevNodes => prevNodes.map(node => {
+      if (node.id === nodeId && (node.type === 'multichoice' || node.type === 'button') && node.data.options) {
+        const updatedOptions = node.data.options.filter((_, index) => index !== optionIndex);
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            options: updatedOptions
+          }
+        };
+      }
+      return node;
+    }));
+    if (selectedNode && selectedNode.id === nodeId && (selectedNode.type === 'multichoice' || selectedNode.type === 'button') && selectedNode.data.options) {
+      setSelectedNode(prevSelected => {
+        if (prevSelected) {
+          const updatedOptions = prevSelected.data.options!.filter((_, index) => index !== optionIndex);
+          return {
+            ...prevSelected,
+            data: {
+              ...prevSelected.data,
+              options: updatedOptions
+            }
+          };
+        }
+        return prevSelected;
+      });
+    }
+  };
+  const deleteNode = (nodeId: string) => {
+    if (nodeId === 'start-1') {
+      alert("The 'Start' node cannot be deleted.");
+      return;
+    }
+    setNodes((prevNodes) => prevNodes.filter((node) => node.id !== nodeId));
+    setConnections((prevConnections) =>
+      prevConnections.filter((conn) => conn.sourceId !== nodeId && conn.targetId !== nodeId)
+    );
+    if (selectedNode && selectedNode.id === nodeId) {
+      setSelectedNode(null);
+      setActiveSidebarView('main'); // Go back to main view after deleting
+      setActiveMainSidebarSubView('settings'); // Reset to settings
+    }
+  };
 
 
-const deleteConnection = (connId: string) => {
-setConnections((prevConnections) => prevConnections.filter((conn) => conn.id !== connId));
-};
+  const deleteConnection = (connId: string) => {
+    setConnections((prevConnections) => prevConnections.filter((conn) => conn.id !== connId));
+  };
 
-const handleZoomIn = () => {
-setZoom((prevZoom) => Math.min(prevZoom + 0.1, 2));
-};
+  const handleZoomIn = () => {
+    setZoom((prevZoom) => Math.min(prevZoom + 0.1, 2));
+  };
 
-const handleZoomOut = () => {
-setZoom((prevZoom) => Math.max(prevZoom - 0.1, 0.5));
-};
+  const handleZoomOut = () => {
+    setZoom((prevZoom) => Math.max(prevZoom - 0.1, 0.5));
+  };
 
 
-// --- NEW: Handle Import Chatbot ---
-const handleImportButtonClick = () => {
-fileInputRef.current?.click(); // Programmatically click the hidden file input
-};
+  // --- NEW: Handle Import Chatbot ---
+  const handleImportButtonClick = () => {
+    fileInputRef.current?.click(); // Programmatically click the hidden file input
+  };
 
-const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-const file = event.target.files?.[0];
-if (file) {
-const reader = new FileReader();
-reader.onload = (e) => {
-try {
-const jsonContent = e.target?.result as string;
-const importedConfig = JSON.parse(jsonContent);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonContent = e.target?.result as string;
+          const importedConfig = JSON.parse(jsonContent);
 
-// Basic validation for the imported JSON structure
-if (importedConfig.botName && importedConfig.nodes && Array.isArray(importedConfig.nodes) &&
-importedConfig.connections && Array.isArray(importedConfig.connections)) {
+          // Basic validation for the imported JSON structure
+          if (importedConfig.botName && importedConfig.nodes && Array.isArray(importedConfig.nodes) &&
+            importedConfig.connections && Array.isArray(importedConfig.connections)) {
 
-setBotName(importedConfig.botName);
-setWelcomeMessage(importedConfig.welcomeMessage || 'Hello! Welcome to the imported bot.');
-setFallbackMessage(importedConfig.fallbackMessage || 'I didn\'t understand that. Can you rephrase?');
+            setBotName(importedConfig.botName);
+            setWelcomeMessage(importedConfig.welcomeMessage || 'Hello! Welcome to the imported bot.');
+            setFallbackMessage(importedConfig.fallbackMessage || 'I didn\'t understand that. Can you rephrase?');
 
-// --- Node Mapping for YOUR custom structure ---
-const mappedNodes: Node[] = importedConfig.nodes.map((node: any) => ({
-id: node.id,
-type: node.type,
-x: node.x || 0, // Use x, y directly
-y: node.y || 0,
-data: {
-title: node.data?.title || '',
-content: node.data?.content || '',
-options: node.data?.options || [],
-useAI: node.data?.useAI ?? false,
-},
-outputs: node.outputs || [], // Preserve outputs array
-}));
+            // --- Node Mapping for YOUR custom structure ---
+            const mappedNodes: Node[] = importedConfig.nodes.map((node: any) => ({
+              id: node.id,
+              type: node.type,
+              x: node.x || 0, // Use x, y directly
+              y: node.y || 0,
+              data: {
+                title: node.data?.title || '',
+                content: node.data?.content || '',
+                options: node.data?.options || [],
+                useAI: node.data?.useAI ?? false,
+              },
+              outputs: node.outputs || [], // Preserve outputs array
+            }));
 
-// --- Connection Mapping for YOUR custom structure ---
-const mappedConnections: Connection[] = importedConfig.connections.map((conn: any) => ({
-id: conn.id,
-sourceId: conn.sourceId,
-sourceOutput: conn.sourceOutput,
-targetId: conn.targetId,
-}));
+            // --- Connection Mapping for YOUR custom structure ---
+            const mappedConnections: Connection[] = importedConfig.connections.map((conn: any) => ({
+              id: conn.id,
+              sourceId: conn.sourceId,
+              sourceOutput: conn.sourceOutput,
+              targetId: conn.targetId,
+            }));
 
-setNodes(mappedNodes);
-setConnections(mappedConnections);
-alert('Chatbot imported successfully!');
-console.log('Imported Chatbot Config:', importedConfig);
+            setNodes(mappedNodes);
+            setConnections(mappedConnections);
+            alert('Chatbot imported successfully!');
+            console.log('Imported Chatbot Config:', importedConfig);
 
-} else {
-alert('Invalid JSON structure. Please ensure it contains "botName", "nodes", and "connections" arrays with correct properties.');
-}
-} catch (parseError) {
-console.error('Error parsing JSON file:', parseError);
-alert('Failed to parse JSON file. Please ensure it\'s a valid JSON.');
-}
-};
-reader.readAsText(file);
-}
-};
+          } else {
+            alert('Invalid JSON structure. Please ensure it contains "botName", "nodes", and "connections" arrays with correct properties.');
+          }
+        } catch (parseError) {
+          console.error('Error parsing JSON file:', parseError);
+          alert('Failed to parse JSON file. Please ensure it\'s a valid JSON.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
 
 
   return (
@@ -880,13 +687,13 @@ reader.readAsText(file);
             <button onClick={exportChatbot} className="btn btn-export">
               Export Chatbot
             </button>
-          
+            {/* Import Button */}
             <input
               type="file"
               ref={fileInputRef}
-              style={{ display: 'none' }}
+              style={{ display: 'none' }} // Hide the actual file input
               onChange={handleFileChange}
-              accept=".json" 
+              accept=".json" // Only accept JSON files
             />
             <button onClick={handleImportButtonClick} className="btn btn-export">
               Import Chatbot

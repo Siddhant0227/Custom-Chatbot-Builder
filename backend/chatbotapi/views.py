@@ -7,15 +7,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 # Import AllowAny for temporary insecure testing
 from rest_framework.permissions import AllowAny, IsAuthenticated
-<<<<<<< Updated upstream
 from rest_framework.authtoken.models import Token
 
 
-=======
-from rest_framework.decorators import api_view, permission_classes
-from django.views.decorators.csrf import csrf_exempt # Imported csrf_exempt
-from django.utils.decorators import method_decorator
->>>>>>> Stashed changes
 from django.http import JsonResponse, Http404
 
 import json
@@ -122,10 +116,6 @@ def get_correction_response(text_to_correct):
 
 # --- API Views ---
 
-<<<<<<< Updated upstream
-=======
-@method_decorator(csrf_exempt, name='dispatch') # This decorator exempts the view from CSRF protection
->>>>>>> Stashed changes
 class AIChatbotResponseView(APIView):
     permission_classes = [AllowAny]
 
@@ -158,10 +148,6 @@ class AIChatbotResponseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-<<<<<<< Updated upstream
-=======
-@method_decorator(csrf_exempt, name='dispatch') # This decorator exempts the view from CSRF protection
->>>>>>> Stashed changes
 class ChatbotListCreateAPIView(APIView):
     # TEMPORARY: AllowAny for testing. REVERT THIS FOR PRODUCTION.
     permission_classes = [AllowAny]
@@ -170,11 +156,7 @@ class ChatbotListCreateAPIView(APIView):
         """
         Lists chatbots belonging to the authenticated user.
         """
-<<<<<<< Updated upstream
         chatbots = Chatbot.objects.filter(user=request.user)
-=======
-        chatbots = Chatbot.objects.filter(user=request.user) # Filter by current user
->>>>>>> Stashed changes
         serializer = ChatbotSerializer(chatbots, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -184,25 +166,15 @@ class ChatbotListCreateAPIView(APIView):
         """
         serializer = ChatbotSerializer(data=request.data)
         if serializer.is_valid():
-<<<<<<< Updated upstream
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-=======
-            serializer.save(user=request.user) # Use request.user directly
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@method_decorator(csrf_exempt, name='dispatch') # This decorator exempts the view from CSRF protection
->>>>>>> Stashed changes
 class CreateEmptyChatbotAPIView(APIView):
     # TEMPORARY: AllowAny for testing. REVERT THIS FOR PRODUCTION.
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-<<<<<<< Updated upstream
         """
         Creates a new chatbot with default empty configuration for nodes and connections,
         associating it with the authenticated user.
@@ -233,15 +205,6 @@ class CreateEmptyChatbotAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-=======
-        serializer = ChatbotSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user) # Use request.user directly
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@method_decorator(csrf_exempt, name='dispatch') # This decorator exempts the view from CSRF protection
->>>>>>> Stashed changes
 class ChatbotRetrieveUpdateDestroyAPIView(APIView):
     # TEMPORARY: AllowAny for testing. REVERT THIS FOR PRODUCTION.
     permission_classes = [IsAuthenticated] # Changed to IsAuthenticated
@@ -249,10 +212,6 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
     def get_object(self, pk):
         """Helper to get a chatbot instance ensuring it belongs to the authenticated user."""
         try:
-<<<<<<< Updated upstream
-=======
-            # Ensure only the owner can retrieve their chatbot
->>>>>>> Stashed changes
             return Chatbot.objects.get(pk=pk, user=self.request.user)
         except Chatbot.DoesNotExist:
             raise Http404
@@ -272,12 +231,7 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
         chatbot = self.get_object(pk) # get_object already filters by user
         serializer = ChatbotSerializer(chatbot, data=request.data, partial=True)
         if serializer.is_valid():
-<<<<<<< Updated upstream
             serializer.save(user=request.user)
-=======
-            # No need to explicitly pass user, get_object ensures ownership
-            serializer.save()
->>>>>>> Stashed changes
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -289,21 +243,14 @@ class ChatbotRetrieveUpdateDestroyAPIView(APIView):
         chatbot.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-<<<<<<< Updated upstream
-=======
-@method_decorator(csrf_exempt, name='dispatch') # This decorator exempts the view from CSRF protection
->>>>>>> Stashed changes
 class ChatbotConfigView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-<<<<<<< Updated upstream
         """
         API endpoint to save/update a chatbot's configuration by name.
         Creates if not exists, updates if exists, for the authenticated user.
         """
-=======
->>>>>>> Stashed changes
         bot_name = request.data.get('botName')
         if not bot_name:
             return Response(
@@ -311,7 +258,6 @@ class ChatbotConfigView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-<<<<<<< Updated upstream
         # --- START OF MODIFIED SECTION ---
         # Extract the fields that belong in the 'configuration' dictionary
         configuration_data = {
@@ -337,28 +283,14 @@ class ChatbotConfigView(APIView):
             chatbot_instance = Chatbot.objects.get(name=bot_name, user=request.user)
             # When updating, partial=True allows sending only a subset of fields.
             # However, if 'configuration' is a JSONField, sending the whole object is typical.
-=======
-        data_for_serializer = request.data.copy()
-        data_for_serializer['name'] = bot_name
-        if 'botName' in data_for_serializer:
-            del data_for_serializer['botName']
-
-        try:
-            # Filter by 'name' and the authenticated user
-            chatbot_instance = Chatbot.objects.get(name=bot_name, user=request.user)
->>>>>>> Stashed changes
             serializer = ChatbotSerializer(instance=chatbot_instance, data=data_for_serializer, partial=True)
         except Chatbot.DoesNotExist:
             # If chatbot doesn't exist, create a new one
             serializer = ChatbotSerializer(data=data_for_serializer)
 
         if serializer.is_valid():
-<<<<<<< Updated upstream
             chatbot = serializer.save(user=request.user)
             # Determine status based on whether it was created or updated
-=======
-            serializer.save(user=request.user) # Use request.user directly
->>>>>>> Stashed changes
             return Response(serializer.data, status=status.HTTP_201_CREATED if serializer.instance._state.adding else status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -386,12 +318,8 @@ class WelcomeView(APIView):
     def get(self, request):
         return JsonResponse({"message": "Welcome to the Chatbot Builder Backend API!"})
 
-<<<<<<< Updated upstream
 # --- Authentication Views ---
 
-=======
-# --- Authentication Views (Keep as is, they handle initial login) ---
->>>>>>> Stashed changes
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -442,7 +370,6 @@ class LoginView(APIView):
             )
 
 class LogoutView(APIView):
-<<<<<<< Updated upstream
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -457,12 +384,3 @@ class LogoutView(APIView):
                 {'message': 'No active token found for this user.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-=======
-    permission_classes = [IsAuthenticated] # Keep IsAuthenticated for logout
-    def post(self, request):
-        logout(request)
-        return Response(
-            {'message': 'Logged out successfully.'},
-            status=status.HTTP_200_OK
-        )
->>>>>>> Stashed changes
