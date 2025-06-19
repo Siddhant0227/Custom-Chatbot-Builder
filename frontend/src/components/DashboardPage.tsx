@@ -20,7 +20,7 @@ interface Chatbot {
 }
 
 const DashboardPage: React.FC = () => { // Explicitly typing the functional component
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth(); // Destructure logout from useAuth
   const [chatbots, setChatbots] = useState<Chatbot[]>([]); // Explicitly type 'chatbots' state as Chatbot[]
   const [loading, setLoading] = useState<boolean>(true); // Explicitly type 'loading' state
   const [error, setError] = useState<string | null>(null); // Explicitly type 'error' state
@@ -31,8 +31,6 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
       if (!isAuthenticated) {
         setLoading(false);
         setError("You must be logged in to view chatbots.");
-        // If you want to redirect immediately if not authenticated, uncomment the line below:
-        // navigate('/login');
         return;
       }
 
@@ -95,18 +93,34 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
     navigate(`/build/${id}`);
   };
 
+  const handleLogout = () => {
+    logout(); // Call the logout function from AuthContext
+    navigate('/login'); // Redirect to the login page after logout
+  };
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-header"> {/* This header will be made sticky */}
         <h1>Your Chatbots</h1>
-        <button onClick={handleCreateNew} className="btn-create-chatbot">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus-circle">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M8 12h8" />
-            <path d="M12 8v8" />
-          </svg>
-          Create New Chatbot
-        </button>
+        <div className="header-actions"> {/* Added a wrapper for buttons for better layout */}
+          <button onClick={handleCreateNew} className="btn-create-chatbot">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus-circle">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M8 12h8" />
+              <path d="M12 8v8" />
+            </svg>
+            Create New Chatbot
+          </button>
+          {/* Logout Button Added Here */}
+          <button onClick={handleLogout} className="btn-logout">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </div>
       </div>
 
       {error && <p className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '20px' }}>{error}</p>}

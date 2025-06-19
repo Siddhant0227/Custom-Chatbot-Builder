@@ -1,97 +1,112 @@
 // src/components/Login.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext.tsx'; // Assuming AuthContext provides login/isAuthenticated
-import './Login.css'; // Your CSS for styling
+import { useAuth } from '../AuthContext.tsx';
+import './Login.css';
 
-// Define your API base URL for consistency
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
 const Login = () => {
-  // Destructure authentication state and functions from your AuthContext
   const { isAuthenticated, login } = useAuth();
-
-  // State variables for form inputs, errors, success messages, and mode (login/register)
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isRegistering, setIsRegistering] = useState(false); // Controls between login and register mode
-
-  // Hook for programmatic navigation
   const navigate = useNavigate();
 
-  // Handle form submission for both login and registration
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior (page reload)
-    setError(''); // Clear any previous errors
-    setSuccessMessage(''); // Clear any previous success messages
+  // Handle login submission
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMessage('');
 
-    // Basic client-side validation
     if (!username || !password) {
       setError('Please enter both username and password.');
       return;
     }
 
     try {
-      // Determine the API endpoint based on whether the user is registering or logging in
-      const apiUrl = isRegistering ? `${API_BASE_URL}/api/register/` : `${API_BASE_URL}/api/login/`;
-
-      // Make the API call to your Django backend
-      const response = await fetch(apiUrl, {
-        method: 'POST', // Always POST for login/register
-        headers: {
-          'Content-Type': 'application/json', // Specify JSON content type
-          // IMPORTANT: The 'Authorization' header is NOT sent here.
-          // Login/Register endpoints are public and return a token, they don't consume one.
-        },
-        body: JSON.stringify({ username, password }), // Send username and password as JSON
+      const response = await fetch(`${API_BASE_URL}/api/login/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
       });
 
-      // Check if the response was successful (status code 2xx)
       if (response.ok) {
-        const data = await response.json(); // Parse the JSON response
-
-        if (isRegistering) {
-          // Handle successful registration
-          setSuccessMessage('Registration successful! You can now log in.');
-          setIsRegistering(false); // Switch back to login mode
-          setUsername(''); // Clear form fields
-          setPassword(''); // Clear form fields
-          // Optionally, if the backend returns a token on registration, log in directly
-          if (data.token) {
-            login(data.username, data.token); // Use AuthContext to log in and store token
-            navigate('/dashboard'); // Redirect to dashboard
-          }
+        const data = await response.json();
+        if (data.token) {
+          login(data.username, data.token);
+          navigate('/dashboard');
         } else {
-          // Handle successful login
-          if (data.token) { // Ensure a token was received
-            login(data.username, data.token); // Use AuthContext to log in and store token
-            navigate('/dashboard'); // Redirect to dashboard
-          } else {
-            // If login was "successful" but no token, something is wrong
-            setError('Login successful, but no authentication token received. Please try again.');
-            console.error('Login successful, but no token received:', data);
-          }
+          setError('Login successful, but no authentication token received. Please try again.');
+          console.error('Login successful, but no token received:', data);
         }
       } else {
-        // Handle API errors (e.g., 400 Bad Request, 401 Unauthorized for invalid credentials)
         try {
-          const errorData = await response.json(); // Try to parse error details from JSON
-          setError(errorData.message || errorData.detail || 'An unknown error occurred during authentication.');
-          console.error("API Error during authentication:", errorData);
+          const errorData = await response.json();
+          setError(errorData.message || errorData.detail || 'An unknown error occurred during login.');
+          console.error("API Error during login:", errorData);
         } catch (jsonError) {
-          // Fallback if the error response is not valid JSON
           setError(`Request failed with status: ${response.status}. Could not parse error details.`);
           console.error("Failed to parse error response JSON:", jsonError);
-          console.error("Raw response:", await response.text()); // Log raw response for debugging
+          console.error("Raw response:", await response.text());
         }
       }
     } catch (err) {
-      // Handle network errors (e.g., server unreachable, CORS issues)
-      console.error('Network or API error during login/register:', err);
+      console.error('Network or API error during login:', err);
       setError('Could not connect to the server. Please check your network connection or server status.');
     }
+  };
+
+  // Handle registration submission
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMessage('');
+
+    if (!username || !password) {
+      setError('Please enter both username and password.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/register/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSuccessMessage('Registration successful! Please log in with your new credentials.');
+        setIsRegistering(false); // Switch back to login mode
+        setUsername('');
+        setPassword('');
+      } else {
+        try {
+          const errorData = await response.json();
+          setError(errorData.message || errorData.detail || 'An unknown error occurred during registration.');
+          console.error("API Error during registration:", errorData);
+        } catch (jsonError) {
+          setError(`Request failed with status: ${response.status}. Could not parse error details.`);
+          console.error("Failed to parse error response JSON:", jsonError);
+          console.error("Raw response:", await response.text());
+        }
+      }
+    } catch (err) {
+      console.error('Network or API error during registration:', err);
+      setError('Could not connect to the server. Please check your network connection or server status.');
+    }
+  };
+
+  // Function to toggle between login and register views
+  const toggleFormMode = () => {
+    setIsRegistering(!isRegistering);
+    setError('');       // Clear messages on toggle
+    setSuccessMessage(''); // Clear messages on toggle
+    setUsername(''); // Clear fields on toggle
+    setPassword(''); // Clear fields on toggle
   };
 
   // If the user is already authenticated, redirect them to the dashboard
@@ -102,45 +117,104 @@ const Login = () => {
   return (
     <>
       <div className="login-container">
-        <div className="login-card">
-          <h2>{isRegistering ? 'Register' : 'Login'}</h2>
-          {/* Display error or success messages */}
-          {error && <div className="error">{error}</div>}
-          {successMessage && <div className="success">{successMessage}</div>}
+        <div className={`login-card ${isRegistering ? 'register-mode' : 'login-mode'}`}>
+          {/* Dynamic Welcome/Toggle Panel */}
+          <div className="welcome-panel">
+            <div className="welcome-content">
+              {isRegistering ? (
+                <>
+                  <h2 className="welcome-title">Welcome Back!</h2>
+                  <p className="welcome-text">To keep connected with us, please login with your personal info.</p>
+                  <button type="button" className="panel-toggle-btn" onClick={toggleFormMode}>Login</button>
+                </>
+              ) : (
+                <>
+                  <h2 className="welcome-title">Hello, Welcome!</h2>
+                  <p className="welcome-text">Enter your personal details to join our community.</p>
+                  <button type="button" className="panel-toggle-btn" onClick={toggleFormMode}>Register</button>
+                </>
+              )}
+            </div>
+          </div>
 
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button type="submit">
-              {isRegistering ? 'Register' : 'Login'}
-            </button>
-          </form>
+          {/* Static Form Panel */}
+          <div className="form-panel">
+            {/* Display title based on mode (inside the form panel) */}
+            <h2 className="form-title">{isRegistering ? 'Create Account' : 'Sign in'}</h2>
 
-          {/* Toggle between Login and Register modes */}
-          <div className="toggle-mode">
-            {isRegistering ? (
-              <>
-                Already have an account?{' '}
-                <button type="button" onClick={() => setIsRegistering(false)}>Login</button>
-              </>
-            ) : (
-              <>
-                Don't have an account?{' '}
-                <button type="button" onClick={() => setIsRegistering(true)}>Register</button>
-              </>
-            )}
+            {/* Display error or success messages */}
+            {error && <div className="error">{error}</div>}
+            {successMessage && <div className="success">{successMessage}</div>}
+
+            {/* Login Form */}
+            <div className={`form-content ${!isRegistering ? 'active-form' : 'inactive-form'}`}>
+              <form onSubmit={handleLoginSubmit}>
+                <div className="form-group-item">
+                  <label htmlFor="login-username">Username</label>
+                  <input
+                    type="text"
+                    id="login-username"
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group-item">
+                  <label htmlFor="login-password">Password</label>
+                  <input
+                    type="password"
+                    id="login-password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <a href="#" className="forgot-password">Forgot Password?</a>
+                <button type="submit">Login</button>
+              </form>
+            </div>
+
+            {/* Registration Form */}
+            <div className={`form-content ${isRegistering ? 'active-form' : 'inactive-form'}`}>
+              <form onSubmit={handleRegisterSubmit}>
+                <div className="form-group-item">
+                  <label htmlFor="register-username">Username</label>
+                  <input
+                    type="text"
+                    id="register-username"
+                    placeholder="Choose a username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group-item">
+                  <label htmlFor="register-password">Password</label>
+                  <input
+                    type="password"
+                    id="register-password"
+                    placeholder="Create a password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <button type="submit">Register</button>
+              </form>
+            </div>
+
+            {/* Social Login Options (Optional, if you want to implement them later) */}
+            <div className="social-login">
+              <p>or login with social platforms</p>
+              <div className="social-icons">
+                <button className="social-btn google">G</button>
+                <button className="social-btn facebook">f</button>
+                <button className="social-btn linkedin">in</button>
+                <button className="social-btn github">O</button> {/* Added GitHub icon placeholder */}
+              </div>
+            </div>
           </div>
         </div>
       </div>
