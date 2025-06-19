@@ -7,6 +7,9 @@ interface AuthContextType {
   username: string | null;
   login: (username: string, token: string) => void;
   logout: () => void;
+  // REMOVED 'user' and 'loading' as they are not managed by this context.
+  // If you later add a 'user' object or a 'loading' state related to auth,
+  // you would add them here.
 }
 
 // Create the AuthContext with a default (null) value

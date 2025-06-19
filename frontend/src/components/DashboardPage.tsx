@@ -27,23 +27,7 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
   const [error, setError] = useState<string | null>(null); // Explicitly type 'error' state
   const navigate = useNavigate();
 
-  useEffect(() => {
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  });
-
-  const elements = document.querySelectorAll('.fade-up');
-  elements.forEach(el => observer.observe(el));
-
-  return () => {
-    elements.forEach(el => observer.unobserve(el));
-  };
-}, []);
-
+  
 
   useEffect(() => {
     const fetchChatbots = async () => {

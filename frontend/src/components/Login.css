@@ -86,6 +86,41 @@ body {
     100% { transform: scale(1); opacity: 0.8; }
 }
 
+/* NEW: Styles for the initial logo display */
+.initial-logo-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh; /* Take full viewport height */
+    position: absolute; /* Position it over the entire container */
+    top: 0;
+    left: 0;
+    background: var(--background-dark); /* Match body background */
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 1s ease-out, visibility 1s ease-out; /* Smooth fade out */
+    z-index: 100; /* Ensure it's on top */
+}
+
+/* When showLogo is false, this class will effectively make it disappear */
+.initial-logo-display.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.chatbot-logo-initial {
+    max-width: 500px; /* Adjust size as needed */
+    width: 80%; /* Responsive width */
+    height: auto;
+    animation: pulseLogo 2s infinite alternate ease-in-out; /* Add a subtle pulse */
+}
+
+@keyframes pulseLogo {
+    0% { transform: scale(1); opacity: 0.9; }
+    100% { transform: scale(1.2); opacity: 1; } /* Increased scale for more zoom */
+}
+
 
 .login-card {
     background-color: var(--surface-color);
@@ -98,8 +133,18 @@ body {
     position: relative;
     overflow: hidden; /* Crucial for panel sliding animation */
     z-index: 10;
-    animation: slideFadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); /* Initial animation */
+    /* initial state for the login card, starts hidden */
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/* When showLogo is false, this animation applies */
+.login-card.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 
 /* Left/Welcome Panel (the blue part that slides) */
 .welcome-panel {
@@ -132,7 +177,9 @@ body {
     max-width: 300px;
 }
 
-/* Style for the chatbot logo - positioned above the card */
+/* Style for the chatbot logo - this original style is no longer directly used for the initial animation */
+/* It's good to keep it if you have other uses for it, but for the initial transition,
+   we're using .chatbot-logo-initial instead. */
 .chatbot-logo {
     position: absolute; /* Position relative to login-container */
     width: 500px; /* Increased size */
@@ -489,20 +536,20 @@ body {
         margin-top: 1.5rem;
     }
 
-    /* Adjust logo position for smaller screens */
+    /* Adjust logo position for smaller screens - this applies to the original chatbot-logo, not the initial one */
     @media (max-width: 768px) {
-    .chatbot-logo {
-        width: 180px; /* Adjusted size for tablets */
-        top: 20px; /* Adjusted vertical position for tablets */
+        .chatbot-logo {
+            width: 180px; /* Adjusted size for tablets */
+            top: 20px; /* Adjusted vertical position for tablets */
+        }
     }
-}
 
-@media (max-width: 780px) {
-    .chatbot-logo {
-        width: 540px; /* Adjusted size for mobile */
-        top: 75px; /* Adjusted vertical position for mobile */
+    @media (max-width: 780px) {
+        .chatbot-logo {
+            width: 540px; /* Adjusted size for mobile */
+            top: 75px; /* Adjusted vertical position for mobile */
+        }
     }
-}
 } /* Closing brace for @media (max-width: 768px) */
 
 @media (max-width: 480px) {
@@ -556,7 +603,7 @@ body {
         height: 40px;
         font-size: 1.1rem;
     }
-    /* Adjust logo position for very small screens */
+    /* Adjust logo position for very small screens - this applies to the original chatbot-logo, not the initial one */
     .chatbot-logo {
         width: 100px; /* Even smaller on very small screens */
         top: 20px; /* Adjust vertical position */

@@ -80,8 +80,9 @@ const ChatbotBuilder = () => {
     const [botName, setBotName] = useState('My Chatbot');
     const [welcomeMessage, setWelcomeMessage] = useState('Hello! How can I help you today?');
     const [fallbackMessage, setFallbackMessage] = useState("I'm sorry, I don't understand. Can you please rephrase?");
-    const [isPreviewMode, setIsPreviewMode] = useState(false);
-    const [conversation, setConversation] = useState<Message[]>([]);
+    const [isPreviewMode, setIsPreviewMode] = useState(false); // Initialized to false
+    // REMOVED: conversation, currentNodeId, isInitialLoading states from here.
+    // They are now managed solely within ChatbotPreview.
     const [nodes, setNodes] = useState<Node[]>([]);
     const [connections, setConnections] = useState<Connection[]>([]);
     const [selectedNode, setSelectedNode] = useState<Node | null>(null);
@@ -93,8 +94,6 @@ const ChatbotBuilder = () => {
     const canvasRef = useRef<HTMLDivElement>(null);
     const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
-    const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
-    const [isInitialLoading, setIsInitialLoading] = useState(false); // Used for preview mode
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [activeMainSidebarSubView, setActiveMainSidebarSubView] = useState<'settings' | 'nodeTypes'>('settings');
     const [isLoadingChatbotData, setIsLoadingChatbotData] = useState(true); // <--- NEW: State for loading existing chatbot data
@@ -132,7 +131,6 @@ const ChatbotBuilder = () => {
 
     // --- EFFECTS ---
 
-    
 
     // Effect to initialize the 'Start' node if no nodes exist (for new chatbots)
 
@@ -233,75 +231,39 @@ useEffect(() => {
         }
     }, [canvasRef]);
 
-    // Effect for preview mode initialization
+    // MODIFIED: Effect for preview mode initialization.
+    // Removed redundant conversation state management.
     useEffect(() => {
         if (isPreviewMode) {
-            setIsInitialLoading(true);
-            setConversation([{ sender: 'bot', message: '...', isTyping: true }]);
-
             const generatedRules: Rule[] = [];
-            const startNode = nodes.find(node => node.type === 'start');
-            let initialCurrentNodeId: string | null = null;
-
-            setTimeout(() => {
-                let initialMessages: Message[] = [];
-
-                if (startNode) {
-                    initialMessages.push({ sender: 'bot', message: startNode.data.content });
-                    initialCurrentNodeId = startNode.id;
-
-                    const firstStartConnection = connections.find(conn => conn.sourceId === startNode.id);
-                    if (firstStartConnection) {
-                        const nextNode = nodes.find(node => node.id === firstStartConnection.targetId);
-                        if (nextNode) {
-                            const messageData: Message = {
-                                sender: 'bot',
-                                message: nextNode.data.content,
-                                nodeId: nextNode.id
-                            };
-
-                            if ((nextNode.type === 'multichoice' || nextNode.type === 'button') && nextNode.data.options) {
-                                messageData.options = nextNode.data.options.map(opt => ({
-                                    label: opt.label,
-                                    value: opt.value
-                                }));
-                            }
-
-                            initialMessages.push(messageData);
-                            initialCurrentNodeId = nextNode.id;
-                        }
-                    }
-                } else {
-                    initialMessages.push({ sender: 'bot', message: welcomeMessage });
+            connections.forEach(conn => {
+                const targetNode = nodes.find(node => node.id === conn.targetId);
+                if (targetNode) {
+                    generatedRules.push({
+                        id: generateId('rule'),
+                        trigger: conn.sourceOutput,
+                        response: targetNode.data.content,
+                        isExactMatch: true,
+                        useAI: targetNode.data.useAI || false,
+                    });
                 }
-
-                setConversation(initialMessages);
-                setCurrentNodeId(initialCurrentNodeId);
-                setIsInitialLoading(false);
-
-                connections.forEach(conn => {
-                    const targetNode = nodes.find(node => node.id === conn.targetId);
-                    if (targetNode) {
-                        generatedRules.push({
-                            id: generateId('rule'),
-                            trigger: conn.sourceOutput,
-                            response: targetNode.data.content,
-                            isExactMatch: true,
-                            useAI: targetNode.data.useAI || false,
-                        });
-                    }
-                });
-                setRules(generatedRules);
-            }, 1000);
+            });
+            setRules(generatedRules);
         } else {
-            setConversation([]);
-            setCurrentNodeId(null);
-            setIsInitialLoading(false);
+            // Optionally clear rules if not in preview, or just leave them
+            setRules([]);
         }
-    }, [isPreviewMode, nodes, connections, welcomeMessage]);
+    }, [isPreviewMode, nodes, connections]);
 
 
     // --- Event Handlers ---
+
+    // New: Toggle Preview Mode
+    const togglePreviewMode = () => {
+        console.log("Toggle Preview button clicked!"); // Keep this for debugging
+        setIsPreviewMode(prevMode => !prevMode);
+    };
+
 
     const exportChatbot = () => {
         const chatbotConfig = {
@@ -863,409 +825,407 @@ useEffect(() => {
 
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <div className="header-content">
-          <h1 className="app-title">No-Code Chatbot Builder</h1>
-          <div className="header-buttons">
-            <button onClick={BacktoDashboard} className="btn btn-export">
-              Back
-            </button>
+  <div className="app-container">
+    <header className="app-header">
+      <div className="header-content">
+        <h1 className="app-title">No-Code Chatbot Builder</h1>
+        <div className="header-buttons">
+          <button onClick={BacktoDashboard} className="btn btn-export">
+            Back
+          </button>
 
-            <button onClick={exportChatbot} className="btn btn-export">
-              Export Chatbot
-            </button>
-            {/* Import Button */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }} // Hide the actual file input
-              onChange={handleFileChange}
-              accept=".json" // Only accept JSON files
-            />
-            <button onClick={handleImportButtonClick} className="btn btn-export">
-              Import Chatbot
-            </button>
-          </div>
+          <button onClick={exportChatbot} className="btn btn-export">
+            Export Chatbot
+          </button>
+          {/* Import Button */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }} // Hide the actual file input
+            onChange={handleFileChange}
+            accept=".json" // Only accept JSON files
+          />
+          <button onClick={handleImportButtonClick} className="btn btn-export">
+            Import Chatbot
+          </button>
+          {/* NEW: Toggle Preview Button */}
+          <button onClick={togglePreviewMode} className="btn btn-toggle-preview">
+            {isPreviewMode ? 'Exit Preview' : 'Toggle Preview'}
+          </button>
         </div>
-      </header>
-      <button
-        id="fixed-sidebar-toggle-btn"
-        className={`fixed-sidebar-toggle ${!isSidebarOpen ? 'sidebar-closed-state' : ''}`}
-        onClick={toggleSidebar}
-        aria-label={isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
-      >
-        {/* Always show the hamburger icon for the fixed toggle button */}
-        <span className="icon-hamburger"><span></span></span>
-      </button>
+      </div>
+    </header>
+    <button
+      id="fixed-sidebar-toggle-btn"
+      className={`fixed-sidebar-toggle ${!isSidebarOpen ? 'sidebar-closed-state' : ''}`}
+      onClick={toggleSidebar}
+      aria-label={isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
+    >
+      {/* Always show the hamburger icon for the fixed toggle button */}
+      <span className="icon-hamburger"><span></span></span>
+    </button>
 
+    {/* This is the main builder UI, which should be conditionally rendered */}
+    {!isPreviewMode ? ( // Render the builder UI only when not in preview mode
+      <div className={`flow-builder-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        {isSidebarCollapsed && (
+          <div className="sidebar-toggle-bar">
+            {/* This div seems empty in your original code */}
+          </div>
+        )}
 
-      {isPreviewMode ? (
-        <ChatbotPreview
-          botName={botName}
-          welcomeMessage={welcomeMessage}
-          fallbackMessage={fallbackMessage}
-          nodes={nodes}
-          connections={connections}
-        />
-      ) : (
-        <div className={`flow-builder-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-          {isSidebarCollapsed && (
-            <div className="sidebar-toggle-bar">
-              {/* This div seems empty in your original code */}
-            </div>
-          )}
-
-          {!isSidebarCollapsed && (
-            <div className="sidebar">
-              {/* Sidebar content container for transitions */}
-              <div className={`sidebar-content-wrapper ${activeSidebarView}`}>
-                {/* Main Sidebar View - Now with sub-views */}
-                <div className="sidebar-view main-view">
-                  <div className="sidebar-menu">
-                    <button
-                      className={`menu-option ${activeMainSidebarSubView === 'settings' ? 'active' : ''}`}
-                      onClick={() => setActiveMainSidebarSubView('settings')}
-                    >
-                      Settings
-                    </button>
-                    <button
-                      className={`menu-option ${activeMainSidebarSubView === 'nodeTypes' ? 'active' : ''}`}
-                      onClick={() => setActiveMainSidebarSubView('nodeTypes')}
-                    >
-                      Input Cards
-                    </button>
-                  </div>
-
-                  {activeMainSidebarSubView === 'settings' && (
-                    <div className="sidebar-settings-content">
-                      <div className="sidebar-section">
-                        <h3>Chatbot Settings</h3>
-                        <div className="setting-item">
-                          <label>Name</label>
-                          <input
-                            type="text"
-                            value={botName}
-                            onChange={(e) => setBotName(e.target.value)}
-                            className="input-box"
-                          />
-                        </div>
-                        <div className="setting-item">
-                          <label>Welcome</label>
-                          <input
-                            type="text"
-                            value={welcomeMessage}
-                            onChange={(e) => setWelcomeMessage(e.target.value)}
-                            className="input-box"
-                          />
-                        </div>
-                        <div className="setting-item">
-                          <label>Fallback</label>
-                          <input
-                            type="text"
-                            value={fallbackMessage}
-                            onChange={(e) => setFallbackMessage(e.target.value)}
-                            className="input-box"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeMainSidebarSubView === 'nodeTypes' && (
-                    <div className="sidebar-node-types-content">
-                      <div className="sidebar-section">
-                        <h3>Node Types</h3>
-                        <div className="node-types">
-                          {availableNodeTypes.map((nodeType) => (
-                            <div
-                              key={nodeType.type}
-                              className={`node-type-item node-type-${nodeType.type.toLowerCase()}`}
-                              onClick={() => addNewNode(nodeType.type)}
-                            >
-                              {nodeType.label}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+        {!isSidebarCollapsed && (
+          <div className="sidebar">
+            {/* Sidebar content container for transitions */}
+            <div className={`sidebar-content-wrapper ${activeSidebarView}`}>
+              {/* Main Sidebar View - Now with sub-views */}
+              <div className="sidebar-view main-view">
+                <div className="sidebar-menu">
+                  <button
+                    className={`menu-option ${activeMainSidebarSubView === 'settings' ? 'active' : ''}`}
+                    onClick={() => setActiveMainSidebarSubView('settings')}
+                  >
+                    Settings
+                  </button>
+                  <button
+                    className={`menu-option ${activeMainSidebarSubView === 'nodeTypes' ? 'active' : ''}`}
+                    onClick={() => setActiveMainSidebarSubView('nodeTypes')}
+                  >
+                    Input Cards
+                  </button>
                 </div>
 
-                {/* Node Properties View */}
-                <div className="sidebar-view node-properties-view">
-                  {selectedNode && (
+                {activeMainSidebarSubView === 'settings' && (
+                  <div className="sidebar-settings-content">
                     <div className="sidebar-section">
-                      <div className="node-properties-back-area">
-                        <button onClick={backToMainSidebar} className="back-btn">
-                          &larr; Back
-                        </button>
-                      </div>
-                      <div className="node-properties-header">
-                        <h3>Node Properties</h3>
-                      </div>
+                      <h3>Chatbot Settings</h3>
                       <div className="setting-item">
-                        <label>Title</label>
+                        <label>Name</label>
                         <input
                           type="text"
-                          value={selectedNode.data?.title || ''}
-                          onChange={(e) => updateNodeData(selectedNode.id, 'title', e.target.value)}
+                          value={botName}
+                          onChange={(e) => setBotName(e.target.value)}
                           className="input-box"
                         />
                       </div>
                       <div className="setting-item">
-                        <label>Content</label>
-                        <textarea
-                          value={selectedNode.data?.content || ''}
-                          onChange={(e) => updateNodeData(selectedNode.id, 'content', e.target.value)}
+                        <label>Welcome</label>
+                        <input
+                          type="text"
+                          value={welcomeMessage}
+                          onChange={(e) => setWelcomeMessage(e.target.value)}
                           className="input-box"
-                          rows={4}
                         />
                       </div>
+                      <div className="setting-item">
+                        <label>Fallback</label>
+                        <input
+                          type="text"
+                          value={fallbackMessage}
+                          onChange={(e) => setFallbackMessage(e.target.value)}
+                          className="input-box"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                      {(selectedNode.type === 'multichoice' || selectedNode.type === 'button') && (
-                        <div className="setting-item">
-                          <label>Options</label>
-                          {selectedNode.data.options?.map((option, index) => (
-                            <div key={index} className="node-option-item">
-                              <input
-                                type="text"
-                                placeholder="Label"
-                                value={option.label}
-                                onChange={(e) => updateNodeOption(selectedNode.id, index, 'label', e.target.value)}
-                                className="input-box small-input label-input"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Value (trigger)"
-                                value={option.value}
-                                onChange={(e) => updateNodeOption(selectedNode.id, index, 'value', e.target.value)}
-                                className="input-box small-input value-input"
-                              />
-                              <button
-                                onClick={() => deleteNodeOption(selectedNode.id, index)}
-                                className="btn btn-delete-option"
-                              >
-                                X
-                              </button>
-                            </div>
-                          ))}
-                          <button onClick={() => addNodeOption(selectedNode.id)} className="btn btn-add-option">
-                            Add Option
-                          </button>
-                        </div>
-                      )}
+                {activeMainSidebarSubView === 'nodeTypes' && (
+                  <div className="sidebar-node-types-content">
+                    <div className="sidebar-section">
+                      <h3>Node Types</h3>
+                      <div className="node-types">
+                        {availableNodeTypes.map((nodeType) => (
+                          <div
+                            key={nodeType.type}
+                            className={`node-type-item node-type-${nodeType.type.toLowerCase()}`}
+                            onClick={() => addNewNode(nodeType.type)}
+                          >
+                            {nodeType.label}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                      {(selectedNode.type === 'message' || selectedNode.type === 'textinput') && (
-                        <div className="setting-item ai-toggle-section">
-                          <input
-                            type="checkbox"
-                            id="aiToggle"
-                            checked={selectedNode.data.useAI || false}
-                            onChange={(e) => updateNodeData(selectedNode.id, 'useAI', e.target.checked)}
-                          />
-                          <label htmlFor="aiToggle">Use AI for response</label>
-                        </div>
-                      )}
-
-                      <button onClick={() => deleteNode(selectedNode.id)} className="btn btn-delete-node">
-                        Delete Node
+              {/* Node Properties View */}
+              <div className="sidebar-view node-properties-view">
+                {selectedNode && (
+                  <div className="sidebar-section">
+                    <div className="node-properties-back-area">
+                      <button onClick={backToMainSidebar} className="back-btn">
+                        &larr; Back
                       </button>
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="flow-canvas-container">
-            <div className="flow-canvas-tools">
-              <button onClick={handleZoomIn} className="zoom-btn">
-                +
-              </button>
-              <span>{Math.round(zoom * 100)}%</span>
-              <button onClick={handleZoomOut} className="zoom-btn">
-                -
-              </button>
-            </div>
-            <div
-              className="flow-canvas"
-              ref={canvasRef}
-              onMouseDown={handleCanvasMouseDown}
-              onMouseMove={handleCanvasMouseMove}
-              onMouseUp={handleCanvasMouseUp}
-              onMouseLeave={handleCanvasMouseUp}
-            >
-              <div className="canvas-content" style={{ transform: `scale(${zoom})`, transformOrigin: '0 0' }}>
-                <svg className="connections-layer" width="100%" height="100%">
-                  {connections.map((conn) => {
-                    const sourceNode = nodes.find((n) => n.id === conn.sourceId);
-                    const targetNode = nodes.find((n) => n.id === conn.targetId);
-
-                    if (!sourceNode || !targetNode) return null;
-let startX: number;
-                    let startY: number;
-
-                    // Determine the exact source point for the connection
-                    if ((sourceNode.type === 'multichoice' || sourceNode.type === 'button') && sourceNode.data.options) {
-                      // Find the specific option's output point
-                      const optionIndex = sourceNode.data.options?.findIndex(opt => opt.value === conn.sourceOutput);
-                      if (optionIndex !== undefined && optionIndex > -1) {
-                       
-                        const NODE_HEADER_HEIGHT = 46.8; 
-                        const NODE_CONTENT_TOP_OFFSET = 15; 
-                        const NODE_OPTIONS_DISPLAY_TOP_PADDING = 10; // From .node-options-display padding-top in CSS
-                        const OPTION_ITEM_HEIGHT = 40; // From .node-option-item-display min-height in CSS
-                        const OPTION_ITEM_GAP = 8;
-                        const OUTPUT_POINT_WIDTH = 16; 
-                        const offsetToOptionsBlock = NODE_HEADER_HEIGHT + NODE_CONTENT_TOP_OFFSET;
-
-                      
-                        startX = sourceNode.x + 240 - (OUTPUT_POINT_WIDTH / 2);
-
-        
-                        startY = sourceNode.y + offsetToOptionsBlock + NODE_OPTIONS_DISPLAY_TOP_PADDING + (OPTION_ITEM_HEIGHT + OPTION_ITEM_GAP) * optionIndex + OPTION_ITEM_HEIGHT / 2;
-
-                      } else {
-                        startX = sourceNode.x + 232;
-                        startY = sourceNode.y + 40; // Mid-height of the node for generic output point
-                      }
-                    } else {
-                    
-                      startX = sourceNode.x + 232; // Node width (240) - half of output point (8)
-                      startY = sourceNode.y + 40; // Mid-height of the node
-                    }
-                    const endX = targetNode.x;         // Input point on the left edge
-                    const endY = targetNode.y + 40;    // Mid-height of the node
-                    const controlX1 = startX + 50;
-                    const controlX2 = endX - 50;
-
-                    return (
-                      <g key={conn.id}>
-                        <path
-                          d={`M ${startX} ${startY} C ${controlX1} ${startY}, ${controlX2} ${endY}, ${endX} ${endY}`}
-                          fill="none"
-                          stroke="#888"
-                          strokeWidth="2"
-                          onClick={() => deleteConnection(conn.id)}
-                          className="connection-path" // Add class for styling/hover
-                        />
-                        {/* Arrowhead */}
-                        <circle cx={endX} cy={endY} r="5" fill="#888" />
-                        {/* Connection Label */}
-                        <text
-                          x={(startX + endX) / 2}
-                          y={(startY + endY) / 2 - 10}
-                          fill="#555"
-                          fontSize="10"
-                          textAnchor="middle"
-                          pointerEvents="none" // Important to allow clicking the path beneath
-                        >
-                          {conn.sourceOutput}
-                        </text>
-                      </g>
-                    );
-                  })}
-
-                  {creatingConnection && (
-                    <path
-                      d={`M ${creatingConnection.startX} ${creatingConnection.startY}
-                      C ${creatingConnection.startX + 50} ${creatingConnection.startY},
-                      ${creatingConnection.endX - 50} ${creatingConnection.endY},
-                      ${creatingConnection.endX} ${creatingConnection.endY}`}
-                      fill="none"
-                      stroke="#888"
-                      strokeWidth="2"
-                      strokeDasharray="5,5"
-                    />
-                  )}
-                </svg>
-                {nodes.map((node) => {
-                  const nodeType = availableNodeTypes.find((nt) => nt.type === node.type);
-                  return (
-                    <div
-                      key={node.id}
-                      className={`flow-node ${selectedNode?.id === node.id ? 'selected' : ''} node-type-${node.type}`}
-                      style={{ left: node.x, top: node.y }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedNode(node);
-                        setActiveSidebarView('nodeProperties'); // Switch to node properties view
-                      }}
-                      onMouseDown={(e) => {
-                        // Allow dragging by clicking anywhere on the node except delete/output handles
-                        if (!(e.target as HTMLElement).closest('.delete-node-btn, .output-point')) {
-                          handleCanvasMouseDown(e); // Use the general canvas mouse down for dragging
-                        }
-                      }}
-                    >
-                      <div className="flow-node-header">
-                        {node.data?.title || 'Unnamed Node'}
-                        {node.id !== 'start-1' && ( // Prevent deleting the start node
-                          <button
-                            className="delete-node-btn"
-                            onClick={(e) => {
-                              e.stopPropagation(); // Prevent node selection/drag when clicking delete
-                              deleteNode(node.id);
-                            }}
-                            title="Delete Node"
-                          >
-                            &#x1F5D1; {/* Trashcan icon */}
-                          </button>
-                        )}
-                        {/* Input point for incoming connections */}
-                        <div className="flow-node-input">
-                          <div className="input-point" />
-                        </div>
-                      </div>
-                      <div className="flow-node-content">
-                        {node.data?.content || 'No content'}
-                      </div>
-                      {/* Render outputs only if node.outputs array is not empty AND not 'end' or 'rating' (if they truly have no outgoing connections) */}
-                      {node.outputs && node.outputs.length > 0 && node.type !== 'end' && node.type !== 'rating' && (
-                        <div className="flow-node-outputs">
-                          {node.outputs.map((output: string) => (
-                            <div
-                              key={output}
-                              className="output-point"
-                              onMouseDown={(e) => startConnection(node.id, output, e)}
-                              title={`Connect from ${output}`}
-                            />
-                          ))}
-                        </div>
-                      )}
-                      {(node.type === 'multichoice' || node.type === 'button') && node.data.options && (
-                        <div className="node-options-display">
-                          {node.data.options.map((option, index) => (
-                            <div
-                              key={index}
-                              className="node-option-item-display">
-                              {option.label}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <div className="flow-node-type">
-                        {nodeType?.label || node.type.toUpperCase()} {/* Display label or type */}
-                      </div>
+                    <div className="node-properties-header">
+                      <h3>Node Properties</h3>
                     </div>
-                  );
-                })}
+                    <div className="setting-item">
+                      <label>Title</label>
+                      <input
+                        type="text"
+                        value={selectedNode.data?.title || ''}
+                        onChange={(e) => updateNodeData(selectedNode.id, 'title', e.target.value)}
+                        className="input-box"
+                      />
+                    </div>
+                    <div className="setting-item">
+                      <label>Content</label>
+                      <textarea
+                        value={selectedNode.data?.content || ''}
+                        onChange={(e) => updateNodeData(selectedNode.id, 'content', e.target.value)}
+                        className="input-box"
+                        rows={4}
+                      />
+                    </div>
+
+                    {(selectedNode.type === 'multichoice' || selectedNode.type === 'button') && (
+                      <div className="setting-item">
+                        <label>Options</label>
+                        {selectedNode.data.options?.map((option, index) => (
+                          <div key={index} className="node-option-item">
+                            <input
+                              type="text"
+                              placeholder="Label"
+                              value={option.label}
+                              onChange={(e) => updateNodeOption(selectedNode.id, index, 'label', e.target.value)}
+                              className="input-box small-input label-input"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Value (trigger)"
+                              value={option.value}
+                              onChange={(e) => updateNodeOption(selectedNode.id, index, 'value', e.target.value)}
+                              className="input-box small-input value-input"
+                            />
+                            <button
+                              onClick={() => deleteNodeOption(selectedNode.id, index)}
+                              className="btn btn-delete-option"
+                            >
+                              X
+                            </button>
+                          </div>
+                        ))}
+                        <button onClick={() => addNodeOption(selectedNode.id)} className="btn btn-add-option">
+                          Add Option
+                        </button>
+                      </div>
+                    )}
+
+                    {(selectedNode.type === 'message' || selectedNode.type === 'textinput') && (
+                      <div className="setting-item ai-toggle-section">
+                        <input
+                          type="checkbox"
+                          id="aiToggle"
+                          checked={selectedNode.data.useAI || false}
+                          onChange={(e) => updateNodeData(selectedNode.id, 'useAI', e.target.checked)}
+                        />
+                        <label htmlFor="aiToggle">Use AI for response</label>
+                      </div>
+                    )}
+
+                    <button onClick={() => deleteNode(selectedNode.id)} className="btn btn-delete-node">
+                      Delete Node
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-       <ChatbotPreview
-        botName={botName}
-        welcomeMessage={welcomeMessage}
-        fallbackMessage={fallbackMessage}
-        nodes={nodes}
-        connections={connections}
-      /> 
-    </div>
-  );
-};
+        <div className="flow-canvas-container">
+          <div className="flow-canvas-tools">
+            <button onClick={handleZoomIn} className="zoom-btn">
+              +
+            </button>
+            <span>{Math.round(zoom * 100)}%</span>
+            <button onClick={handleZoomOut} className="zoom-btn">
+              -
+            </button>
+          </div>
+          <div
+            className="flow-canvas"
+            ref={canvasRef}
+            onMouseDown={handleCanvasMouseDown}
+            onMouseMove={handleCanvasMouseMove}
+            onMouseUp={handleCanvasMouseUp}
+            onMouseLeave={handleCanvasMouseUp}
+          >
+            <div className="canvas-content" style={{ transform: `scale(${zoom})`, transformOrigin: '0 0' }}>
+              <svg className="connections-layer" width="100%" height="100%">
+                {connections.map((conn) => {
+                  const sourceNode = nodes.find((n) => n.id === conn.sourceId);
+                  const targetNode = nodes.find((n) => n.id === conn.targetId);
+
+                  if (!sourceNode || !targetNode) return null;
+                  let startX: number;
+                  let startY: number;
+
+                  // Determine the exact source point for the connection
+                  if ((sourceNode.type === 'multichoice' || sourceNode.type === 'button') && sourceNode.data.options) {
+                    // Find the specific option's output point
+                    const optionIndex = sourceNode.data.options?.findIndex(opt => opt.value === conn.sourceOutput);
+                    if (optionIndex !== undefined && optionIndex > -1) {
+
+                      const NODE_HEADER_HEIGHT = 46.8;
+                      const NODE_CONTENT_TOP_OFFSET = 15;
+                      const NODE_OPTIONS_DISPLAY_TOP_PADDING = 10; // From .node-options-display padding-top in CSS
+                      const OPTION_ITEM_HEIGHT = 40; // From .node-option-item-display min-height in CSS
+                      const OPTION_ITEM_GAP = 8;
+                      const OUTPUT_POINT_WIDTH = 16;
+                      const offsetToOptionsBlock = NODE_HEADER_HEIGHT + NODE_CONTENT_TOP_OFFSET;
+
+
+                      startX = sourceNode.x + 240 - (OUTPUT_POINT_WIDTH / 2);
+
+
+                      startY = sourceNode.y + offsetToOptionsBlock + NODE_OPTIONS_DISPLAY_TOP_PADDING + (OPTION_ITEM_HEIGHT + OPTION_ITEM_GAP) * optionIndex + OPTION_ITEM_HEIGHT / 2;
+
+                    } else {
+                      startX = sourceNode.x + 232;
+                      startY = sourceNode.y + 40; // Mid-height of the node for generic output point
+                    }
+                  } else {
+
+                    startX = sourceNode.x + 232; // Node width (240) - half of output point (8)
+                    startY = sourceNode.y + 40; // Mid-height of the node
+                  }
+                  const endX = targetNode.x;
+                  const endY = targetNode.y + 40;
+                  const controlX1 = startX + 50;
+                  const controlX2 = endX - 50;
+
+                  return (
+                    <g key={conn.id}>
+                      <path
+                        d={`M ${startX} ${startY} C ${controlX1} ${startY}, ${controlX2} ${endY}, ${endX} ${endY}`}
+                        fill="none"
+                        stroke="#888"
+                        strokeWidth="2"
+                        onClick={() => deleteConnection(conn.id)}
+                        className="connection-path" // Add class for styling/hover
+                      />
+                      {/* Arrowhead */}
+                      <circle cx={endX} cy={endY} r="5" fill="#888" />
+                      {/* Connection Label */}
+                      <text
+                        x={(startX + endX) / 2}
+                        y={(startY + endY) / 2 - 10}
+                        fill="#555"
+                        fontSize="10"
+                        textAnchor="middle"
+                        pointerEvents="none" // Important to allow clicking the path beneath
+                      >
+                        {conn.sourceOutput}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {creatingConnection && (
+                  <path
+                    d={`M ${creatingConnection.startX} ${creatingConnection.startY}
+                    C ${creatingConnection.startX + 50} ${creatingConnection.startY},
+                    ${creatingConnection.endX - 50} ${creatingConnection.endY},
+                    ${creatingConnection.endX} ${creatingConnection.endY}`}
+                    fill="none"
+                    stroke="#888"
+                    strokeWidth="2"
+                    strokeDasharray="5,5"
+                  />
+                )}
+              </svg>
+              {nodes.map((node) => {
+                const nodeType = availableNodeTypes.find((nt) => nt.type === node.type);
+                return (
+                  <div
+                    key={node.id}
+                    className={`flow-node ${selectedNode?.id === node.id ? 'selected' : ''} node-type-${node.type}`}
+                    style={{ left: node.x, top: node.y }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedNode(node);
+                      setActiveSidebarView('nodeProperties'); // Switch to node properties view
+                    }}
+                    onMouseDown={(e) => {
+                      // Allow dragging by clicking anywhere on the node except delete/output handles
+                      if (!(e.target as HTMLElement).closest('.delete-node-btn, .output-point')) {
+                        handleCanvasMouseDown(e); // Use the general canvas mouse down for dragging
+                      }
+                    }}
+                  >
+                    <div className="flow-node-header">
+                      {node.data?.title || 'Unnamed Node'}
+                      {node.id !== 'start-1' && ( // Prevent deleting the start node
+                        <button
+                          className="delete-node-btn"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent node selection/drag when clicking delete
+                            deleteNode(node.id);
+                          }}
+                          title="Delete Node"
+                        >
+                          &#x1F5D1; {/* Trashcan icon */}
+                        </button>
+                      )}
+                      {/* Input point for incoming connections */}
+                      <div className="flow-node-input">
+                        <div className="input-point" />
+                      </div>
+                    </div>
+                    <div className="flow-node-content">
+                      {node.data?.content || 'No content'}
+                    </div>
+                    {/* Render outputs only if node.outputs array is not empty AND not 'end' or 'rating' (if they truly have no outgoing connections) */}
+                    {node.outputs && node.outputs.length > 0 && node.type !== 'end' && node.type !== 'rating' && (
+                      <div className="flow-node-outputs">
+                        {node.outputs.map((output: string) => (
+                          <div
+                            key={output}
+                            className="output-point"
+                            onMouseDown={(e) => startConnection(node.id, output, e)}
+                            title={`Connect from ${output}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    {(node.type === 'multichoice' || node.type === 'button') && node.data.options && (
+                      <div className="node-options-display">
+                        {node.data.options.map((option, index) => (
+                          <div
+                            key={index}
+                            className="node-option-item-display">
+                            {option.label}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flow-node-type">
+                      {nodeType?.label || node.type.toUpperCase()} {/* Display label or type */}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : null} {/* If in preview mode, don't render the builder directly here */}
+
+    {/* ALWAYS RENDER THE CHATBOTPREVIEW COMPONENT */}
+    {/* Pass isPreviewMode to it so it can control its internal display */}
+    <ChatbotPreview
+      botName={botName}
+      welcomeMessage={welcomeMessage}
+      fallbackMessage={fallbackMessage}
+      nodes={nodes}
+      connections={connections}
+      isPreview={false} // Change this from isPreviewMode to false
+    />
+  </div>
+);}; // Added semicolon here
 
 export default ChatbotBuilder;
