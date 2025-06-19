@@ -2,179 +2,216 @@
 
 /* --- Base Styles & Variables --- */
 :root {
-    /* NEW COLOR PALETTE - Deep Ocean & Electric Accents */
-    --primary-gradient: linear-gradient(135deg, #b6a400 0%, #8E2DE2 100%); /* Deep Violet to Electric Purple */
-    --secondary-gradient: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%); /* Sky Blue to Mint Green */
-    --accent-color: #00F0FF; /* Electric Cyan - for highlights */
-    --background-dark: #0A192F; /* Very dark blue, almost black (like a deep ocean) */
-    --background-medium: #172A45; /* Slightly lighter dark blue */
-    --surface-color: #1F3354; /* Dark blue-grey for cards/panels */
-    --text-lightest: #E2E8F0; /* Off-white for primary text */
-    --text-light: #A8B3C7; /* Lighter gray-blue for secondary text */
-    --text-medium: #6B7A99; /* Even lighter gray-blue */
-    --border-dark: #2F4265;
-    --border-light: #3A4E7A;
+    /* REFINED COLOR PALETTE - Lumina Core & Bio-Luminescent Accents */
+    --primary-gradient: linear-gradient(135deg, #FF6F00 0%, #FFD600 100%); /* Warm Orange to Golden Yellow - More inviting */
+    --secondary-gradient: linear-gradient(135deg, #2ED8B1 0%, #00C4FF 100%); /* Teal to Bright Sky Blue - Modern and fresh */
+    --accent-color: #00FFD1; /* Electric Aqua - Super vibrant, bio-luminescent feel */
+    --background-dark: #070D1A; /* Even deeper, near-black, like infinite space */
+    --background-medium: #101827; /* Dark charcoal-blue */
+    --surface-color: #1A253F; /* Rich, dark blue-grey for elements */
+    --text-lightest: #F5F7FA; /* Crisp off-white */
+    --text-light: #C0C8D6; /* Soft cool gray */
+    --text-medium: #8A96AC; /* Deeper cool gray */
+    --border-dark: #2A3C5B; /* Subtle, defining border */
+    --border-light: #3E5170; /* Slightly lighter border */
 
-    /* Shadows remain similar, but might look better on dark backgrounds */
-    --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 12px 25px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.5);
+    /* ELEVATED SHADOWS - More ethereal and multi-layered */
+    --shadow-sm: 0 5px 20px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 20px 45px rgba(0, 0, 0, 0.5); /* Deeper and broader */
+    --shadow-lg: 0 50px 100px rgba(0, 0, 0, 0.8); /* Ultra deep, almost like a nebula */
+    --shadow-inset: inset 0 0 12px rgba(0, 0, 0, 0.2); /* For subtle internal depth */
+
 
     --border-radius-sm: 8px;
     --border-radius-md: 12px;
     --border-radius-lg: 16px;
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+
+    /* ANIMATION Easing Functions - Hyper-smooth and reactive */
+    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out-quad: cubic-bezier(0.45, 0, 0.55, 1);
+    --ease-in-out-sine: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+
+    /* Animation Durations */
+    --duration-fast: 0.2s;
+    --duration-normal: 0.4s;
+    --duration-slow: 0.6s;
+
+    /* NEW: Global hover intensity for subtle consistency */
+    --hover-intensity: 0.08; /* Controls how much elements brighten/shift on hover */
 }
 
 /* --- Global & Utility Styles --- */
 body {
     margin: 0;
     font-family: var(--font-family);
-    background: var(--background-dark); /* Darker background */
-    color: var(--text-lightest); /* Light text on dark background */
-    overflow-x: hidden; /* Prevent horizontal scroll on some animations */
+    background: var(--background-dark);
+    color: var(--text-lightest);
+    overflow-x: hidden;
+    /* NEW: More intricate background pattern for deeper immersion */
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgZmlsbD0iIzBhMTQyZSIgZmlsbC1vcGFjaXR5PSIwLjMiPgogICAgICAgICAgICA8cGF0aCBkPSJNNCAwSDJ2MiAyVjBoLTJWNiAyVjRWMEg0VjZINlY0SDhWMkg2VjBoMiAzVjRoMnYySDFjLTEuNiAwLTItLjctMi0yVjBDMCAuMiAwIC44IDAgMXYzIDJWMjFoMlYzVjBoNHY0VjIwaDJ2MkgydjhoMlYyVjhoMnY4aDJWOGgydjRoMlIuIi8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Z2c+');
+    background-size: 40px 40px; /* Slightly larger, still subtle */
+    background-blend-mode: overlay;
 }
 
 button {
     cursor: pointer;
     border: none;
     outline: none;
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transitions */
+    /* More pronounced will-change for performance */
+    transition: all var(--duration-fast) var(--ease-out-quint);
+    will-change: transform, box-shadow, background, color, border-color, filter;
 }
 
 /* --- Dashboard Page Container --- */
 .dashboard-page {
-    max-width: 1500px; /* Slightly wider max-width */
+    max-width: 1700px; /* Wider for more expansive feel */
     margin: 0 auto;
-    padding: 0 2rem 3rem 2rem; /* Adjusted padding-top (moved to .dashboard-header) */
-    min-height: 100vh; /* Ensure it takes full viewport height */
+    padding: 0 3rem 5rem 3rem; /* More generous padding */
+    min-height: 100vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 2.5rem; /* Increased spacing */
+    gap: 4rem; /* Increased spacing */
 }
 
 /* --- Dashboard Header Section (NOW STICKY) --- */
 .dashboard-header {
-    background: var(--background-dark); /* Solid background to prevent content show-through */
-    padding: 2rem 2.5rem; /* More generous padding */
-    border-radius: var(--border-radius-lg); /* Maintain rounded corners */
-    box-shadow: var(--shadow-md); /* Stronger shadow */
+    background: var(--background-dark);
+    padding: 3rem 4rem; /* Even more generous padding */
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border-dark);
-    position: sticky; /* Makes the header stick to the top */
-    top: 0; /* Sticks to the very top of the viewport */
-    z-index: 50; /* Ensures it's above other content when scrolling */
-    display: flex; /* Arrange title and button side-by-by */
-    justify-content: space-between; /* Space between title and button */
-    align-items: center; /* Vertically align them */
-    margin-bottom: 2.5rem; /* Space between header and content below it */
-    overflow: hidden; /* For glow effect */
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4rem;
+    overflow: hidden;
+    transition: all var(--duration-normal) var(--ease-out-quint);
+    will-change: box-shadow, transform, background;
+    /* NEW: Subtle inset shadow for depth */
+    box-shadow: var(--shadow-md), var(--shadow-inset);
 }
 
-/* Subtle border glow effect for header */
+/* Header border glow with more dynamic opacity */
 .dashboard-header::before {
     content: '';
     position: absolute;
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
-    background: var(--primary-gradient);
-    filter: blur(15px); /* Glow effect */
+    top: -10px; /* Larger glow area */
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: var(--secondary-gradient); /* Use secondary for a cooler glow */
+    filter: blur(30px); /* Even stronger blur */
     border-radius: var(--border-radius-lg);
     z-index: -1;
-    opacity: 0.3;
-    transition: opacity 0.5s ease;
+    opacity: 0.15; /* Softer base glow */
+    transition: opacity var(--duration-normal) var(--ease-out-expo), filter var(--duration-normal) var(--ease-out-expo);
 }
 
 .dashboard-header:hover::before {
-    opacity: 0.5; /* Stronger glow on hover */
+    opacity: 0.35; /* Stronger glow on hover */
+    filter: blur(45px); /* More diffuse on hover */
 }
 
 .dashboard-header h1 {
-    font-size: 3rem; /* Larger, more impactful heading */
-    font-weight: 900; /* Extra bold */
+    font-size: 3.8rem; /* Even larger, more commanding heading */
+    font-weight: 950; /* Ultra bold */
     margin: 0;
-    background: var(--secondary-gradient); /* Use a fresh, vibrant gradient */
+    background: var(--primary-gradient); /* Use primary for warmer, inviting title */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     line-height: 1.1;
-    text-shadow: 0 2px 10px rgba(146, 254, 157, 0.4); /* Glow from the gradient */
+    text-shadow: 0 5px 25px rgba(255, 100, 0, 0.7); /* Stronger, warmer glow */
+    transition: text-shadow var(--duration-normal) var(--ease-out-quint);
 }
 
-/* New: Wrapper for buttons in the header to control their layout */
+.dashboard-header h1:hover {
+    text-shadow: 0 8px 35px rgba(255, 150, 0, 1); /* More intense glow on hover */
+}
+
 .dashboard-header .header-actions {
     display: flex;
-    gap: 1rem; /* Space between the create and logout buttons */
+    gap: 1.5rem; /* More space between buttons */
     align-items: center;
 }
 
-/* Styling for the Create New Chatbot button (inside dashboard-header) */
+/* Create New Chatbot button */
 .dashboard-header .btn-create-chatbot {
-    background: var(--primary-gradient); /* Use primary for main CTA */
+    background: var(--secondary-gradient); /* Use secondary for a fresh CTA */
     color: white;
-    padding: 0.8rem 1.8rem; /* Adjusted padding */
-    border-radius: 50px;
-    font-size: 0.95rem;
-    font-weight: 700;
+    padding: 1.1rem 2.2rem; /* Adjusted padding */
+    border-radius: 60px; /* More pill-like */
+    font-size: 1.05rem; /* Slightly larger font */
+    font-weight: 800;
     box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
-    gap: 0.6rem; /* Space for icon and text */
+    gap: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px; /* More prominent spacing */
     position: relative;
     overflow: hidden;
-    z-index: 1; /* Above pseudo-element */
-    text-decoration: none; /* In case it was an <a> in previous thoughts */
+    z-index: 1;
+    text-decoration: none;
+    transition: all var(--duration-fast) var(--ease-out-quint);
+    will-change: transform, box-shadow, filter;
+    /* NEW: subtle filter for base appearance */
+    filter: brightness(1);
 }
 
 .dashboard-header .btn-create-chatbot::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
+    left: -150%; /* Start even further left for dramatic shimmer */
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent); /* Stronger shimmer */
+    transition: all var(--duration-normal) var(--ease-out-expo);
     z-index: -1;
 }
 
 .dashboard-header .btn-create-chatbot:hover::before {
-    left: 100%;
+    left: 150%; /* Swipe further right */
 }
 
 .dashboard-header .btn-create-chatbot:hover {
-    transform: translateY(-2px); /* Subtle lift on hover */
-    box-shadow: var(--shadow-md); /* Stronger shadow on hover */
-    background: var(--primary-gradient); /* Keep the same gradient */
+    transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
+    box-shadow: 0 15px 35px rgba(0, 196, 255, 0.6); /* Vibrant glow from secondary gradient */
+    filter: brightness(1.2); /* Brighter on hover */
 }
 
 .dashboard-header .btn-create-chatbot svg {
     stroke: white;
-    width: 20px;
-    height: 20px;
+    width: 24px; /* Larger icon */
+    height: 24px;
 }
 
-/* NEW: Styling for the Logout button */
+/* Logout button */
 .dashboard-header .btn-logout {
-    background: none; /* No background fill initially */
-    color: var(--text-light); /* Light text color */
-    padding: 0.8rem 1.2rem; /* Similar padding to other buttons, slightly less horizontal */
-    border: 1px solid var(--border-dark); /* Subtle border */
-    border-radius: 50px;
-    font-size: 0.95rem;
-    font-weight: 700;
+    background: none;
+    color: var(--text-light);
+    padding: 1.1rem 1.6rem;
+    border: 1px solid var(--border-dark);
+    border-radius: 60px;
+    font-size: 1.05rem;
+    font-weight: 800;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     position: relative;
     overflow: hidden;
     z-index: 1;
+    transition: all var(--duration-fast) var(--ease-out-quint);
+    will-change: transform, box-shadow, background, color, border-color, filter;
 }
 
 .dashboard-header .btn-logout::before {
@@ -184,52 +221,55 @@ button {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #FF6B6B 0%, #EE3333 100%); /* A red gradient for logout */
+    background: linear-gradient(135deg, #FF4500 0%, #E63900 100%); /* Stronger, bold red gradient */
     z-index: -1;
-    opacity: 0; /* Start invisible */
-    transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-    border-radius: 50px; /* Match button border-radius */
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out-expo);
+    border-radius: 60px;
 }
 
 .dashboard-header .btn-logout:hover::before {
-    opacity: 1; /* Fade in red background on hover */
+    opacity: 1;
 }
 
 .dashboard-header .btn-logout:hover {
-    color: white; /* Text turns white on hover */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 107, 107, 0.3); /* Reddish shadow on hover */
-    border-color: transparent; /* Remove border when background appears */
+    color: white;
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 15px 35px rgba(255, 69, 0, 0.6); /* Vibrant red glow */
+    border-color: transparent;
+    filter: brightness(1.2); /* Brighter on hover */
 }
 
 .dashboard-header .btn-logout svg {
-    stroke: var(--text-light); /* Icon matches text color initially */
-    width: 20px;
-    height: 20px;
-    transition: stroke 0.4s ease; /* Transition icon color */
+    stroke: var(--text-light);
+    width: 24px;
+    height: 24px;
+    transition: stroke var(--duration-fast) var(--ease-out-quint);
 }
 
 .dashboard-header .btn-logout:hover svg {
-    stroke: white; /* Icon turns white on hover */
+    stroke: white;
 }
 
 
-/* --- Loading Spinner --- */
+/* --- Loading Spinner & Empty State --- */
 .loading-spinner, .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 50vh; /* More central */
-    gap: 1.5rem;
+    min-height: 65vh; /* More central */
+    gap: 2rem;
     color: var(--text-light);
-    font-size: 1.25rem;
+    font-size: 1.5rem; /* Larger font */
     text-align: center;
+    animation: fadeIn var(--duration-normal) var(--ease-out-quint) forwards;
 }
 
 .loading-spinner .lucide, .empty-state .lucide {
-    color: var(--accent-color); /* Vibrant icon color */
-    opacity: 0.8;
+    color: var(--accent-color);
+    opacity: 0.9;
+    animation: pulseGlow 2s infinite alternate ease-in-out;
 }
 
 .animate-spin {
@@ -241,101 +281,164 @@ button {
     to { transform: rotate(360deg); }
 }
 
-/* --- Stats Grid Section (Add this section to your HTML if desired) --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0% { transform: scale(1); filter: drop-shadow(0 0 8px var(--accent-color)); }
+    100% { transform: scale(1.1); filter: drop-shadow(0 0 25px var(--accent-color)); } /* More pronounced glow */
+}
+
+
+/* --- Stats Grid Section --- */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Slightly larger min-width */
-    gap: 2rem; /* Consistent spacing */
-    margin-bottom: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Slightly larger min-width */
+    gap: 3rem;
+    margin-bottom: 4rem;
+    animation: fadeInGrid var(--duration-slow) var(--ease-out-quint) forwards;
+    animation-delay: 0.2s;
 }
+
+@keyframes fadeInGrid {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 
 .stat-card {
     background: var(--surface-color);
-    padding: 2rem; /* More padding */
+    padding: 2.5rem; /* More padding */
     border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-sm), var(--shadow-inset); /* Add inset shadow */
     border: 1px solid var(--border-dark);
     display: flex;
     align-items: center;
-    gap: 1.25rem;
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    gap: 1.8rem;
+    transition: all var(--duration-normal) var(--ease-out-expo);
     position: relative;
     overflow: hidden;
+    will-change: transform, box-shadow, border-color, filter;
+    filter: brightness(1); /* Base brightness */
+
+    /* Subtle background pattern for cards */
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity var(--duration-normal) var(--ease-out-quint);
+        z-index: 0;
+    }
 }
 
 .stat-card:hover {
-    transform: translateY(-5px); /* More lift */
-    box-shadow: var(--shadow-md); /* Stronger shadow */
-    border-color: var(--border-light);
+    transform: translateY(-10px); /* More lift */
+    box-shadow: var(--shadow-md), 0 0 25px rgba(0, 255, 209, 0.4); /* Stronger external shadow with accent glow */
+    border-color: var(--accent-color); /* Border changes to accent */
+    filter: brightness(1.1); /* Brighter on hover */
+    &::after {
+        opacity: 1; /* Reveal subtle pattern */
+    }
 }
 
 .stat-icon {
-    background: var(--primary-gradient); /* Use primary gradient for icon background */
+    background: var(--primary-gradient);
     color: white;
-    padding: 0.9rem; /* Larger icon container */
+    padding: 1.2rem; /* Larger icon container */
     border-radius: var(--border-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     position: relative;
     z-index: 1;
+    transition: box-shadow var(--duration-fast) var(--ease-out-quint);
 }
 
 /* Stat icon subtle pulse/glow on hover */
 .stat-card:hover .stat-icon::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: -8px; /* Expand glow area */
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
     background: var(--accent-color);
     border-radius: inherit;
-    filter: blur(10px);
-    opacity: 0.4;
-    transition: opacity 0.3s ease-in-out;
+    filter: blur(22px); /* More significant blur */
+    opacity: 0.6;
+    transition: opacity var(--duration-normal) var(--ease-out-expo), filter var(--duration-normal) var(--ease-out-expo);
     z-index: -1;
 }
+.stat-card:hover .stat-icon {
+    box-shadow: 0 10px 25px rgba(0, 255, 209, 0.8); /* Accent color glow on icon */
+}
+
 
 .stat-content h3 {
-    font-size: 2rem; /* Larger stat numbers */
-    font-weight: 800;
-    color: var(--text-lightest); /* Light text on dark card */
+    font-size: 2.5rem; /* Larger stat numbers */
+    font-weight: 900; /* Bolder */
+    color: var(--text-lightest);
     margin: 0;
     background: var(--secondary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 1px 5px rgba(0, 201, 255, 0.3);
+    text-shadow: 0 3px 18px rgba(46, 216, 177, 0.7); /* Stronger, more vibrant text shadow */
+    transition: text-shadow var(--duration-fast) ease-out;
+}
+.stat-card:hover .stat-content h3 {
+    text-shadow: 0 5px 25px rgba(0, 196, 255, 1); /* More intense glow on hover from secondary gradient */
 }
 
 .stat-content p {
-    color: var(--text-light); /* Lighter gray-blue */
-    font-size: 0.95rem;
-    margin: 0.4rem 0 0 0;
+    color: var(--text-light);
+    font-size: 1.1rem; /* Slightly larger font */
+    margin: 0.6rem 0 0 0;
     font-weight: 500;
 }
 
 /* --- Chatbots Section --- */
 .chatbot-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* Larger min-width for cards */
-    gap: 2.5rem; /* Increased gap */
-    padding: 0 0 3rem 0;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Even larger min-width */
+    gap: 3.5rem; /* Increased gap */
+    padding: 0 0 5rem 0;
 }
 
 .chatbot-card {
     background: var(--surface-color);
     border: 1px solid var(--border-dark);
     border-radius: var(--border-radius-lg);
-    padding: 2.5rem; /* More internal padding */
-    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s ease;
+    padding: 3.2rem; /* More internal padding */
+    transition: transform var(--duration-normal) var(--ease-out-expo),
+                box-shadow var(--duration-normal) var(--ease-out-expo),
+                border-color var(--duration-fast) var(--ease-out-quint),
+                filter var(--duration-fast) var(--ease-out-quint);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    will-change: transform, box-shadow, border-color, filter;
+    filter: brightness(1); /* Base brightness */
+
+    /* Inner radial glow on hover - more concentrated */
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(circle at 50% 0%, rgba(0, 255, 209, 0.08) 0%, transparent 60%); /* Accent color glow */
+        opacity: 0;
+        transition: opacity var(--duration-normal) var(--ease-out-quint);
+        z-index: 0;
+        pointer-events: none;
+    }
 }
 
 .chatbot-card::before {
@@ -344,362 +447,457 @@ button {
     top: 0;
     left: 0;
     right: 0;
-    height: 8px; /* Thicker accent line */
+    height: 12px; /* Thicker accent line */
     background: var(--primary-gradient);
     border-top-left-radius: var(--border-radius-lg);
     border-top-right-radius: var(--border-radius-lg);
-    transform: translateY(-100%); /* Start off-screen */
-    transition: transform 0.4s ease-out; /* Slide in on hover */
+    transform: translateY(-100%);
+    transition: transform var(--duration-normal) var(--ease-out-expo);
 }
 
 .chatbot-card:hover::before {
-    transform: translateY(0); /* Slide into view */
+    transform: translateY(0);
 }
 
 .chatbot-card:hover {
-    transform: translateY(-10px); /* Even more significant lift on hover */
-    box-shadow: 0 35px 50px -10px rgba(0, 0, 0, 0.4), 0 20px 30px -10px rgba(0, 0, 0, 0.15); /* More impactful shadow */
-    border-color: var(--border-light);
+    transform: translateY(-15px) perspective(1000px) rotateX(1.5deg); /* Even more dramatic lift and tilt */
+    box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 255, 209, 0.3); /* Ultra deep shadow with accent glow */
+    border-color: var(--accent-color);
+    filter: brightness(1.15); /* More noticeable brightness increase */
+    &::after {
+        opacity: 1;
+    }
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1.5rem; /* Adjusted spacing */
-    gap: 1.5rem;
+    margin-bottom: 2rem;
+    gap: 2rem;
 }
 
 .chatbot-info h3 {
-    font-size: 1.6rem; /* Larger title */
-    font-weight: 800;
+    font-size: 2rem; /* Larger title */
+    font-weight: 850; /* Bolder */
     color: var(--text-lightest);
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.8rem 0;
     line-height: 1.2;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
+    transition: text-shadow var(--duration-fast) ease-out;
+}
+.chatbot-card:hover .chatbot-info h3 {
+    text-shadow: 0 4px 15px rgba(255, 255, 255, 0.4); /* Stronger glow on hover */
 }
 
+
 .status-badge {
-    font-size: 0.8rem; /* Slightly larger badge text */
+    font-size: 0.9rem; /* Slightly larger badge text */
     font-weight: 700;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px; /* More rounded */
     text-transform: uppercase;
-    letter-spacing: 0.08em; /* More prominent spacing */
+    letter-spacing: 0.12em; /* More prominent spacing */
     white-space: nowrap;
+    transition: all var(--duration-fast) var(--ease-out-quint);
+    filter: brightness(1);
 }
 
 .status-active {
-    background: rgba(0, 255, 100, 0.15); /* More vibrant active */
+    background: linear-gradient(45deg, rgba(0, 255, 100, 0.25) 0%, rgba(0, 255, 100, 0.15) 100%);
     color: #00FF64; /* Electric green */
+    border: 1px solid rgba(0, 255, 100, 0.4);
+}
+.status-active:hover {
+    background: linear-gradient(45deg, rgba(0, 255, 100, 0.4) 0%, rgba(0, 255, 100, 0.2) 100%);
+    box-shadow: 0 0 15px rgba(0, 255, 100, 0.6);
+    filter: brightness(1.2);
 }
 
 .status-inactive {
-    background: rgba(255, 50, 50, 0.15); /* More vibrant inactive */
+    background: linear-gradient(45deg, rgba(255, 50, 50, 0.25) 0%, rgba(255, 50, 50, 0.15) 100%);
     color: #FF3232; /* Bright red */
+    border: 1px solid rgba(255, 50, 50, 0.4);
+}
+.status-inactive:hover {
+    background: linear-gradient(45deg, rgba(255, 50, 50, 0.4) 0%, rgba(255, 50, 50, 0.2) 100%);
+    box-shadow: 0 0 15px rgba(255, 50, 50, 0.6);
+    filter: brightness(1.2);
 }
 
 .status-draft {
-    background: rgba(255, 200, 0, 0.15); /* More vibrant draft */
+    background: linear-gradient(45deg, rgba(255, 200, 0, 0.25) 0%, rgba(255, 200, 0, 0.15) 100%);
     color: #FFC800; /* Golden yellow */
+    border: 1px solid rgba(255, 200, 0, 0.4);
 }
+.status-draft:hover {
+    background: linear-gradient(45deg, rgba(255, 200, 0, 0.4) 0%, rgba(255, 200, 0, 0.2) 100%);
+    box-shadow: 0 0 15px rgba(255, 200, 0, 0.6);
+    filter: brightness(1.2);
+}
+
 
 .card-actions {
     display: flex;
-    gap: 1rem; /* Increased gap between buttons */
+    gap: 1.5rem; /* Increased gap */
     flex-shrink: 0;
 }
 
 .btn-edit, .btn-settings {
-    background: var(--background-medium); /* Darker background for buttons */
+    background: var(--background-medium);
     border: 1px solid var(--border-dark);
-    padding: 0.75rem; /* Larger buttons */
-    border-radius: 10px; /* Slightly more rounded */
-    color: var(--text-light); /* Lighter text color */
+    padding: 1rem; /* Larger buttons */
+    border-radius: 14px; /* More rounded */
+    color: var(--text-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    transition: all var(--duration-fast) var(--ease-out-quint);
+    will-change: transform, box-shadow, background, color, border-color, filter;
+    filter: brightness(1);
 }
 
 .btn-edit:hover {
-    background: var(--primary-gradient); /* Gradient hover */
+    background: var(--primary-gradient);
     color: white;
     border-color: transparent;
-    transform: translateY(-3px) scale(1.05); /* Lift and subtle scale */
-    box-shadow: 0 8px 20px rgba(74, 0, 224, 0.4); /* Glow shadow */
+    transform: translateY(-6px) scale(1.08); /* More pronounced lift and scale */
+    box-shadow: 0 15px 35px rgba(255, 100, 0, 0.6); /* Warmer glow */
+    filter: brightness(1.2);
 }
 
 .btn-settings:hover {
-    background: var(--secondary-gradient); /* Different gradient for settings */
+    background: var(--secondary-gradient);
     color: white;
     border-color: transparent;
-    transform: translateY(-3px) scale(1.05); /* Lift and subtle scale */
-    box-shadow: 0 8px 20px rgba(0, 201, 255, 0.4); /* Glow shadow */
+    transform: translateY(-6px) scale(1.08);
+    box-shadow: 0 15px 35px rgba(0, 196, 255, 0.6); /* Cooler glow */
+    filter: brightness(1.2);
 }
 
 .card-category {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .category-tag {
-    background: var(--background-medium); /* Darker tag background */
+    background: var(--background-medium);
     color: var(--text-light);
-    font-size: 0.85rem;
+    font-size: 1rem; /* Slightly larger */
     font-weight: 600;
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px; /* More rounded */
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px; /* More rounded */
     border: 1px solid var(--border-dark);
-    transition: all 0.3s ease;
+    transition: all var(--duration-fast) var(--ease-out-quint);
+    filter: brightness(1);
 }
 
 .category-tag:hover {
     background: var(--border-light);
     color: var(--text-lightest);
+    transform: translateY(-3px); /* Subtle lift */
+    box-shadow: var(--shadow-sm);
+    filter: brightness(1.1);
 }
 
 .card-stats {
     display: flex;
     flex-direction: column;
-    gap: 1rem; /* Increased gap */
-    margin-bottom: 2rem; /* More spacing before footer */
+    gap: 1.5rem;
+    margin-bottom: 3rem;
 }
 
 .stat-item {
     display: flex;
     align-items: center;
-    gap: 0.8rem; /* Consistent gap for icons and text */
+    gap: 1.2rem;
     color: var(--text-light);
-    font-size: 1rem; /* Slightly larger text */
+    font-size: 1.15rem; /* Larger text */
+    transition: all var(--duration-fast) var(--ease-out-quint);
+}
+.stat-item:hover {
+    color: var(--text-lightest);
+    transform: translateX(8px); /* More noticeable slide */
 }
 
 .stat-item svg {
     stroke: var(--text-light);
-    opacity: 0.7;
-    width: 20px; /* Larger icons */
-    height: 20px;
+    opacity: 0.8;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
+    transition: stroke var(--duration-fast) ease-out, opacity var(--duration-fast) ease-out;
+}
+.stat-item:hover svg {
+    stroke: var(--accent-color);
+    opacity: 1;
 }
 
 .card-footer {
-    border-top: 1px solid var(--border-dark); /* Darker border */
-    padding-top: 1.5rem; /* More padding */
+    border-top: 1px solid var(--border-dark);
+    padding-top: 2rem;
 }
 
 .last-updated {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    color: var(--text-medium); /* Slightly darker text for less prominence */
-    font-size: 0.95rem;
+    gap: 1.2rem;
+    color: var(--text-medium);
+    font-size: 1.1rem;
 }
 
 .last-updated svg {
     stroke: var(--text-medium);
-    opacity: 0.7;
-    width: 20px;
-    height: 20px;
+    opacity: 0.8;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
 }
 
 /* --- Empty State --- */
 .empty-state {
-    min-height: 70vh; /* Make it more prominent when no chatbots exist */
+    min-height: 80vh; /* More prominent */
 }
 
 .empty-state h3 {
-    font-size: 2rem; /* More prominent message */
-    font-weight: 800;
+    font-size: 2.5rem; /* More prominent message */
+    font-weight: 900;
     color: var(--text-lightest);
-    margin: 0 0 1rem 0;
+    margin: 0 0 1.5rem 0;
+    line-height: 1.2;
 }
 
 .empty-state p {
-    margin: 0 0 2.5rem 0; /* More spacing before button */
-    max-width: 600px; /* Wider text block */
-    line-height: 1.7;
+    margin: 0 0 3.5rem 0;
+    max-width: 700px; /* Wider text block */
+    line-height: 1.8;
     color: var(--text-light);
+    font-size: 1.25rem; /* Larger text */
 }
 
 .btn-create-empty {
     background: var(--primary-gradient);
     color: white;
-    padding: 1.2rem 2.5rem;
-    border-radius: 50px;
-    font-size: 1.2rem;
-    font-weight: 700;
+    padding: 1.5rem 3.2rem;
+    border-radius: 60px;
+    font-size: 1.4rem;
+    font-weight: 800;
     box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 1.2rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     position: relative;
     overflow: hidden;
     z-index: 1;
+    transition: all var(--duration-normal) var(--ease-out-expo);
+    will-change: transform, box-shadow, filter;
+    filter: brightness(1);
 }
 
 .btn-create-empty::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
+    left: -150%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    transition: all var(--duration-slow) var(--ease-out-expo);
     z-index: -1;
 }
 
 .btn-create-empty:hover::before {
-    left: 100%;
+    left: 150%;
 }
 
 .btn-create-empty:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-10px) scale(1.04); /* More pronounced lift and scale */
+    box-shadow: var(--shadow-lg), 0 0 50px rgba(255, 100, 0, 0.7); /* Ultra strong glow */
     background: var(--primary-gradient);
+    filter: brightness(1.25);
 }
-
 
 /* --- Responsive Design --- */
 @media (max-width: 992px) {
     .dashboard-page {
-        padding: 0 1.5rem 2rem 1.5rem; /* Adjusted padding */
-        gap: 2rem;
+        padding: 0 2rem 3rem 2rem;
+        gap: 3rem;
     }
     .dashboard-header {
-        padding: 1.5rem;
-        margin-bottom: 2rem;
+        padding: 2.5rem 3rem;
+        margin-bottom: 3rem;
     }
     .dashboard-header h1 {
-        font-size: 2.5rem;
+        font-size: 3.2rem;
     }
-    .dashboard-header .header-actions { /* Adjust header actions for smaller screens */
-        gap: 0.8rem;
+    .dashboard-header .header-actions {
+        gap: 1.2rem;
+    }
+    .dashboard-header .btn-create-chatbot {
+        padding: 0.9rem 1.8rem;
+        font-size: 0.95rem;
     }
     .dashboard-header .btn-logout {
-      padding: 0.7rem 1.1rem;
-      font-size: 0.9rem;
+      padding: 0.9rem 1.4rem;
+      font-size: 0.95rem;
     }
     .chatbot-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 3rem;
     }
     .chatbot-card {
-        padding: 2rem;
+        padding: 2.5rem;
     }
     .chatbot-info h3 {
-        font-size: 1.4rem;
+        font-size: 1.8rem;
     }
     .empty-state h3 {
-        font-size: 1.75rem;
+        font-size: 2.2rem;
     }
     .empty-state p {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
     }
 }
 
 @media (max-width: 768px) {
     .dashboard-page {
-        padding: 0 1rem 1.5rem 1rem; /* Adjusted padding */
+        padding: 0 1.5rem 2.5rem 1.5rem;
     }
     .dashboard-header {
-        flex-direction: column; /* Stack title and buttons vertically */
-        align-items: flex-start; /* Align header content to the left */
-        padding: 1.25rem;
-        gap: 1rem; /* Space between title and actions */
-        margin-bottom: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 2rem;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
     }
     .dashboard-header h1 {
-        font-size: 2.2rem;
+        font-size: 2.8rem;
     }
-    .dashboard-header .header-actions { /* Actions group for smaller screens */
-        width: 100%; /* Take full width */
-        justify-content: flex-end; /* Push buttons to the right */
-        gap: 0.8rem;
+    .dashboard-header .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 1rem;
     }
     .dashboard-header .btn-create-chatbot {
-        width: auto; /* Allow button to size naturally */
-        padding: 0.7rem 1.4rem;
-        font-size: 0.85rem;
-        gap: 0.5rem;
+        padding: 0.8rem 1.6rem;
+        font-size: 0.9rem;
+        gap: 0.6rem;
     }
     .dashboard-header .btn-create-chatbot svg {
         width: 18px;
         height: 18px;
     }
     .dashboard-header .btn-logout {
-      padding: 0.6rem 1rem;
-      font-size: 0.8rem;
+        padding: 0.7rem 1.1rem;
+        font-size: 0.85rem;
     }
     .dashboard-header .btn-logout svg {
         width: 18px;
         height: 18px;
     }
     .chatbot-grid {
-        grid-template-columns: 1fr; /* Single column layout */
-        gap: 1.5rem;
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
     }
     .chatbot-card {
-        padding: 1.8rem;
+        padding: 2.2rem;
     }
     .card-header {
-        flex-direction: column; /* Stack card header elements */
+        flex-direction: column;
         align-items: stretch;
-        gap: 1rem;
+        gap: 1.5rem;
     }
     .card-actions {
-        justify-content: flex-end; /* Push action buttons to the right */
+        justify-content: flex-end;
     }
     .btn-edit, .btn-settings {
-        padding: 0.6rem;
-        font-size: 0.95rem;
+        padding: 0.8rem;
+        font-size: 1rem;
     }
 }
 
 @media (max-width: 480px) {
     .dashboard-page {
-        padding: 0 0.75rem 1rem 0.75rem; /* Adjusted padding */
+        padding: 0 1rem 2rem 1rem;
     }
     .dashboard-header {
-        padding: 1rem;
-    }
-    .dashboard-header h1 {
-        font-size: 2rem;
-    }
-    .dashboard-header .btn-create-chatbot {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.8rem;
-    }
-    .dashboard-header .btn-create-chatbot svg {
-        width: 16px;
-        height: 16px;
-    }
-    .dashboard-header .btn-logout {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.75rem;
-    }
-    .dashboard-header .btn-logout svg {
-        width: 16px;
-        height: 16px;
-    }
-    .chatbot-card {
         padding: 1.5rem;
     }
-    .chatbot-info h3 {
-        font-size: 1.25rem;
+    .dashboard-header h1 {
+        font-size: 2.4rem;
     }
-    .status-badge, .category-tag, .stat-item, .last-updated {
+    .dashboard-header .btn-create-chatbot {
+        padding: 0.7rem 1.4rem;
+        font-size: 0.85rem;
+    }
+    .dashboard-header .btn-create-chatbot svg {
+        width: 17px;
+        height: 17px;
+    }
+    .dashboard-header .btn-logout {
+        padding: 0.6rem 0.9rem;
         font-size: 0.8rem;
     }
+    .dashboard-header .btn-logout svg {
+        width: 17px;
+        height: 17px;
+    }
+    .chatbot-card {
+        padding: 2rem;
+    }
+    .chatbot-info h3 {
+        font-size: 1.6rem;
+    }
+    .status-badge, .category-tag, .stat-item, .last-updated {
+        font-size: 0.9rem;
+    }
     .empty-state h3 {
-        font-size: 1.5rem;
+        font-size: 2rem;
     }
     .empty-state p {
-        font-size: 0.95rem;
+        font-size: 1.1rem;
     }
     .btn-create-empty {
-        font-size: 1rem;
-        padding: 0.85rem 1.2rem;
+        font-size: 1.2rem;
+        padding: 1.2rem 2.5rem;
     }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 15px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+.btn-create-chatbot:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+  filter: brightness(0.9);
+}
+.btn-logout:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+  filter: brightness(0.9);
+}
+.btn-edit:active, .btn-settings:active {
+    transform: translateY(0) scale(0.95);
+    box-shadow: var(--shadow-sm);
+    filter: brightness(0.9);
+}
+.stat-card:active {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-sm);
+    filter: brightness(0.95);
+}
+.chatbot-card:active {
+    transform: translateY(-8px) perspective(1000px) rotateX(0.5deg);
+    box-shadow: var(--shadow-md);
+    filter: brightness(0.95);
 }

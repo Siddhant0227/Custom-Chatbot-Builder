@@ -7,51 +7,88 @@
   padding: 0;
 }
 
+/*
+==========================================================================
+   Design Tokens - The single source of truth for all stylistic values.
+   - Naming Convention: `[category]-[property]-[variant]`
+     - e.g., `color-brand-primary`, `font-size-base`, `spacing-md`
+   - This structure improves auto-complete and makes the system's
+     intent clear and easy to learn.
+==========================================================================
+*/
+
 :root {
-  --primary-dark: #2c2c2c; 
-  --primary-blue: #2196F3;
-  --accent-green: #4CAF50;
-  --accent-red: #f44336;
-  --button-bg-light: #e9ecef;
-    --button-hover-bg-light: #d1e7ff;
-    --button-hover-bg: rgba(0, 123, 255, 0.1);
-    --button-active-bg: rgba(0, 123, 255, 0.2);
-    --button-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
-  --playful-purple: #5c6bc0; /* A deep, professional blue/purple */
-  --playful-light-purple: #7e8ce3; /* A lighter, more energetic blue/purple */
-  --playful-border-light: #e0e0e0; /* Softer border for main elements */
-  --playful-shadow-light: rgba(0, 0, 0, 0.08); /* Lighter, more diffused shadow */
-  --playful-shadow-medium: rgba(0, 0, 0, 0.15);
-  --bg-light-grey: #f7f7f7; /* App background - very light */
-  --bg-white: #ffffff;
-  --bg-sidebar: #ffffff; /* Explicitly white for sidebar */
-  --bg-chat-light: #f9f9f9;
-  --border-default: #e0e0e0; 
-  --text-dark: #333333;
-  --text-medium: #555555;
-  --text-light: #888888;
+  /* 🎨 Colors: Brand Palette */
+  --color-brand-primary: #2196F3;         /* The main brand color */
+  --color-brand-secondary: #5c6bc0;       /* A secondary, complementary color */
+  --color-brand-secondary-light: #7e8ce3; /* A lighter variant of the secondary color */
 
-  --main-content-bg: #fdfdff; /* A very subtle off-white for main content areas */
-  --sidebar-toggle-closed-bg: #4a4a4a; /* New: Dark background for closed sidebar toggle */
+  /* 🎨 Colors: UI & Neutral Tones */
+  --color-ui-background: #f7f7f7;         /* App/body background */
+  --color-ui-surface: #ffffff;           /* Card, sidebar, and modal backgrounds */
+  --color-ui-surface-subtle: #fdfdff;     /* Subtle background for main content areas */
+  --color-ui-surface-alt: #f0f0f0;        /* Alternative surface, e.g., for node options */
 
-  /* Node specific colors from image */
-  --node-header-green: #90EE90; /* Light green for start node header */
-  --node-header-dark-grey: #4a4a4a; /* Dark grey for button card header */
-  --node-option-border: #cccccc; /* Light grey border for options */
-  --node-option-bg: #f0f0f0; /* Light grey background for options */
+  --color-ui-border: #e0e0e0;             /* Default border color */
+  --color-ui-border-interactive: #cccccc; /* Border for interactive elements like options */
+  
+  --color-text-primary: #2c2c2c;          /* For headings and primary text */
+  --color-text-secondary: #4a4a4a;        /* For less important text and headers */
+  --color-text-muted: #888888;            /* For hints, placeholders, and disabled text */
+  --color-text-on-brand: #ffffff;         /* Text used on top of a brand-colored background */
 
-    --spacing-xs: 8px;   /* Slightly more space */
-    --spacing-sm: 16px;  /* Increased small spacing */
-    --spacing-md: 24px;  /* Consistent medium spacing */
-    --spacing-lg: 32px;  /* Increased large spacing */
-    --border-radius-sm: 8px; /* Slightly more rounded */
-    --border-radius-md: 12px; /* More rounded for main elements */
-    --font-size-sm: 1em;    /* Clearer small text */
-    --font-size-md: 1.1em;   /* Standard text size */
-    --font-size-lg: 1.3em;   /* Larger text size */
-    --font-size-xl: 2em;     /* Extra large for titles */
+  /* 🎨 Colors: Semantic Feedback */
+  --color-feedback-success: #4CAF50;      /* For success messages, validation */
+  --color-feedback-danger: #f44336;       /* For error messages, destructive actions */
+  --color-feedback-warning: #ff9800;     /* (Suggested) For warnings */
+  --color-feedback-info: var(--color-brand-primary); /* (Suggested) For informational alerts */
+
+  /* 🔘 Buttons & Interactive Elements */
+  --button-bg-primary: var(--color-brand-primary);
+  --button-text-primary: var(--color-text-on-brand);
+  --button-bg-secondary: #e9ecef;
+  --button-text-secondary: var(--color-text-primary);
+  
+  --button-hover-bg-primary: #1976D2; /* Darker shade of primary for hover */
+  --button-hover-bg-secondary: #d1e7ff;
+  
+  --button-active-bg-primary: rgba(0, 85, 179, 0.2);
+  --button-active-bg-secondary: rgba(0, 123, 255, 0.2);
+
+  /* ✍️ Typography */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px (default) */
+  --font-size-md: 1.125rem;   /* 18px */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.75rem;    /* 28px */
+  --font-size-xxl: 2.25rem;   /* 36px */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* 📏 Spacing & Sizing */
+  --spacing-xs: 0.5rem;   /* 8px */
+  --spacing-sm: 1rem;     /* 16px */
+  --spacing-md: 1.5rem;   /* 24px */
+  --spacing-lg: 2rem;     /* 32px */
+  --spacing-xl: 3rem;     /* 48px */
+  --spacing-xxl: 4rem;    /* 64px */
+
+  /* 🖼️ Borders & Shadows */
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-interactive: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.6;
@@ -151,388 +188,419 @@ textarea,
 /* Removed .btn-toggle from header as it's now a fixed button */
 
 
-.sidebar-header-with-toggle .btn-hide-sidebar {
-    width: 40px; /* Larger hide button */
-    height: 40px;
-    padding: 0;
-    border-radius: 50%;
-    background-color: #607D8B;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-}
-.sidebar-header-with-toggle .btn-hide-sidebar:hover {
-    background-color: #4a5568;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+/*
+==========================================================================
+   Base & App Layout
+   - Uses variables defined in the :root scope.
+   - Sets foundational styles for the entire application.
+==========================================================================
+*/
+
+body {
+  font-family: var(--font-family-sans);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-ui-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- EXPORT BUTTON (Updated for visibility) --- */
-.btn-export {
-  background-color: var(--bg-white);
-  color: var(--text-dark);
-  border: 1px solid var(--playful-border-light); /* Use playful border */
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* Consistent shadow */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  /* Disabling text selection globally is an accessibility concern. */
+  /* It's better to apply this only where needed.             */
+  /* user-select: none; */ 
 }
 
-.btn-export:hover {
-  background-color: var(--bg-light-grey);
-  color: var(--text-dark);
-  border-color: var(--playful-light-purple); /* Playful border on hover */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+/* Allow text selection on interactive text elements */
+input[type="text"],
+textarea,
+.chat-input,
+.chat-bubble {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
 }
 
-.btn-delete {
-  background-color: var(--accent-red);
-  color: white;
-  margin-top: 10px;
-  box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3); /* Red shadow */
-}
-.btn-delete:hover {
-  background-color: #d32f2f;
+/*
+==========================================================================
+   App Header
+==========================================================================
+*/
+.app-header {
+  background-color: var(--color-text-primary); /* Using a dark text color for a dark header */
+  color: var(--color-text-on-brand);
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  border-bottom: 2px solid var(--color-brand-secondary);
 }
 
-.icon-hamburger {
+.app-header:hover {
+  background-color: #3a3a3a; /* A slightly lighter dark for hover */
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.35); /* Enhanced shadow on hover */
+  border-color: var(--color-brand-secondary-light);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.app-title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.03em;
+  transition: color 0.3s ease;
+}
+
+/*
+==========================================================================
+   Buttons (BEM - Block__Element--Modifier)
+   - .btn is the base Block.
+   - .btn--primary, .btn--secondary are Modifiers.
+==========================================================================
+*/
+
+/* Base Button Style */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-sm);
+  font-weight: var(--font-weight-medium); /* Changed from 600 to 500 for consistency */
+  
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+  opacity: 0.95;
+}
+
+/* Modifier: Primary Button (e.g., Main CTA) */
+.btn--primary {
+  background-color: var(--button-bg-primary);
+  color: var(--button-text-primary);
+  box-shadow: var(--shadow-interactive);
+}
+.btn--primary:hover {
+  background-color: var(--button-hover-bg-primary);
+}
+
+/* Modifier: Secondary Button (e.g., Export, Cancel) */
+.btn--secondary {
+  background-color: var(--button-bg-secondary);
+  color: var(--button-text-secondary);
+  border-color: var(--color-ui-border);
+}
+.btn--secondary:hover {
+  background-color: var(--button-hover-bg-secondary);
+  border-color: var(--color-brand-primary);
+}
+
+/* Modifier: Danger Button (e.g., Delete) */
+.btn--danger {
+  background-color: var(--color-feedback-danger);
+  color: var(--color-text-on-brand);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+.btn--danger:hover {
+  background-color: #d32f2f; /* Darker red for hover */
+  box-shadow: 0 6px 16px rgba(244, 67, 54, 0.35);
+}
+
+.header-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* Specific Icon Button (can still use .btn as a base) */
+.btn-hide-sidebar {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--border-radius-full);
+  background-color: var(--color-text-secondary);
+  color: var(--color-ui-surface);
+  box-shadow: var(--shadow-sm);
+}
+.btn-hide-sidebar:hover {
+  background-color: #333;
+  box-shadow: var(--shadow-md);
+}
+/* Base styles for all icons to promote consistency */
+.icon-base {
   position: relative;
-  width: 24px; /* Slightly larger */
-  height: 20px; /* Adjusted height */
   display: flex;
   align-items: center;
   justify-content: center;
-  /* cursor: pointer; (handled by parent button) */
+  /* Cursor handled by parent button, so no need here */
 }
-.icon-hamburger::before,
-.icon-hamburger::after {
+
+.icon-base::before,
+.icon-base::after,
+.icon-base span {
   content: '';
   display: block;
-  width: 100%;
-  height: 3px; /* Thicker lines */
-  background-color: white;
-  border-radius: 1.5px;
+  background-color: white; /* Consistent color for all lines */
+  border-radius: 1.5px; /* Consistent border-radius for all lines */
   position: absolute;
-  left: 0;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out; /* Smooth transitions for all states */
 }
+
+/* --- */
+
+/* Hamburger Icon */
+.icon-hamburger {
+  @extend .icon-base; /* Inherit base styles */
+  width: 26px; /* Slightly larger for better tap target */
+  height: 22px; /* Adjusted height for better proportion */
+}
+
+.icon-hamburger::before,
+.icon-hamburger::after,
+.icon-hamburger span {
+  width: 100%;
+  height: 3px; /* Consistent thickness for hamburger lines */
+  left: 0;
+}
+
 .icon-hamburger::before {
   top: 0;
 }
+
 .icon-hamburger::after {
   bottom: 0;
 }
+
 .icon-hamburger span { /* Middle line */
-  display: block;
-  width: 100%;
-  height: 3px;
-  background-color: white;
-  border-radius: 1.5px;
-  transition: all 0.3s ease-in-out;
+  top: 50%;
+  transform: translateY(-50%); /* Centering the middle line */
 }
 
-/* Close Icon for closing sidebar (fixed button) */
+/* --- */
+
+/* Close Icon */
 .icon-close {
-  position: relative;
+  @extend .icon-base; /* Inherit base styles */
   width: 24px;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* cursor: pointer; (handled by parent button) */
 }
+
 .icon-close::before,
 .icon-close::after {
-  content: '';
-  display: block;
   width: 100%;
   height: 3px;
-  background-color: white;
-  border-radius: 1.5px;
-  position: absolute;
-  left: 0;
   top: 50%;
+  left: 0;
   transform-origin: center;
-  transition: all 0.3s ease-in-out;
 }
+
 .icon-close::before {
   transform: translateY(-50%) rotate(45deg);
 }
+
 .icon-close::after {
   transform: translateY(-50%) rotate(-45deg);
 }
 
+/* --- */
 
-/* Left Arrow Icon (for internal sidebar hide button) */
+/* Arrow Icons Base */
+.icon-arrow-base {
+  @extend .icon-base; /* Inherit base styles */
+  width: 28px; /* Slightly larger for arrows */
+  height: 28px;
+}
+
+.icon-arrow-base::before,
+.icon-arrow-base::after {
+  width: 14px; /* Slightly longer arrow "feathers" */
+  height: 2.5px; /* Consistent thickness */
+  border-radius: 1.25px; /* Adjust border-radius for new height */
+}
+
+/* Left Arrow Icon */
 .icon-arrow-left {
-    position: relative;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* cursor: pointer; (handled by parent button) */
+  @extend .icon-arrow-base; /* Inherit arrow base styles */
 }
-.icon-arrow-left::before,
-.icon-arrow-left::after {
-  content: '';
-  display: block;
-  width: 12px;
-  height: 2.5px;
-  background-color: white;
-  border-radius: 1px;
-  position: absolute;
-  transition: all 0.2s ease-in-out;
-}
+
 .icon-arrow-left::before {
-    left: 5px;
-    transform: rotate(45deg);
-    top: 7px;
+  left: 5px;
+  transform: rotate(45deg);
+  top: 8px; /* Adjusted top for visual balance */
 }
+
 .icon-arrow-left::after {
-    left: 5px;
-    transform: rotate(-45deg);
-    bottom: 7px;
+  left: 5px;
+  transform: rotate(-45deg);
+  bottom: 8px; /* Adjusted bottom for visual balance */
 }
-/* Right Arrow Icon (for fixed button when sidebar is closed, if not using hamburger) */
-/* Keeping this for now, but will use hamburger for open state of fixed button */
+
+/* --- */
+
+/* Right Arrow Icon */
 .icon-arrow-right {
-    position: relative;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* cursor: pointer; (handled by parent button) */
+  @extend .icon-arrow-base; /* Inherit arrow base styles */
 }
-.icon-arrow-right::before,
-.icon-arrow-right::after {
-  content: '';
-  display: block;
-  width: 12px;
-  height: 2.5px;
-  background-color: white;
-  border-radius: 1px;
-  position: absolute;
-  transition: all 0.2s ease-in-out;
-}
+
 .icon-arrow-right::before {
-    right: 5px;
-    transform: rotate(-45deg);
-    top: 7px;
+  right: 5px;
+  transform: rotate(-45deg);
+  top: 8px; /* Adjusted top for visual balance */
 }
+
 .icon-arrow-right::after {
-    right: 5px;
-    transform: rotate(45deg);
-    bottom: 7px;
+  right: 5px;
+  transform: rotate(45deg);
+  bottom: 8px; /* Adjusted bottom for visual balance */
 }
-
-/* Trashcan Icon (for deleting nodes) */
-.icon-trash {
-  position: relative;
-  width: 18px;
-  height: 20px;
-  display: block;
-  cursor: pointer;
-  color: #888; /* Default color */
-  transition: color 0.2s ease;
-}
-.icon-trash::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 3px;
-  background-color: currentColor; /* Inherits color */
-  border-radius: 1.5px;
-}
-.icon-trash::after {
-  content: '';
-  position: absolute;
-  top: 5px;
-  left: 2px;
-  width: calc(100% - 4px);
-  height: 14px;
-  border: 2px solid currentColor;
-  border-top: none;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
-.icon-trash:hover {
-  color: var(--accent-red); /* Red on hover */
-}
-
-/* Plus Icon (for node output points within options) */
-.icon-plus {
-  position: relative;
-  width: 16px;
-  height: 16px;
+/* Base styles for all icons to promote consistency */
+.icon-base {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: #555; /* Default color */
-  transition: color 0.2s ease, transform 0.2s ease;
+  position: relative;
+  /* Cursor and color handled by individual icons for specific interactions */
 }
-.icon-plus::before,
-.icon-plus::after {
+
+.icon-base::before,
+.icon-base::after,
+.icon-base span {
   content: '';
+  display: block;
   position: absolute;
-  background-color: currentColor;
-  border-radius: 1px;
+  background-color: currentColor; /* Inherits color from the parent */
+  transition: all 0.2s ease; /* Smooth transitions for all elements */
+  border-radius: 1px; /* Default for sharp edges, adjust as needed */
 }
+
+/* --- */
+
+/* Trashcan Icon */
+.icon-trash {
+  @extend .icon-base; /* Inherit base styles */
+  width: 20px; /* Slightly larger for better clickability */
+  height: 22px; /* Adjusted height */
+  color: #888; /* Default muted color */
+  cursor: pointer;
+}
+
+.icon-trash::before { /* Lid */
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%; /* Wider lid */
+  height: 3px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.icon-trash::after { /* Body */
+  top: 6px; /* Positioned below the lid */
+  left: 10%; /* Inset from sides */
+  width: 80%; /* Takes up more width of the container */
+  height: 16px; /* Taller body */
+  border: 2px solid currentColor;
+  border-top: none; /* No top border, lid acts as top */
+  border-bottom-left-radius: 4px; /* More pronounced bottom curve */
+  border-bottom-right-radius: 4px;
+}
+
+.icon-trash:hover {
+  color: var(--accent-red, #e74c3c); /* Red on hover, with fallback */
+}
+
+/* --- */
+
+/* Plus Icon */
+.icon-plus {
+  @extend .icon-base; /* Inherit base styles */
+  width: 18px; /* Slightly larger for better visibility */
+  height: 18px;
+  color: #555; /* Default color */
+  cursor: pointer;
+}
+
 .icon-plus::before { /* Horizontal line */
   width: 100%;
   height: 2px;
 }
+
 .icon-plus::after { /* Vertical line */
   width: 2px;
   height: 100%;
 }
-.icon-plus:hover {
-  color: var(--playful-purple); /* Purple on hover */
-  transform: scale(1.1);
-}
 
+.icon-plus:hover {
+  color: var(--playful-purple, #9b59b6); /* Purple on hover, with fallback */
+  transform: scale(1.15); /* Slightly more pronounced scale effect */
+}
 
 /* --- Fixed Sidebar Toggle Button --- */
 .fixed-sidebar-toggle {
     position: fixed;
-    top: 100px; /* Adjust based on header height, or desired position */
-    left: 20px; /* Position on the left side */
-    z-index: 100; /* Ensure it's above other content but below welcome overlay */
-    background-color: var(--playful-purple); /* Default: playful purple when sidebar is open */
-    color: white; /* Icon color (lines) */
-    width: 50px; /* Size of the round button */
-    height: 50px;
-    border-radius: 50%; /* Round button */
+    top: 100px; /* Aligned with header or desired spacing */
+    left: 20px; /* Consistent left positioning */
+    z-index: 1000; /* High z-index to ensure visibility, above typical content */
+
+    /* Sizing & Shape */
+    width: 54px; /* Slightly larger for better tap target and visual presence */
+    height: 54px;
+    border-radius: 50%; /* Perfect circle */
+
+    /* Flexbox for centering icon */
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 5px 15px rgba(92, 107, 192, 0.5); /* Stronger shadow */
+
+    /* Appearance (Default: Sidebar Open State) */
+    background-color: var(--playful-purple, #7b1fa2); /* Playful purple, with a solid fallback */
+    color: white; /* Icon color */
+    border: 2px solid rgba(255, 255, 255, 0.4); /* Subtle white border for depth */
+    box-shadow: 0 6px 18px rgba(92, 107, 192, 0.55); /* Enhanced shadow for depth */
+
+    /* Interactivity */
     cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid rgba(255, 255, 255, 0.4); /* White border */
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother, more engaging transition */
 }
 
-/* State when sidebar is closed - applies to the fixed button */
+/* State when sidebar is closed */
 .fixed-sidebar-toggle.sidebar-closed-state {
-    background-color: var(--sidebar-toggle-closed-bg); /* Dark background when sidebar is closed */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Darker shadow for dark background */
+    background-color: var(--sidebar-toggle-closed-bg, #333); /* Dark background with fallback */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); /* Adjust shadow for darker background */
+    border-color: rgba(255, 255, 255, 0.2); /* Slightly less prominent border when closed */
 }
 
+/* Hover effects */
 .fixed-sidebar-toggle:hover {
-    background-color: var(--playful-light-purple);
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(92, 107, 192, 0.6);
+    background-color: var(--playful-light-purple, #9c27b0); /* Lighter purple on hover */
+    transform: scale(1.08); /* More noticeable hover scale */
+    box-shadow: 0 10px 25px rgba(92, 107, 192, 0.7); /* Deeper shadow on hover */
 }
+
 .fixed-sidebar-toggle.sidebar-closed-state:hover {
-    background-color: #666666; /* Slightly lighter dark on hover */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    background-color: var(--sidebar-toggle-closed-hover-bg, #444); /* Lighter dark on hover, with fallback */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); /* Deeper shadow for dark background hover */
 }
-
-
-/* --- Preview Mode Styles (Unchanged from your provided CSS, but included for completeness) --- */
-.preview-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  max-width: 600px;
-  margin: 20px auto;
-  width: 100%;
-  background-color: var(--bg-white);
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--playful-border-light);
-}
-
-.preview-header {
-  text-align: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-default);
-}
-
-.preview-title {
-  font-size: 1.8rem;
-  color: var(--text-dark);
-}
-
-.chat-window {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--border-default);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
-}
-
-.chat-messages {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-  background-color: var(--bg-chat-light);
-  display: flex;
-  flex-direction: column;
-}
-
-.chat-message {
-  margin-bottom: 10px;
-  display: flex;
-}
-
-.chat-message-user {
-  justify-content: flex-end;
-}
-
-.chat-bubble {
-  padding: 10px 15px;
-  border-radius: 18px;
-  max-width: 70%;
-  word-break: break-word;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.chat-message-user .chat-bubble {
-  background-color: var(--primary-blue);
-  color: white;
-}
-
-.chat-message-bot .chat-bubble {
-  background-color: #e0e0e0;
-  color: var(--text-dark);
-}
-
-.chat-input-container {
-  display: flex;
-  padding: 10px;
-  background-color: var(--bg-white);
-  border-top: 1px solid var(--border-default);
-  align-items: center;
-}
-
-.chat-input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid var(--border-default);
-  border-radius: 20px;
-  margin-right: 10px;
-  font-size: 1rem;
-}
-
-.chat-send-btn {
-  padding: 10px 20px;
-  background-color: var(--primary-blue);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.chat-send-btn:hover {
-  background-color: #1976D2;
-}
-
 /* --- Flow Builder Styles --- */
 .flow-builder-container {
   flex: 1;
@@ -548,7 +616,124 @@ textarea,
 .flow-builder-container.sidebar-collapsed {
   grid-template-columns: 60px 1fr; /* Slightly wider collapsed bar */
 }
+/* --- Preview Mode Styles --- */
+.preview-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    max-width: 650px; /* Slightly wider for better content display */
+    margin: 25px auto; /* Slightly more vertical margin */
+    width: 100%;
+    background-color: var(--bg-white, #ffffff); /* Added fallback */
+    border-radius: 10px; /* Slightly more rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12); /* Slightly stronger shadow */
+    border: 1px solid var(--playful-border-light, #e0e0e0); /* Added fallback */
+}
 
+.preview-header {
+    text-align: center;
+    margin-bottom: 25px; /* Increased spacing */
+    padding-bottom: 15px; /* Increased padding */
+    border-bottom: 1px solid var(--border-default, #ddd); /* Added fallback */
+}
+
+.preview-title {
+    font-size: 2rem; /* Larger title for emphasis */
+    color: var(--text-dark, #333); /* Added fallback */
+    font-weight: 600; /* Slightly bolder */
+}
+
+.chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-default, #ddd); /* Added fallback */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 0 7px rgba(0, 0, 0, 0.07); /* Slightly more prominent inner shadow */
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background-color: var(--bg-chat-light, #f9f9f9); /* Added fallback */
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-message {
+    margin-bottom: 12px; /* Slightly increased spacing between messages */
+    display: flex;
+}
+
+.chat-message-user {
+    justify-content: flex-end;
+}
+
+.chat-bubble {
+    padding: 10px 16px; /* Slightly more horizontal padding */
+    border-radius: 20px; /* Slightly more rounded bubbles */
+    max-width: 75%; /* Allows user messages to take a bit more space */
+    word-break: break-word;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow for bubbles */
+}
+
+.chat-message-user .chat-bubble {
+    background-color: var(--primary-blue, #2196f3); /* Added fallback */
+    color: white;
+}
+
+.chat-message-bot .chat-bubble {
+    background-color: var(--bg-chat-bubble-bot, #e0e0e0); /* New variable for bot bubble color */
+    color: var(--text-dark, #333); /* Added fallback */
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 12px; /* Slightly more padding */
+    background-color: var(--bg-white, #ffffff); /* Added fallback */
+    border-top: 1px solid var(--border-default, #ddd); /* Added fallback */
+    align-items: center;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 12px 15px; /* Increased padding for input */
+    border: 1px solid var(--border-default, #ccc); /* Added fallback */
+    border-radius: 22px; /* More rounded input field */
+    margin-right: 12px; /* Slightly increased margin */
+    font-size: 1.05rem; /* Slightly larger font */
+    line-height: 1.4; /* Improve text flow */
+}
+
+.chat-input:focus {
+    outline: none;
+    border-color: var(--primary-blue, #2196f3); /* Highlight on focus */
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2); /* Soft blue glow on focus */
+}
+
+.chat-send-btn {
+    padding: 10px 22px; /* Slightly more padding */
+    background-color: var(--primary-blue, #2196f3); /* Added fallback */
+    color: white;
+    border: none;
+    border-radius: 22px; /* More rounded button */
+    cursor: pointer;
+    font-weight: 600; /* Slightly bolder text */
+    transition: background-color 0.25s ease-out, transform 0.15s ease-out; /* Added transform transition */
+}
+
+.chat-send-btn:hover {
+    background-color: var(--primary-blue-dark, #1976D2); /* Use a darker primary blue variable */
+    transform: translateY(-1px); /* Subtle lift on hover */
+}
+
+.chat-send-btn:active {
+    transform: translateY(0); /* Return to original position on click */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Inset shadow for press effect */
+}
 /* --- Sidebar (Updated for conditional rendering) --- */
 .sidebar {
   background-color: var(--bg-white);
@@ -651,153 +836,208 @@ textarea.input-box {
   gap: 12px; /* Increased gap */
 }
 
-/* --- Node Type Buttons (Sidebar) - Made Bigger and Text Black --- */
+/* --- Node Type Buttons (Sidebar) --- */
 .node-type-item {
-  padding: 14px 12px; /* Increased padding to make them bigger */
-  border-radius: 10px; /* Slightly more rounded */
-  color: var(--text-dark); /* Changed text color to black for better visibility */
-  font-size: 15px; /* Larger font size */
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* Softer shadow */
-  text-shadow: none; /* Removed text-shadow as text is now dark */
-  border: 1px solid rgba(0,0,0,0.1); /* Subtle dark border for definition */
-  font-family: 'Open Sans', sans-serif; /* Changed font */
+    padding: 16px 14px; /* Slightly more vertical padding for a squarer look */
+    border-radius: 12px; /* More rounded, modern feel */
+    color: var(--text-dark, #333); /* Ensure dark text with fallback */
+    font-size: 16px; /* Slightly larger, more readable font */
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), /* Softer "pop" transition */
+                box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+                opacity 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slightly more prominent initial shadow */
+    text-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.08); /* More subtle, consistent dark border */
+    font-family: 'Open Sans', sans-serif;
+    /* Prevent text selection, useful for interactive elements */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 
 .node-type-item:hover {
-  transform: translateY(-4px); /* More pronounced lift */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-  opacity: 0.95; /* Slight opacity change on hover */
+    transform: translateY(-5px); /* More pronounced lift on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* Deeper shadow on hover for more depth */
+    opacity: 1; /* Ensure full opacity on hover for clarity */
 }
 
-/* Node Type Colors (from image_42b94e.png - as you provided them) */
+.node-type-item:active {
+    transform: translateY(-2px); /* Slight press down effect on click */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15); /* Softer shadow when pressed */
+}
+
+/* Node Type Colors (from image_42b94e.png) */
+/* Using more vibrant and consistent gradients with fallbacks */
 .node-type-item.node-type-start {
-  background: linear-gradient(145deg, #d3e9c7 0%, #aed68d 100%); /* Soft Mint Green */
+    background: linear-gradient(145deg, #e6ffdb 0%, #b2e091 100%); /* Brighter Mint Green */
+    color: var(--text-dark-green, #28a745); /* Specific dark green text color */
 }
 
 .node-type-item.node-type-message {
-  background: linear-gradient(145deg, #c2e0f0 0%, #a9d4e5 100%); /* Sky Blue */
+    background: linear-gradient(145deg, #dbe9ff 0%, #a9c6e5 100%); /* Brighter Sky Blue */
+    color: var(--text-dark-blue, #007bff); /* Specific dark blue text color */
 }
 
 .node-type-item.node-type-multichoice {
-  background: linear-gradient(145deg, #f0c2e0 0%, #e0a9d4 100%); /* Lavender Pink */
+    background: linear-gradient(145deg, #ffe0f5 0%, #e8a9d4 100%); /* More vibrant Lavender Pink */
+    color: var(--text-dark-pink, #e83e8c); /* Specific dark pink text color */
 }
 
 .node-type-item.node-type-button {
-  background: linear-gradient(145deg, #ffd9b3 0%, #fbc281 100%); /* Peach Orange */
+    background: linear-gradient(145deg, #fff3e0 0%, #fbc281 100%); /* Brighter Peach Orange */
+    color: var(--text-dark-orange, #fd7e14); /* Specific dark orange text color */
 }
 
 .node-type-item.node-type-textinput {
-  background: linear-gradient(145deg, #e0d1e0 0%, #ccbccb 100%); /* Gentle Lilac */
+    background: linear-gradient(145deg, #eee0ff 0%, #ccbbd1 100%); /* Brighter Gentle Lilac */
+    color: var(--text-dark-purple, #6f42c1); /* Specific dark purple text color */
 }
 
 .node-type-item.node-type-rating {
-  background: linear-gradient(145deg, #ffe0b3 0%, #fbd49f 100%); /* Muted Yellow */
+    background: linear-gradient(145deg, #ffffe0 0%, #fbd49f 100%); /* Brighter Muted Yellow */
+    color: var(--text-dark-yellow, #ffc107); /* Specific dark yellow text color */
 }
 
 
 /* Node Properties within sidebar */
 .node-option-item {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem; /* Increased gap */
-  margin-bottom: 1rem; /* More space */
-  background-color: #f8f9fb; /* Lighter playful grey background */
-  padding: 0.8rem; /* More padding */
-  border-radius: 10px; /* More rounded */
-  border: 1px solid #eef1f5;
-  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.03); /* Softer inner shadow */
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Increased gap for better spacing */
+    margin-bottom: 1.2rem; /* More space below each option */
+    background-color: var(--bg-light-grey, #f8f9fb); /* Consistent light grey background with fallback */
+    padding: 1rem; /* More generous padding */
+    border-radius: 12px; /* More rounded to match other UI elements */
+    border: 1px solid var(--border-light, #eef1f5); /* Use a common light border variable with fallback */
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.05); /* Slightly deeper inner shadow */
+    transition: all 0.2s ease-in-out; /* Smooth transition for any changes */
 }
 
 .node-option-item input {
-  padding: 0.7rem 1rem;
-  font-size: 0.95rem;
-  border-radius: 8px; /* More rounded */
+    flex: 1; /* Allow input to grow and fill space */
+    padding: 0.8rem 1.2rem; /* More generous padding for input field */
+    font-size: 1rem; /* Clearer font size for input */
+    border-radius: 10px; /* More rounded input field */
+    border: 1px solid var(--border-default, #ccc); /* Consistent border for input */
+    background-color: var(--bg-white, #fff); /* White background for input */
+    color: var(--text-dark, #333); /* Consistent text color */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle inner shadow for input */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Smooth transition for focus */
+}
+
+.node-option-item input:focus {
+    outline: none; /* Remove default outline */
+    border-color: var(--primary-blue, #2196f3); /* Highlight on focus */
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2); /* Soft blue glow on focus */
 }
 
 .btn-delete-option {
-  background-color: var(--accent-red);
-  color: white;
-  min-width: 38px; /* Slightly larger */
-  height: 38px;
-  padding: 0;
-  border-radius: 50%;
-  font-size: 1.2rem; /* Larger X */
-  flex-shrink: 0;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    background-color: var(--accent-red, #dc3545); /* Consistent accent red with fallback */
+    color: white;
+    min-width: 40px; /* Slightly larger and square */
+    height: 40px;
+    padding: 0; /* Ensures content is centered by flexbox */
+    border-radius: 50%;
+    font-size: 1.3rem; /* Larger 'X' for better visibility */
+    flex-shrink: 0; /* Prevents shrinking */
+    display: flex; /* Use flexbox to center content */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* More prominent shadow */
+    transition: all 0.2s ease-in-out; /* Smooth transition */
 }
 .btn-delete-option:hover {
-  background-color: #c82333;
-  transform: scale(1.08); /* More pronounced scale */
+    background-color: var(--accent-red-dark, #c82333); /* Darker red on hover with fallback */
+    transform: scale(1.1); /* More pronounced scale */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25); /* Deeper shadow */
+}
+.btn-delete-option:active {
+    transform: scale(0.95); /* Slight shrink on click */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Softer shadow when pressed */
 }
 
+
 .btn-add-option {
-  background-color: var(--playful-purple);
-  color: white;
-  margin-top: 1.5rem; /* More margin */
-  width: 100%;
-  padding: 1rem 1.5rem; /* More padding */
-  font-size: 1.05rem; /* Slightly larger */
-  box-shadow: 0 4px 12px rgba(92, 107, 192, 0.3);
+    background-color: var(--playful-purple, #7b1fa2); /* Consistent playful purple with fallback */
+    color: white;
+    margin-top: 2rem; /* More top margin to separate from options */
+    width: 100%;
+    padding: 1.1rem 1.5rem; /* More generous padding */
+    font-size: 1.1rem; /* Slightly larger font */
+    font-weight: 600; /* Bolder text */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 5px 15px rgba(92, 107, 192, 0.4); /* Stronger shadow */
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother, springy transition */
 }
 .btn-add-option:hover {
-  background-color: var(--playful-light-purple);
+    background-color: var(--playful-light-purple, #9c27b0); /* Lighter purple on hover with fallback */
+    transform: translateY(-3px); /* Subtle lift on hover */
+    box-shadow: 0 8px 20px rgba(92, 107, 192, 0.5); /* Deeper shadow on hover */
+}
+.btn-add-option:active {
+    transform: translateY(0); /* Return to original position on click */
+    box-shadow: 0 3px 8px rgba(92, 107, 192, 0.3); /* Softer shadow when pressed */
 }
 
 
 /* AI Toggle */
 .setting-item.ai-toggle-section {
-  border-top: 1px solid var(--playful-border-light);
-  padding-top: 1.8rem; /* Increased padding */
-  margin-top: 1.8rem; /* Increased margin */
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  font-size: 1rem; /* Larger font */
-  color: var(--text-medium);
+    border-top: 1px solid var(--playful-border-light, #eef1f5); /* Consistent border with fallback */
+    padding-top: 2rem; /* More padding */
+    margin-top: 2rem; /* More margin */
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Increased gap */
+    font-size: 1.05rem; /* Slightly larger font for readability */
+    color: var(--text-medium, #555); /* Consistent text color with fallback */
+    font-weight: 500; /* Slightly bolder text */
 }
 
 .ai-toggle-section input[type="checkbox"] {
-  width: 20px; /* Larger checkbox */
-  height: 20px;
-  accent-color: var(--playful-purple);
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    width: 22px; /* Larger checkbox for easier interaction */
+    height: 22px;
+    accent-color: var(--playful-purple, #7b1fa2); /* Consistent accent color with fallback */
+    cursor: pointer;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.12); /* Slightly deeper shadow */
+    border-radius: 4px; /* Slight border-radius for softer look */
+    /* Adjust alignment for better visual balance if needed, e.g., vertical-align: middle; */
 }
 
 /* --- Flow Canvas --- */
 .flow-canvas-container {
-  flex: 1;
-  position: relative;
-  background-color: var(--bg-white);
-  border-radius: 18px; /* More rounded to match welcome content */
-  box-shadow: 0 8px 30px var(--playful-shadow-light);
-  overflow: hidden;
-  border: 1px solid var(--playful-border-light);
-  transition: all 0.3s ease;
+    flex: 1;
+    position: relative;
+    background-color: var(--bg-white, #ffffff); /* Consistent white background with fallback */
+    border-radius: 20px; /* Even more rounded to feel modern and friendly */
+    box-shadow: 0 10px 40px var(--playful-shadow-medium, rgba(92, 107, 192, 0.15)); /* More pronounced initial shadow */
+    overflow: hidden; /* Essential for containing nodes */
+    border: 1px solid var(--playful-border-light, #eef1f5); /* Consistent border with fallback */
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother, more engaging transition */
 }
 
 .flow-canvas-container:hover {
-    box-shadow: 0 10px 35px rgba(92, 107, 192, 0.12);
-    border-color: var(--playful-light-purple);
+    box-shadow: 0 15px 50px var(--playful-shadow-heavy, rgba(92, 107, 192, 0.2)); /* Deeper shadow on hover */
+    border-color: var(--playful-purple, #7b1fa2); /* Border highlights on hover */
 }
 
 .flow-canvas-tools {
-  position: absolute;
-  top: 20px; /* More space from top */
-  right: 20px; /* More space from right */
-  background-color: rgba(255, 255, 255, 0.98); /* Less transparent */
-  padding: 12px 18px; /* More padding */
-  border-radius: 10px; /* More rounded */
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow */
-  display: flex;
-  align-items: center;
-  gap: 12px; /* Increased gap */
-  z-index: 20;
-  border: 1px solid var(--playful-border-light);
+    position: absolute;
+    top: 25px; /* More space from top */
+    right: 25px; /* More space from right */
+    background-color: var(--bg-tool-panel, rgba(255, 255, 255, 0.98)); /* Dedicated variable for tool panel background */
+    backdrop-filter: blur(8px); /* Subtle blur effect for a modern frosted glass look */
+    padding: 15px 20px; /* More generous padding */
+    border-radius: 12px; /* More rounded */
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.2); /* Stronger, more defined shadow */
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Increased gap */
+    z-index: 20;
+    border: 1px solid var(--playful-border-light, #eef1f5); /* Consistent border with fallback */
+    transition: all 0.2s ease-in-out; /* Smooth transition for any internal changes */
 }
 
 .zoom-btn {
