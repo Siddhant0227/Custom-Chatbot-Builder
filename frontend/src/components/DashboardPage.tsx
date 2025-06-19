@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
 import './DashboardPage.css';
 
+
 // Define interface for Chatbot for TypeScript clarity
 interface Chatbot {
   id: string;
@@ -25,6 +26,24 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
   const [loading, setLoading] = useState<boolean>(true); // Explicitly type 'loading' state
   const [error, setError] = useState<string | null>(null); // Explicitly type 'error' state
   const navigate = useNavigate();
+
+  useEffect(() => {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  });
+
+  const elements = document.querySelectorAll('.fade-up');
+  elements.forEach(el => observer.observe(el));
+
+  return () => {
+    elements.forEach(el => observer.unobserve(el));
+  };
+}, []);
+
 
   useEffect(() => {
     const fetchChatbots = async () => {
@@ -214,5 +233,8 @@ const DashboardPage: React.FC = () => { // Explicitly typing the functional comp
     </div>
   );
 };
+
+
+
 
 export default DashboardPage;

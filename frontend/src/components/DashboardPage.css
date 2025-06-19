@@ -1,25 +1,31 @@
 /* src/components/DashboardPage.css */
 
-/* --- Base Styles & Variables --- */
+/* --- Base Styles & Variables - Streamlined Lumina Core & Bio-Luminescent Accents --- */
 :root {
-    /* REFINED COLOR PALETTE - Lumina Core & Bio-Luminescent Accents */
-    --primary-gradient: linear-gradient(135deg, #FF6F00 0%, #FFD600 100%); /* Warm Orange to Golden Yellow - More inviting */
-    --secondary-gradient: linear-gradient(135deg, #2ED8B1 0%, #00C4FF 100%); /* Teal to Bright Sky Blue - Modern and fresh */
-    --accent-color: #00FFD1; /* Electric Aqua - Super vibrant, bio-luminescent feel */
-    --background-dark: #070D1A; /* Even deeper, near-black, like infinite space */
-    --background-medium: #101827; /* Dark charcoal-blue */
-    --surface-color: #1A253F; /* Rich, dark blue-grey for elements */
-    --text-lightest: #F5F7FA; /* Crisp off-white */
-    --text-light: #C0C8D6; /* Soft cool gray */
-    --text-medium: #8A96AC; /* Deeper cool gray */
-    --border-dark: #2A3C5B; /* Subtle, defining border */
-    --border-light: #3E5170; /* Slightly lighter border */
+    /* Refined Color Palette - Optimized for Vibrancy & Contrast */
+    --primary-gradient: linear-gradient(135deg, #FF6F00 0%, #FFD600 100%); /* Warm Orange to Golden Yellow */
+    --secondary-gradient: linear-gradient(135deg, #2ED8B1 0%, #00C4FF 100%); /* Teal to Bright Sky Blue */
+    --accent-color: #00FFD1; /* Electric Aqua - Primary highlight, used carefully */
 
-    /* ELEVATED SHADOWS - More ethereal and multi-layered */
-    --shadow-sm: 0 5px 20px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 20px 45px rgba(0, 0, 0, 0.5); /* Deeper and broader */
-    --shadow-lg: 0 50px 100px rgba(0, 0, 0, 0.8); /* Ultra deep, almost like a nebula */
-    --shadow-inset: inset 0 0 12px rgba(0, 0, 0, 0.2); /* For subtle internal depth */
+    /* Deeper, more balanced darks */
+    --background-dark: #070D1A; /* Near-black for main background */
+    --background-medium: #101827; /* Dark charcoal-blue for sections */
+    --surface-color: #1A253F; /* Rich, dark blue-grey for cards */
+
+    /* Text Colors - High contrast and readability */
+    --text-lightest: #F5F7FA; /* Crisp off-white for main text */
+    --text-light: #C0C8D6; /* Soft cool gray for secondary text */
+    --text-medium: #8A96AC; /* Deeper cool gray for subtle info */
+
+    /* Border Colors - Subtle definition */
+    --border-dark: #2A3C5B;
+    --border-light: #3E5170;
+
+    /* Optimized Shadows - Balanced depth and performance */
+    --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.25); /* Lighter, more performant small shadow */
+    --shadow-md: 0 15px 30px rgba(0, 0, 0, 0.4); /* Reduced spread for medium shadow */
+    --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.6); /* Max shadow, use sparingly */
+    --shadow-inset: inset 0 0 8px rgba(0, 0, 0, 0.15); /* Subtle inner shadow */
 
 
     --border-radius-sm: 8px;
@@ -27,7 +33,7 @@
     --border-radius-lg: 16px;
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 
-    /* ANIMATION Easing Functions - Hyper-smooth and reactive */
+    /* Animation Easing Functions - Fine-tuned for smoothness */
     --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
     --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-in-out-quad: cubic-bezier(0.45, 0, 0.55, 1);
@@ -35,11 +41,12 @@
 
     /* Animation Durations */
     --duration-fast: 0.2s;
-    --duration-normal: 0.4s;
-    --duration-slow: 0.6s;
+    --duration-normal: 0.35s; /* Slightly faster normal duration */
+    --duration-slow: 0.5s;
 
-    /* NEW: Global hover intensity for subtle consistency */
-    --hover-intensity: 0.08; /* Controls how much elements brighten/shift on hover */
+    /* Global hover brightness for subtle consistency */
+    --hover-brightness-increase: 1.08; /* Consistent brightness boost on hover */
+    --active-brightness-decrease: 0.95; /* Consistent dimming on active */
 }
 
 /* --- Global & Utility Styles --- */
@@ -49,9 +56,9 @@ body {
     background: var(--background-dark);
     color: var(--text-lightest);
     overflow-x: hidden;
-    /* NEW: More intricate background pattern for deeper immersion */
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgZmlsbD0iIzBhMTQyZSIgZmlsbC1vcGFjaXR5PSIwLjMiPgogICAgICAgICAgICA8cGF0aCBkPSJNNCAwSDJ2MiAyVjBoLTJWNiAyVjRWMEg0VjZINlY0SDhWMkg2VjBoMiAzVjRoMnYySDFjLTEuNiAwLTItLjctMi0yVjBDMCAuMiAwIC44IDAgMXYzIDJWMjFoMlYzVjBoNHY0VjIwaDJ2MkgydjhoMlYyVjhoMnY4aDJWOGgydjRoMlIuIi8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Z2c+');
-    background-size: 40px 40px; /* Slightly larger, still subtle */
+    /* More subtle background pattern */
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzgiIGhlaWdodD0iMzgiIHZpZXdCb3g9IjAgMCAzOCAzOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgZmlsbD0iIzBhMTQyZSIgZmlsbC1vcGFjaXR5PSIwLjMiPgogICAgICAgICAgICA8cGF0aCBkPSJNNCAwSDJ2MiAyVjBoLTJWNiAyVjRWMEg0VjZINlY0SDhWMkg2VjBoMiAzVjRoMnYySDFjLTEuNiAwLTItLjctMi0yVjBDMCAuMiAwIC44IDAgMXYzIDJWMjFoMlYzVjBoNHY0VjIwaDJ2MkgydjhoMlYyVjhoMnY0aDJIeiIvPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+');
+    background-size: 30px 30px; /* Smaller, even more subtle pattern */
     background-blend-mode: overlay;
 }
 
@@ -59,29 +66,33 @@ button {
     cursor: pointer;
     border: none;
     outline: none;
-    /* More pronounced will-change for performance */
-    transition: all var(--duration-fast) var(--ease-out-quint);
-    will-change: transform, box-shadow, background, color, border-color, filter;
+    /* Specific will-change for performance */
+    transition: transform var(--duration-fast) var(--ease-out-quint),
+                box-shadow var(--duration-fast) var(--ease-out-quint),
+                background var(--duration-fast) var(--ease-out-quint),
+                color var(--duration-fast) var(--ease-out-quint),
+                border-color var(--duration-fast) var(--ease-out-quint);
+    will-change: transform, box-shadow, background, color, border-color; /* Removed filter */
 }
 
 /* --- Dashboard Page Container --- */
 .dashboard-page {
-    max-width: 1700px; /* Wider for more expansive feel */
+    max-width: 1600px; /* Slightly smaller max-width for tighter feel */
     margin: 0 auto;
-    padding: 0 3rem 5rem 3rem; /* More generous padding */
+    padding: 0 3rem 5rem 3rem;
     min-height: 100vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 4rem; /* Increased spacing */
+    gap: 3.5rem; /* Slightly reduced gap */
 }
 
 /* --- Dashboard Header Section (NOW STICKY) --- */
 .dashboard-header {
     background: var(--background-dark);
-    padding: 3rem 4rem; /* Even more generous padding */
+    padding: 2.5rem 3.5rem;
     border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-md), var(--shadow-inset);
     border: 1px solid var(--border-dark);
     position: sticky;
     top: 0;
@@ -89,127 +100,127 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 4rem;
+    margin-bottom: 3.5rem;
     overflow: hidden;
-    transition: all var(--duration-normal) var(--ease-out-quint);
-    will-change: box-shadow, transform, background;
-    /* NEW: Subtle inset shadow for depth */
-    box-shadow: var(--shadow-md), var(--shadow-inset);
+    transition: box-shadow var(--duration-normal) var(--ease-out-quint),
+                transform var(--duration-normal) var(--ease-out-quint);
+    will-change: box-shadow, transform;
 }
 
 /* Header border glow with more dynamic opacity */
 .dashboard-header::before {
     content: '';
     position: absolute;
-    top: -10px; /* Larger glow area */
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
-    background: var(--secondary-gradient); /* Use secondary for a cooler glow */
-    filter: blur(30px); /* Even stronger blur */
+    top: -8px; /* Reduced glow area */
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    background: var(--secondary-gradient);
+    filter: blur(25px); /* Slightly less blur */
     border-radius: var(--border-radius-lg);
     z-index: -1;
-    opacity: 0.15; /* Softer base glow */
+    opacity: 0.1; /* Softer base glow */
     transition: opacity var(--duration-normal) var(--ease-out-expo), filter var(--duration-normal) var(--ease-out-expo);
 }
 
 .dashboard-header:hover::before {
-    opacity: 0.35; /* Stronger glow on hover */
-    filter: blur(45px); /* More diffuse on hover */
+    opacity: 0.3; /* Stronger glow on hover */
+    filter: blur(35px); /* More diffuse on hover */
 }
 
 .dashboard-header h1 {
-    font-size: 3.8rem; /* Even larger, more commanding heading */
-    font-weight: 950; /* Ultra bold */
+    font-size: 3.5rem;
+    font-weight: 900; /* Slightly less bold */
     margin: 0;
-    background: var(--primary-gradient); /* Use primary for warmer, inviting title */
+    background: var(--primary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     line-height: 1.1;
-    text-shadow: 0 5px 25px rgba(255, 100, 0, 0.7); /* Stronger, warmer glow */
+    text-shadow: 0 4px 20px rgba(255, 100, 0, 0.6); /* Reduced spread */
     transition: text-shadow var(--duration-normal) var(--ease-out-quint);
 }
 
 .dashboard-header h1:hover {
-    text-shadow: 0 8px 35px rgba(255, 150, 0, 1); /* More intense glow on hover */
+    text-shadow: 0 6px 30px rgba(255, 150, 0, 0.9);
 }
 
 .dashboard-header .header-actions {
     display: flex;
-    gap: 1.5rem; /* More space between buttons */
+    gap: 1.2rem;
     align-items: center;
 }
 
 /* Create New Chatbot button */
 .dashboard-header .btn-create-chatbot {
-    background: var(--secondary-gradient); /* Use secondary for a fresh CTA */
+    background: var(--secondary-gradient);
     color: white;
-    padding: 1.1rem 2.2rem; /* Adjusted padding */
-    border-radius: 60px; /* More pill-like */
-    font-size: 1.05rem; /* Slightly larger font */
-    font-weight: 800;
+    padding: 1rem 2rem;
+    border-radius: 50px; /* Consistent pill shape */
+    font-size: 1rem;
+    font-weight: 700; /* Slightly less bold */
     box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 1px; /* More prominent spacing */
+    letter-spacing: 0.8px;
     position: relative;
     overflow: hidden;
     z-index: 1;
     text-decoration: none;
+    /* Use brightness for hover effect for subtle change */
+    filter: brightness(1);
     transition: all var(--duration-fast) var(--ease-out-quint);
     will-change: transform, box-shadow, filter;
-    /* NEW: subtle filter for base appearance */
-    filter: brightness(1);
 }
 
 .dashboard-header .btn-create-chatbot::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -150%; /* Start even further left for dramatic shimmer */
+    left: -120%; /* Reduced swipe range */
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent); /* Stronger shimmer */
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); /* Slightly less intense shimmer */
     transition: all var(--duration-normal) var(--ease-out-expo);
     z-index: -1;
 }
 
 .dashboard-header .btn-create-chatbot:hover::before {
-    left: 150%; /* Swipe further right */
+    left: 120%; /* Reduced swipe range */
 }
 
 .dashboard-header .btn-create-chatbot:hover {
-    transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
-    box-shadow: 0 15px 35px rgba(0, 196, 255, 0.6); /* Vibrant glow from secondary gradient */
-    filter: brightness(1.2); /* Brighter on hover */
+    transform: translateY(-4px) scale(1.02); /* Less aggressive lift and scale */
+    box-shadow: 0 12px 30px rgba(0, 196, 255, 0.5); /* Lighter glow */
+    filter: brightness(var(--hover-brightness-increase)); /* Consistent brightness */
 }
 
 .dashboard-header .btn-create-chatbot svg {
     stroke: white;
-    width: 24px; /* Larger icon */
-    height: 24px;
+    width: 20px;
+    height: 20px;
 }
 
 /* Logout button */
 .dashboard-header .btn-logout {
     background: none;
     color: var(--text-light);
-    padding: 1.1rem 1.6rem;
+    padding: 1rem 1.5rem;
     border: 1px solid var(--border-dark);
-    border-radius: 60px;
-    font-size: 1.05rem;
-    font-weight: 800;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     position: relative;
     overflow: hidden;
     z-index: 1;
+    filter: brightness(1);
     transition: all var(--duration-fast) var(--ease-out-quint);
     will-change: transform, box-shadow, background, color, border-color, filter;
 }
@@ -221,11 +232,11 @@ button {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #FF4500 0%, #E63900 100%); /* Stronger, bold red gradient */
+    background: linear-gradient(135deg, #FF4500 0%, #E63900 100%);
     z-index: -1;
     opacity: 0;
     transition: opacity var(--duration-normal) var(--ease-out-expo);
-    border-radius: 60px;
+    border-radius: 50px;
 }
 
 .dashboard-header .btn-logout:hover::before {
@@ -234,16 +245,16 @@ button {
 
 .dashboard-header .btn-logout:hover {
     color: white;
-    transform: translateY(-5px) scale(1.03);
-    box-shadow: 0 15px 35px rgba(255, 69, 0, 0.6); /* Vibrant red glow */
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(255, 69, 0, 0.5);
     border-color: transparent;
-    filter: brightness(1.2); /* Brighter on hover */
+    filter: brightness(var(--hover-brightness-increase));
 }
 
 .dashboard-header .btn-logout svg {
     stroke: var(--text-light);
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     transition: stroke var(--duration-fast) var(--ease-out-quint);
 }
 
@@ -258,10 +269,10 @@ button {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 65vh; /* More central */
-    gap: 2rem;
+    min-height: 60vh; /* Slightly reduced min-height */
+    gap: 1.8rem;
     color: var(--text-light);
-    font-size: 1.5rem; /* Larger font */
+    font-size: 1.4rem;
     text-align: center;
     animation: fadeIn var(--duration-normal) var(--ease-out-quint) forwards;
 }
@@ -269,7 +280,7 @@ button {
 .loading-spinner .lucide, .empty-state .lucide {
     color: var(--accent-color);
     opacity: 0.9;
-    animation: pulseGlow 2s infinite alternate ease-in-out;
+    animation: pulseGlow 1.8s infinite alternate ease-in-out; /* Slightly faster pulse */
 }
 
 .animate-spin {
@@ -282,53 +293,55 @@ button {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(30px); }
+    from { opacity: 0; transform: translateY(20px); } /* Reduced Y translation */
     to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulseGlow {
-    0% { transform: scale(1); filter: drop-shadow(0 0 8px var(--accent-color)); }
-    100% { transform: scale(1.1); filter: drop-shadow(0 0 25px var(--accent-color)); } /* More pronounced glow */
+    0% { transform: scale(1); filter: drop-shadow(0 0 6px var(--accent-color)); } /* Reduced blur for performance */
+    100% { transform: scale(1.08); filter: drop-shadow(0 0 18px var(--accent-color)); } /* Reduced blur for performance */
 }
 
 
 /* --- Stats Grid Section --- */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Slightly larger min-width */
-    gap: 3rem;
-    margin-bottom: 4rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Slightly smaller min-width */
+    gap: 2.5rem;
+    margin-bottom: 3.5rem;
     animation: fadeInGrid var(--duration-slow) var(--ease-out-quint) forwards;
-    animation-delay: 0.2s;
+    animation-delay: 0.15s; /* Slightly reduced delay */
 }
 
 @keyframes fadeInGrid {
-    from { opacity: 0; transform: translateY(40px); }
+    from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 
 .stat-card {
     background: var(--surface-color);
-    padding: 2.5rem; /* More padding */
+    padding: 2.2rem;
     border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-sm), var(--shadow-inset); /* Add inset shadow */
+    box-shadow: var(--shadow-sm), var(--shadow-inset);
     border: 1px solid var(--border-dark);
     display: flex;
     align-items: center;
-    gap: 1.8rem;
-    transition: all var(--duration-normal) var(--ease-out-expo);
+    gap: 1.5rem;
+    transition: transform var(--duration-normal) var(--ease-out-expo),
+                box-shadow var(--duration-normal) var(--ease-out-expo),
+                border-color var(--duration-fast) var(--ease-out-quint); /* Removed filter from transition */
     position: relative;
     overflow: hidden;
-    will-change: transform, box-shadow, border-color, filter;
-    filter: brightness(1); /* Base brightness */
+    will-change: transform, box-shadow, border-color; /* Removed filter */
+    filter: brightness(1); /* Keep base brightness */
 
     /* Subtle background pattern for cards */
     &::after {
         content: '';
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        background: radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.03) 0%, transparent 50%); /* Reduced opacity */
         opacity: 0;
         transition: opacity var(--duration-normal) var(--ease-out-quint);
         z-index: 0;
@@ -336,24 +349,24 @@ button {
 }
 
 .stat-card:hover {
-    transform: translateY(-10px); /* More lift */
-    box-shadow: var(--shadow-md), 0 0 25px rgba(0, 255, 209, 0.4); /* Stronger external shadow with accent glow */
-    border-color: var(--accent-color); /* Border changes to accent */
-    filter: brightness(1.1); /* Brighter on hover */
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-md), 0 0 20px rgba(0, 255, 209, 0.3); /* Reduced glow spread */
+    border-color: var(--accent-color);
+    filter: brightness(var(--hover-brightness-increase)); /* Consistent brightness */
     &::after {
-        opacity: 1; /* Reveal subtle pattern */
+        opacity: 0.8; /* Slightly less opaque */
     }
 }
 
 .stat-icon {
     background: var(--primary-gradient);
     color: white;
-    padding: 1.2rem; /* Larger icon container */
+    padding: 1rem;
     border-radius: var(--border-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Slightly reduced shadow */
     position: relative;
     z-index: 1;
     transition: box-shadow var(--duration-fast) var(--ease-out-quint);
@@ -363,50 +376,50 @@ button {
 .stat-card:hover .stat-icon::after {
     content: '';
     position: absolute;
-    top: -8px; /* Expand glow area */
-    left: -8px;
-    right: -8px;
-    bottom: -8px;
+    top: -6px; /* Smaller glow area */
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
     background: var(--accent-color);
     border-radius: inherit;
-    filter: blur(22px); /* More significant blur */
-    opacity: 0.6;
+    filter: blur(18px); /* Less blur for performance */
+    opacity: 0.5;
     transition: opacity var(--duration-normal) var(--ease-out-expo), filter var(--duration-normal) var(--ease-out-expo);
     z-index: -1;
 }
 .stat-card:hover .stat-icon {
-    box-shadow: 0 10px 25px rgba(0, 255, 209, 0.8); /* Accent color glow on icon */
+    box-shadow: 0 8px 20px rgba(0, 255, 209, 0.7); /* Reduced glow */
 }
 
 
 .stat-content h3 {
-    font-size: 2.5rem; /* Larger stat numbers */
-    font-weight: 900; /* Bolder */
+    font-size: 2.2rem;
+    font-weight: 800;
     color: var(--text-lightest);
     margin: 0;
     background: var(--secondary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 3px 18px rgba(46, 216, 177, 0.7); /* Stronger, more vibrant text shadow */
+    text-shadow: 0 2px 8px rgba(46, 216, 177, 0.5); /* Reduced blur and opacity */
     transition: text-shadow var(--duration-fast) ease-out;
 }
 .stat-card:hover .stat-content h3 {
-    text-shadow: 0 5px 25px rgba(0, 196, 255, 1); /* More intense glow on hover from secondary gradient */
+    text-shadow: 0 4px 12px rgba(0, 196, 255, 0.8); /* Reduced blur and opacity */
 }
 
 .stat-content p {
     color: var(--text-light);
-    font-size: 1.1rem; /* Slightly larger font */
-    margin: 0.6rem 0 0 0;
-    font-weight: 500;
+    font-size: 1rem;
+    margin: 0.5rem 0 0 0;
+    font-weight: 400; /* Slightly lighter weight */
 }
 
 /* --- Chatbots Section --- */
 .chatbot-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Even larger min-width */
-    gap: 3.5rem; /* Increased gap */
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); /* Slightly smaller min-width */
+    gap: 3rem;
     padding: 0 0 5rem 0;
 }
 
@@ -414,18 +427,17 @@ button {
     background: var(--surface-color);
     border: 1px solid var(--border-dark);
     border-radius: var(--border-radius-lg);
-    padding: 3.2rem; /* More internal padding */
+    padding: 2.8rem;
     transition: transform var(--duration-normal) var(--ease-out-expo),
                 box-shadow var(--duration-normal) var(--ease-out-expo),
-                border-color var(--duration-fast) var(--ease-out-quint),
-                filter var(--duration-fast) var(--ease-out-quint);
+                border-color var(--duration-fast) var(--ease-out-quint); /* Removed filter from transition */
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    will-change: transform, box-shadow, border-color, filter;
-    filter: brightness(1); /* Base brightness */
+    will-change: transform, box-shadow, border-color; /* Removed filter */
+    filter: brightness(1); /* Keep base brightness */
 
     /* Inner radial glow on hover - more concentrated */
     &::after {
@@ -433,7 +445,7 @@ button {
         position: absolute;
         inset: 0;
         border-radius: inherit;
-        background: radial-gradient(circle at 50% 0%, rgba(0, 255, 209, 0.08) 0%, transparent 60%); /* Accent color glow */
+        background: radial-gradient(circle at 50% 0%, rgba(0, 255, 209, 0.06) 0%, transparent 60%); /* Reduced opacity */
         opacity: 0;
         transition: opacity var(--duration-normal) var(--ease-out-quint);
         z-index: 0;
@@ -447,7 +459,7 @@ button {
     top: 0;
     left: 0;
     right: 0;
-    height: 12px; /* Thicker accent line */
+    height: 10px; /* Slightly thinner accent line */
     background: var(--primary-gradient);
     border-top-left-radius: var(--border-radius-lg);
     border-top-right-radius: var(--border-radius-lg);
@@ -460,12 +472,12 @@ button {
 }
 
 .chatbot-card:hover {
-    transform: translateY(-15px) perspective(1000px) rotateX(1.5deg); /* Even more dramatic lift and tilt */
-    box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 255, 209, 0.3); /* Ultra deep shadow with accent glow */
+    transform: translateY(-10px) perspective(1000px) rotateX(1deg); /* Less aggressive lift and tilt */
+    box-shadow: var(--shadow-lg), 0 0 30px rgba(0, 255, 209, 0.25); /* Reduced glow */
     border-color: var(--accent-color);
-    filter: brightness(1.15); /* More noticeable brightness increase */
+    filter: brightness(var(--hover-brightness-increase)); /* Consistent brightness */
     &::after {
-        opacity: 1;
+        opacity: 0.8; /* Slightly less opaque */
     }
 }
 
@@ -473,88 +485,92 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 2rem;
-    gap: 2rem;
+    margin-bottom: 1.8rem;
+    gap: 1.5rem;
 }
 
 .chatbot-info h3 {
-    font-size: 2rem; /* Larger title */
-    font-weight: 850; /* Bolder */
+    font-size: 1.8rem;
+    font-weight: 800;
     color: var(--text-lightest);
-    margin: 0 0 0.8rem 0;
+    margin: 0 0 0.6rem 0;
     line-height: 1.2;
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
+    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.1); /* Reduced text shadow */
     transition: text-shadow var(--duration-fast) ease-out;
 }
 .chatbot-card:hover .chatbot-info h3 {
-    text-shadow: 0 4px 15px rgba(255, 255, 255, 0.4); /* Stronger glow on hover */
+    text-shadow: 0 3px 12px rgba(255, 255, 255, 0.3); /* Reduced text shadow */
 }
 
 
 .status-badge {
-    font-size: 0.9rem; /* Slightly larger badge text */
-    font-weight: 700;
-    padding: 0.6rem 1.2rem;
-    border-radius: 30px; /* More rounded */
+    font-size: 0.85rem;
+    font-weight: 600; /* Slightly less bold */
+    padding: 0.5rem 1rem;
+    border-radius: 25px; /* Slightly less rounded */
     text-transform: uppercase;
-    letter-spacing: 0.12em; /* More prominent spacing */
+    letter-spacing: 0.1em;
     white-space: nowrap;
     transition: all var(--duration-fast) var(--ease-out-quint);
     filter: brightness(1);
 }
 
 .status-active {
-    background: linear-gradient(45deg, rgba(0, 255, 100, 0.25) 0%, rgba(0, 255, 100, 0.15) 100%);
-    color: #00FF64; /* Electric green */
-    border: 1px solid rgba(0, 255, 100, 0.4);
+    background: linear-gradient(45deg, rgba(0, 255, 100, 0.2) 0%, rgba(0, 255, 100, 0.1) 100%); /* Reduced opacity */
+    color: #00FF64;
+    border: 1px solid rgba(0, 255, 100, 0.3); /* Reduced opacity */
 }
 .status-active:hover {
-    background: linear-gradient(45deg, rgba(0, 255, 100, 0.4) 0%, rgba(0, 255, 100, 0.2) 100%);
-    box-shadow: 0 0 15px rgba(0, 255, 100, 0.6);
-    filter: brightness(1.2);
+    background: linear-gradient(45deg, rgba(0, 255, 100, 0.35) 0%, rgba(0, 255, 100, 0.15) 100%);
+    box-shadow: 0 0 10px rgba(0, 255, 100, 0.5); /* Reduced glow */
+    filter: brightness(var(--hover-brightness-increase));
 }
 
 .status-inactive {
-    background: linear-gradient(45deg, rgba(255, 50, 50, 0.25) 0%, rgba(255, 50, 50, 0.15) 100%);
-    color: #FF3232; /* Bright red */
-    border: 1px solid rgba(255, 50, 50, 0.4);
+    background: linear-gradient(45deg, rgba(255, 50, 50, 0.2) 0%, rgba(255, 50, 50, 0.1) 100%);
+    color: #FF3232;
+    border: 1px solid rgba(255, 50, 50, 0.3);
 }
 .status-inactive:hover {
-    background: linear-gradient(45deg, rgba(255, 50, 50, 0.4) 0%, rgba(255, 50, 50, 0.2) 100%);
-    box-shadow: 0 0 15px rgba(255, 50, 50, 0.6);
-    filter: brightness(1.2);
+    background: linear-gradient(45deg, rgba(255, 50, 50, 0.35) 0%, rgba(255, 50, 50, 0.15) 100%);
+    box-shadow: 0 0 10px rgba(255, 50, 50, 0.5);
+    filter: brightness(var(--hover-brightness-increase));
 }
 
 .status-draft {
-    background: linear-gradient(45deg, rgba(255, 200, 0, 0.25) 0%, rgba(255, 200, 0, 0.15) 100%);
-    color: #FFC800; /* Golden yellow */
-    border: 1px solid rgba(255, 200, 0, 0.4);
+    background: linear-gradient(45deg, rgba(255, 200, 0, 0.2) 0%, rgba(255, 200, 0, 0.1) 100%);
+    color: #FFC800;
+    border: 1px solid rgba(255, 200, 0, 0.3);
 }
 .status-draft:hover {
-    background: linear-gradient(45deg, rgba(255, 200, 0, 0.4) 0%, rgba(255, 200, 0, 0.2) 100%);
-    box-shadow: 0 0 15px rgba(255, 200, 0, 0.6);
-    filter: brightness(1.2);
+    background: linear-gradient(45deg, rgba(255, 200, 0, 0.35) 0%, rgba(255, 200, 0, 0.15) 100%);
+    box-shadow: 0 0 10px rgba(255, 200, 0, 0.5);
+    filter: brightness(var(--hover-brightness-increase));
 }
 
 
 .card-actions {
     display: flex;
-    gap: 1.5rem; /* Increased gap */
+    gap: 1.2rem;
     flex-shrink: 0;
 }
 
 .btn-edit, .btn-settings {
     background: var(--background-medium);
     border: 1px solid var(--border-dark);
-    padding: 1rem; /* Larger buttons */
-    border-radius: 14px; /* More rounded */
+    padding: 0.9rem;
+    border-radius: 12px;
     color: var(--text-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-    transition: all var(--duration-fast) var(--ease-out-quint);
-    will-change: transform, box-shadow, background, color, border-color, filter;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform var(--duration-fast) var(--ease-out-quint),
+                box-shadow var(--duration-fast) var(--ease-out-quint),
+                background var(--duration-fast) var(--ease-out-quint),
+                color var(--duration-fast) var(--ease-out-quint),
+                border-color var(--duration-fast) var(--ease-out-quint); /* Removed filter from transition */
+    will-change: transform, box-shadow, background, color, border-color; /* Removed filter */
     filter: brightness(1);
 }
 
@@ -562,31 +578,31 @@ button {
     background: var(--primary-gradient);
     color: white;
     border-color: transparent;
-    transform: translateY(-6px) scale(1.08); /* More pronounced lift and scale */
-    box-shadow: 0 15px 35px rgba(255, 100, 0, 0.6); /* Warmer glow */
-    filter: brightness(1.2);
+    transform: translateY(-5px) scale(1.05); /* Less aggressive */
+    box-shadow: 0 10px 25px rgba(255, 100, 0, 0.5); /* Reduced glow */
+    filter: brightness(var(--hover-brightness-increase));
 }
 
 .btn-settings:hover {
     background: var(--secondary-gradient);
     color: white;
     border-color: transparent;
-    transform: translateY(-6px) scale(1.08);
-    box-shadow: 0 15px 35px rgba(0, 196, 255, 0.6); /* Cooler glow */
-    filter: brightness(1.2);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 196, 255, 0.5);
+    filter: brightness(var(--hover-brightness-increase));
 }
 
 .card-category {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .category-tag {
     background: var(--background-medium);
     color: var(--text-light);
-    font-size: 1rem; /* Slightly larger */
-    font-weight: 600;
-    padding: 0.6rem 1.2rem;
-    border-radius: 12px; /* More rounded */
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
     border: 1px solid var(--border-dark);
     transition: all var(--duration-fast) var(--ease-out-quint);
     filter: brightness(1);
@@ -595,36 +611,36 @@ button {
 .category-tag:hover {
     background: var(--border-light);
     color: var(--text-lightest);
-    transform: translateY(-3px); /* Subtle lift */
+    transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
-    filter: brightness(1.1);
+    filter: brightness(var(--hover-brightness-increase));
 }
 
 .card-stats {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 3rem;
+    gap: 1.2rem;
+    margin-bottom: 2.5rem;
 }
 
 .stat-item {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
     color: var(--text-light);
-    font-size: 1.15rem; /* Larger text */
+    font-size: 1.05rem;
     transition: all var(--duration-fast) var(--ease-out-quint);
 }
 .stat-item:hover {
     color: var(--text-lightest);
-    transform: translateX(8px); /* More noticeable slide */
+    transform: translateX(6px);
 }
 
 .stat-item svg {
-    stroke: var(--text-light);
+    stroke: var(--text-medium);
     opacity: 0.8;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     transition: stroke var(--duration-fast) ease-out, opacity var(--duration-fast) ease-out;
 }
@@ -635,59 +651,59 @@ button {
 
 .card-footer {
     border-top: 1px solid var(--border-dark);
-    padding-top: 2rem;
+    padding-top: 1.8rem;
 }
 
 .last-updated {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
     color: var(--text-medium);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .last-updated svg {
     stroke: var(--text-medium);
     opacity: 0.8;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
 }
 
 /* --- Empty State --- */
 .empty-state {
-    min-height: 80vh; /* More prominent */
+    min-height: 75vh;
 }
 
 .empty-state h3 {
-    font-size: 2.5rem; /* More prominent message */
-    font-weight: 900;
+    font-size: 2.2rem;
+    font-weight: 800;
     color: var(--text-lightest);
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 1.2rem 0;
     line-height: 1.2;
 }
 
 .empty-state p {
-    margin: 0 0 3.5rem 0;
-    max-width: 700px; /* Wider text block */
-    line-height: 1.8;
+    margin: 0 0 3rem 0;
+    max-width: 600px;
+    line-height: 1.7;
     color: var(--text-light);
-    font-size: 1.25rem; /* Larger text */
+    font-size: 1.15rem;
 }
 
 .btn-create-empty {
     background: var(--primary-gradient);
     color: white;
-    padding: 1.5rem 3.2rem;
-    border-radius: 60px;
-    font-size: 1.4rem;
-    font-weight: 800;
+    padding: 1.2rem 2.8rem;
+    border-radius: 50px;
+    font-size: 1.3rem;
+    font-weight: 700;
     box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
     position: relative;
     overflow: hidden;
     z-index: 1;
@@ -700,23 +716,23 @@ button {
     content: '';
     position: absolute;
     top: 0;
-    left: -150%;
+    left: -120%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transition: all var(--duration-slow) var(--ease-out-expo);
     z-index: -1;
 }
 
 .btn-create-empty:hover::before {
-    left: 150%;
+    left: 120%;
 }
 
 .btn-create-empty:hover {
-    transform: translateY(-10px) scale(1.04); /* More pronounced lift and scale */
-    box-shadow: var(--shadow-lg), 0 0 50px rgba(255, 100, 0, 0.7); /* Ultra strong glow */
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: var(--shadow-lg), 0 0 40px rgba(255, 100, 0, 0.6); /* Reduced glow */
     background: var(--primary-gradient);
-    filter: brightness(1.25);
+    filter: brightness(var(--hover-brightness-increase));
 }
 
 /* --- Responsive Design --- */
@@ -726,38 +742,38 @@ button {
         gap: 3rem;
     }
     .dashboard-header {
-        padding: 2.5rem 3rem;
+        padding: 2.2rem 3rem;
         margin-bottom: 3rem;
     }
     .dashboard-header h1 {
-        font-size: 3.2rem;
+        font-size: 3rem;
     }
     .dashboard-header .header-actions {
-        gap: 1.2rem;
+        gap: 1rem;
     }
     .dashboard-header .btn-create-chatbot {
-        padding: 0.9rem 1.8rem;
-        font-size: 0.95rem;
+        padding: 0.8rem 1.6rem;
+        font-size: 0.9rem;
     }
     .dashboard-header .btn-logout {
-      padding: 0.9rem 1.4rem;
-      font-size: 0.95rem;
+      padding: 0.8rem 1.3rem;
+      font-size: 0.9rem;
     }
     .chatbot-grid {
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 3rem;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2.5rem;
     }
     .chatbot-card {
-        padding: 2.5rem;
+        padding: 2.2rem;
     }
     .chatbot-info h3 {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
     .empty-state h3 {
-        font-size: 2.2rem;
+        font-size: 2rem;
     }
     .empty-state p {
-        font-size: 1.15rem;
+        font-size: 1.1rem;
     }
 }
 
@@ -768,53 +784,53 @@ button {
     .dashboard-header {
         flex-direction: column;
         align-items: flex-start;
-        padding: 2rem;
-        gap: 1.5rem;
-        margin-bottom: 2.5rem;
+        padding: 1.8rem;
+        gap: 1.2rem;
+        margin-bottom: 2.2rem;
     }
     .dashboard-header h1 {
-        font-size: 2.8rem;
+        font-size: 2.6rem;
     }
     .dashboard-header .header-actions {
         width: 100%;
         justify-content: flex-end;
-        gap: 1rem;
+        gap: 0.8rem;
     }
     .dashboard-header .btn-create-chatbot {
-        padding: 0.8rem 1.6rem;
-        font-size: 0.9rem;
-        gap: 0.6rem;
+        padding: 0.7rem 1.4rem;
+        font-size: 0.85rem;
+        gap: 0.5rem;
     }
     .dashboard-header .btn-create-chatbot svg {
-        width: 18px;
-        height: 18px;
+        width: 17px;
+        height: 17px;
     }
     .dashboard-header .btn-logout {
-        padding: 0.7rem 1.1rem;
-        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
     }
     .dashboard-header .btn-logout svg {
-        width: 18px;
-        height: 18px;
+        width: 17px;
+        height: 17px;
     }
     .chatbot-grid {
         grid-template-columns: 1fr;
-        gap: 2.5rem;
+        gap: 2rem;
     }
     .chatbot-card {
-        padding: 2.2rem;
+        padding: 2rem;
     }
     .card-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 1.5rem;
+        gap: 1.2rem;
     }
     .card-actions {
         justify-content: flex-end;
     }
     .btn-edit, .btn-settings {
-        padding: 0.8rem;
-        font-size: 1rem;
+        padding: 0.7rem;
+        font-size: 0.95rem;
     }
 }
 
@@ -823,81 +839,82 @@ button {
         padding: 0 1rem 2rem 1rem;
     }
     .dashboard-header {
-        padding: 1.5rem;
+        padding: 1.2rem;
     }
     .dashboard-header h1 {
-        font-size: 2.4rem;
+        font-size: 2.2rem;
     }
     .dashboard-header .btn-create-chatbot {
-        padding: 0.7rem 1.4rem;
-        font-size: 0.85rem;
-    }
-    .dashboard-header .btn-create-chatbot svg {
-        width: 17px;
-        height: 17px;
-    }
-    .dashboard-header .btn-logout {
-        padding: 0.6rem 0.9rem;
+        padding: 0.6rem 1.2rem;
         font-size: 0.8rem;
     }
+    .dashboard-header .btn-create-chatbot svg {
+        width: 16px;
+        height: 16px;
+    }
+    .dashboard-header .btn-logout {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.75rem;
+    }
     .dashboard-header .btn-logout svg {
-        width: 17px;
-        height: 17px;
+        width: 16px;
+        height: 16px;
     }
     .chatbot-card {
-        padding: 2rem;
+        padding: 1.8rem;
     }
     .chatbot-info h3 {
-        font-size: 1.6rem;
+        font-size: 1.4rem;
     }
     .status-badge, .category-tag, .stat-item, .last-updated {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     .empty-state h3 {
-        font-size: 2rem;
+        font-size: 1.7rem;
     }
     .empty-state p {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     .btn-create-empty {
-        font-size: 1.2rem;
-        padding: 1.2rem 2.5rem;
+        font-size: 1.1rem;
+        padding: 1rem 1.8rem;
     }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 15px;
+  width: 12px; /* Slightly thinner scrollbar */
 }
 ::-webkit-scrollbar-thumb {
   background: var(--border-light);
-  border-radius: 4px;
+  border-radius: 6px; /* More rounded */
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-color);
 }
+/* Active states - Consistent and subtle feedback */
 .btn-create-chatbot:active {
-  transform: scale(0.98);
+  transform: scale(0.97); /* Slightly less aggressive */
   box-shadow: var(--shadow-sm);
-  filter: brightness(0.9);
+  filter: brightness(var(--active-brightness-decrease));
 }
 .btn-logout:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
   box-shadow: var(--shadow-sm);
-  filter: brightness(0.9);
+  filter: brightness(var(--active-brightness-decrease));
 }
 .btn-edit:active, .btn-settings:active {
-    transform: translateY(0) scale(0.95);
+    transform: translateY(-2px) scale(0.97); /* Subtle press, less extreme */
     box-shadow: var(--shadow-sm);
-    filter: brightness(0.9);
+    filter: brightness(var(--active-brightness-decrease));
 }
 .stat-card:active {
-    transform: translateY(-5px);
+    transform: translateY(-4px); /* Reduced lift */
     box-shadow: var(--shadow-sm);
-    filter: brightness(0.95);
+    filter: brightness(var(--active-brightness-decrease));
 }
 .chatbot-card:active {
-    transform: translateY(-8px) perspective(1000px) rotateX(0.5deg);
+    transform: translateY(-6px) perspective(1000px) rotateX(0.5deg); /* Reduced lift and tilt */
     box-shadow: var(--shadow-md);
-    filter: brightness(0.95);
+    filter: brightness(var(--active-brightness-decrease));
 }

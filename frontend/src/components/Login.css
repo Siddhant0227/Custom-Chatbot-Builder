@@ -1,3 +1,5 @@
+/* Login.css */
+
 :root {
     /* NEW COLOR PALETTE - Deep Ocean & Electric Accents */
     --primary-gradient: linear-gradient(135deg, #b6a400 0%, #8E2DE2 100%); /* Deep Violet to Electric Purple */
@@ -58,11 +60,11 @@ body {
     background: var(--background-dark);
     min-height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: center; /* Centers the login-card vertically in the remaining space */
+    justify-content: center; /* Centers the login-card horizontally */
     padding: 2rem;
     font-family: var(--font-family);
-    position: relative;
+    position: relative; /* Crucial for positioning the logo absolutely */
     overflow: hidden;
 }
 
@@ -128,6 +130,17 @@ body {
 /* Content within the welcome panel */
 .welcome-content {
     max-width: 300px;
+}
+
+/* Style for the chatbot logo - positioned above the card */
+.chatbot-logo {
+    position: absolute; /* Position relative to login-container */
+    width: 500px; /* Increased size */
+    height: auto;
+    top: 100px; /* Adjusted vertical position from the top of login-container */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust to truly center horizontally */
+    z-index: 20; /* Ensure it's above other elements */
 }
 
 .welcome-title {
@@ -198,7 +211,6 @@ body {
 
 .form-content {
     width: 100%;
-    /* No longer absolute positioning here */
     display: flex; /* Make it a flex container to align its children */
     flex-direction: column; /* Stack children vertically */
     align-items: center; /* Center children horizontally */
@@ -206,9 +218,7 @@ body {
     transition: opacity 0.5s ease, visibility 0.5s ease, height 0.5s ease, padding 0.5s ease; /* Ensure height and padding transition */
     box-sizing: border-box; /* Include padding in width */
     padding: 0 2rem; /* Give some internal padding */
-    /* Ensure only active form is visible and takes up space */
     position: relative; /* Add relative positioning to prevent form items from escaping */
-    /* top: 50%; left: 50%; transform: translate(-50%, -50%); - REMOVED */
 }
 
 .form-content.active-form {
@@ -245,12 +255,6 @@ body {
     width: 100%;
     gap: 0.5rem; /* Space between label and input */
     text-align: left; /* Align label to the left within its group */
-}
-
-.form-group-item label {
-    font-size: 1rem;
-    color: var(--text-light); /* Lighter color for labels */
-    font-weight: 600;
 }
 
 
@@ -462,6 +466,9 @@ body {
         width: 100%; /* Take full width */
         border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg); /* Rounded bottom corners only */
         padding: 2rem;
+        /* Reset margins for vertical stacking */
+        margin-left: 0;
+        margin-right: 0;
     }
 
     .login-card.register-mode .form-panel {
@@ -481,7 +488,22 @@ body {
     .social-login {
         margin-top: 1.5rem;
     }
+
+    /* Adjust logo position for smaller screens */
+    @media (max-width: 768px) {
+    .chatbot-logo {
+        width: 180px; /* Adjusted size for tablets */
+        top: 20px; /* Adjusted vertical position for tablets */
+    }
 }
+
+@media (max-width: 780px) {
+    .chatbot-logo {
+        width: 540px; /* Adjusted size for mobile */
+        top: 75px; /* Adjusted vertical position for mobile */
+    }
+}
+} /* Closing brace for @media (max-width: 768px) */
 
 @media (max-width: 480px) {
     .login-card {
@@ -502,91 +524,29 @@ body {
         font-size: 0.9rem;
     }
     .form-panel {
-    flex-grow: 1;
-    width: 45%;
-    display: flex;
-    flex-direction: column;
-    align-items: right;
-    justify-content: right;
-    padding: 2.5rem;
-    background-color: var(--background-light);
-    border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
-    margin-right: 55%;
-    z-index: 0;
-    box-sizing: border-box;
-}
-.login-card.register-mode .form-panel {
-    margin-left: 0;
-    border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
-}
+        padding: 1.5rem; /* Adjust padding for smaller screens */
+    }
 
-/* No change to .form-title as it should remain centered by text-align */
-.form-title {
-    font-size: 2.2rem;
-    margin-bottom: 2rem;
-    text-align: center; /* Remains centered */
-    color: var(--color-text-dark);
-    font-weight: 800;
-    line-height: 1.2;
-    /* We need to ensure the title itself is centered within the form-panel's new alignment */
-    width: 100%; /* Make sure title spans full width to allow text-align: center to work */
-}
-.form-content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    /* Align items to the start (left) within this flex container */
-    align-items: flex-start;
-    gap: 1.5rem;
-    transition: opacity 0.5s ease, visibility 0.5s ease, height 0.5s ease, padding 0.5s ease;
-    box-sizing: border-box;
-    padding: 0 2rem; /* Keep internal padding */
-    position: relative; /* Keep relative positioning for forms to occupy space */
-}
-.form-content.active-form {
-    opacity: 1;
-    visibility: visible;
-    height: auto;
-    padding: 0 2rem;
-    overflow: visible;
-}
-.form-content.inactive-form {
-    opacity: 0;
-    visibility: hidden;
-    height: 0;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    pointer-events: none;
-    position: absolute; /* Keep it out of flow when inactive */
-
-}
-.form-content form {
-    display: flex;
-    flex-direction: column;
-
-    gap: 1rem;
-    width: 100%; /* Ensure form takes full width of its parent (.form-content) */
-    max-width: 300px; /* Constrain form width for better readability */
-    /* Ensure content inside form is left-aligned, if the form itself is centered */
-    align-self: center; /* Center the form itself within the form-content */
-}
-
-
-.form-group-item {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 0.5rem;
-    text-align: left; /* Explicitly ensure labels/inputs align left */
-}
-
+    .form-title {
+        font-size: 1.6rem; /* Smaller title on very small screens */
+        margin-bottom: 1rem;
+    }
+    .form-content {
+        padding: 0;
+        gap: 1rem;
+    }
+    .form-content form {
+        max-width: 280px; /* Slightly narrower forms */
+    }
+    .form-group-item {
+        gap: 0.3rem;
+    }
 
     .login-card input[type="text"],
     .login-card input[type="password"],
     .login-card button[type="submit"] {
         padding: 0.8rem;
-        font-size: 1rem;    
+        font-size: 1rem;
     }
     .social-icons {
         gap: 0.8rem;
@@ -596,4 +556,19 @@ body {
         height: 40px;
         font-size: 1.1rem;
     }
+    /* Adjust logo position for very small screens */
+    .chatbot-logo {
+        width: 100px; /* Even smaller on very small screens */
+        top: 20px; /* Adjust vertical position */
+    }
+} /* Closing brace for @media (max-width: 480px) */
+
+.card-3d {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: rotateY(10deg) rotateX(5deg) scale(1.02);
 }

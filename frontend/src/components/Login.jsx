@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
 import './Login.css';
+import ChatbotLogo from './cover.png'; // Corrected path from previous step
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
@@ -117,10 +118,14 @@ const Login = () => {
   return (
     <>
       <div className="login-container">
+        {/* Place the logo directly inside login-container for independent positioning */}
+        <img src={ChatbotLogo} alt="Chatbot Logo" className="chatbot-logo" /> 
+
         <div className={`login-card ${isRegistering ? 'register-mode' : 'login-mode'}`}>
           {/* Dynamic Welcome/Toggle Panel */}
           <div className="welcome-panel">
             <div className="welcome-content">
+              {/* Removed img tag from here */}
               {isRegistering ? (
                 <>
                   <h2 className="welcome-title">Welcome Back!</h2>
