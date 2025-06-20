@@ -2,10 +2,12 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext.tsx'; 
-import Login from './components/Login.jsx';
+import LoginPage from './components/LoginPage.jsx';
+
 import DashboardPage from './components/DashboardPage.tsx';
 import ChatbotBuilder from './components/ChatbotBuilder.tsx';
 import WelcomeScreen from './components/WelcomeScreen.tsx';
+
 
 const TopNavBar = () => {
   const { logout, username } = useAuth();
@@ -50,7 +52,7 @@ const AppContent = () => {
 
       <Routes>
        
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
         <Route path="/welcome" element={<PrivateRoute><WelcomeScreen /></PrivateRoute>} />
         <Route path="/build/:chatbotId?" element={<PrivateRoute><ChatbotBuilder /></PrivateRoute>} />

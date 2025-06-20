@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.tsx';
 import './Login.css';
-import ChatbotLogo from './cover.png';
+import ChatbotLogo from './cover.png'; // Corrected path from previous step
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
@@ -13,18 +13,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [showLogo, setShowLogo] = useState(true); // New state to control logo visibility
+  const [isRegistering, setIsRegistering] = useState(false); // Controls between login and register mode
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // After a short delay, hide the initial logo and show the login card and persistent logo
-    const timer = setTimeout(() => {
-      setShowLogo(false);
-    }, 2000); // Adjust delay (in milliseconds) as needed for the initial logo
-
-    return () => clearTimeout(timer); // Clean up the timer
-  }, []);
 
   // Handle login submission
   const handleLoginSubmit = async (e) => {
@@ -114,10 +104,10 @@ const Login = () => {
   // Function to toggle between login and register views
   const toggleFormMode = () => {
     setIsRegistering(!isRegistering);
-    setError('');
-    setSuccessMessage('');
-    setUsername('');
-    setPassword('');
+    setError('');       // Clear messages on toggle
+    setSuccessMessage(''); // Clear messages on toggle
+    setUsername(''); // Clear fields on toggle
+    setPassword(''); // Clear fields on toggle
   };
 
   // If the user is already authenticated, redirect them to the dashboard
@@ -128,114 +118,114 @@ const Login = () => {
   return (
     <>
       <div className="login-container">
-        {/* Conditional rendering of logo and login card */}
-        {showLogo ? (
-          <div className="initial-logo-display">
-            <img src={ChatbotLogo} alt="Chatbot Logo" className="chatbot-logo-initial" />
+        {/* Place the logo directly inside login-container for independent positioning */}
+      
+
+        {/* The main login card with sliding panels */}
+        <div className={`login-card ${isRegistering ? 'register-mode' : 'login-mode'}`}>
+          {/* Dynamic Welcome/Toggle Panel */}
+          <div className="welcome-panel">
+        
+            <div className="welcome-content">
+              {/* Conditional rendering for welcome text based on mode */}
+              {isRegistering ? (
+                <>
+                  <h2 className="welcome-title">Welcome Back!</h2>
+                  <p className="welcome-text">To keep connected with us, please login with your personal info.</p>
+                  <button type="button" className="panel-toggle-btn" onClick={toggleFormMode}>
+                    Login
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 className="welcome-title">Hello, Friend!</h2>
+                  <p className="welcome-text">Enter your personal details and start your journey with us.</p>
+                  <button type="button" className="panel-toggle-btn" onClick={toggleFormMode}>
+                    Register
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-        ) : (
-          // When showLogo is false, render both the persistent logo and the login card
-          <>
-            <img src={ChatbotLogo} alt="Chatbot Logo" className="chatbot-logo" /> {/* Persistent logo */}
-            <div className={`login-card ${isRegistering ? 'register-mode' : 'login-mode'} active`}>
-              {/* Dynamic Welcome/Toggle Panel */}
-              <div className="welcome-panel">
-                <div className="welcome-content">
-                  {isRegistering ? (
-                    <>
-                      <h2 className="welcome-title">Welcome Back!</h2>
-                      <p className="welcome-text">To keep connected with us, please login with your personal info.</p>
-                      <button type="button" className="panel-toggle-btn" onClick={toggleFormMode}>Login</button>
-                    </>
-                  ) : (
-                    <>
-                      <h2 className="welcome-title">Hello, Welcome!</h2>
-                      <p className="welcome-text">Enter your personal details to join our community.</p>
-                      <button type="button" className="panel-toggle-btn" onClick={toggleFormMode}>Register</button>
-                    </>
-                  )}
-                </div>
-              </div>
 
-              {/* Static Form Panel */}
-              <div className="form-panel">
-                <h2 className="form-title">{isRegistering ? 'Create Account' : 'Sign in'}</h2>
-                {error && <div className="error">{error}</div>}
-                {successMessage && <div className="success">{successMessage}</div>}
+          {/* Right Panel - Contains the actual Login/Register Forms */}
+          <div className="form-panel">
+            <h2 className="form-title">{isRegistering ? 'Create Account' : 'Sign in'}</h2>
 
-                {/* Login Form */}
-                <div className={`form-content ${!isRegistering ? 'active-form' : 'inactive-form'}`}>
-                  <form onSubmit={handleLoginSubmit}>
-                    <div className="form-group-item">
-                      <label htmlFor="login-username">Username</label>
-                      <input
-                        type="text"
-                        id="login-username"
-                        placeholder="Enter your username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-group-item">
-                      <label htmlFor="login-password">Password</label>
-                      <input
-                        type="password"
-                        id="login-password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <a href="#" className="forgot-password">Forgot Password?</a>
-                    <button type="submit">Login</button>
-                  </form>
-                </div>
+            {error && <div className="error">{error}</div>}
+            {successMessage && <div className="success">{successMessage}</div>}
 
-                {/* Registration Form */}
-                <div className={`form-content ${isRegistering ? 'active-form' : 'inactive-form'}`}>
-                  <form onSubmit={handleRegisterSubmit}>
-                    <div className="form-group-item">
-                      <label htmlFor="register-username">Username</label>
-                      <input
-                        type="text"
-                        id="register-username"
-                        placeholder="Choose a username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-group-item">
-                      <label htmlFor="register-password">Password</label>
-                      <input
-                        type="password"
-                        id="register-password"
-                        placeholder="Create a password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <button type="submit">Register</button>
-                  </form>
+            {/* Login Form */}
+            <div className={`form-content ${!isRegistering ? 'active-form' : 'inactive-form'}`}>
+              <form onSubmit={handleLoginSubmit}>
+                <div className="form-group-item">
+                  <label htmlFor="login-username">Username</label>
+                  <input
+                    type="text"
+                    id="login-username"
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
                 </div>
+                <div className="form-group-item">
+                  <label htmlFor="login-password">Password</label>
+                  <input
+                    type="password"
+                    id="login-password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <a href="#" className="forgot-password">Forgot Password?</a>
+                <button type="submit">Sign In</button>
+              </form>
+            </div>
 
-                {/* Social Login Options */}
-                <div className="social-login">
-                  <p>or login with social platforms</p>
-                  <div className="social-icons">
-                    <button className="social-btn google">G</button>
-                    <button className="social-btn facebook">f</button>
-                    <button className="social-btn linkedin">in</button>
-                    <button className="social-btn github">O</button>
-                  </div>
+            {/* Registration Form */}
+            <div className={`form-content ${isRegistering ? 'active-form' : 'inactive-form'}`}>
+              <form onSubmit={handleRegisterSubmit}>
+                <div className="form-group-item">
+                  <label htmlFor="register-username">Username</label>
+                  <input
+                    type="text"
+                    id="register-username"
+                    placeholder="Choose a username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
                 </div>
+                <div className="form-group-item">
+                  <label htmlFor="register-password">Password</label>
+                  <input
+                    type="password"
+                    id="register-password"
+                    placeholder="Create a password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <button type="submit">Register</button>
+              </form>
+            </div>
+
+            {/* Social Login Options (Optional, if you want to implement them later) */}
+            <div className="social-login">
+              <p>or login with social platforms</p>
+              <div className="social-icons">
+                <button className="social-btn google">G</button>
+                <button className="social-btn facebook">f</button>
+                <button className="social-btn linkedin">in</button>
+                <button className="social-btn github">O</button>
               </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </>
   );

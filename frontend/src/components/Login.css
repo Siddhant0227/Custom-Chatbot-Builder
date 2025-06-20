@@ -168,14 +168,15 @@ body {
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
     width: 100%;
-    max-width: 950px;
-    height: 650px;
+    max-width: 1250px;
+    height: 1000px;
     display: flex;
     position: relative;
     overflow: hidden;
     z-index: 10;
     animation: cardSlideIn 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transition: var(--transition-smooth);
+   
 }
 
 @keyframes cardSlideIn {
@@ -210,7 +211,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: rgb(212, 213, 214);
     padding: 3rem;
     text-align: center;
     transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55), border-radius 0.8s ease;
@@ -837,38 +838,4 @@ body {
         height: 45px;
         font-size: 1.2rem;
     }
-}
-/* NEW: Styles for the initial logo display */
-.initial-logo-display {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100vh; /* Take full viewport height */
-    position: absolute; /* Position it over the entire container */
-    top: 0;
-    left: 0;
-    background: var(--background-dark); /* Match body background */
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 1s ease-out, visibility 1s ease-out; /* Smooth fade out */
-    z-index: 100; /* Ensure it's on top */
-}
-
-/* When showLogo is false, this class will effectively make it disappear */
-.initial-logo-display.hidden {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.chatbot-logo-initial {
-    max-width: 500px; /* Adjust size as needed */
-    width: 80%; /* Responsive width */
-    height: auto;
-    animation: pulseLogo 1.9s infinite alternate ease-in-out; /* Add a subtle pulse */
-}
-
-@keyframes pulseLogo {
-    0% { transform: scale(1); opacity: 0.9; }
-    100% { transform: scale(5); opacity: 1; } /* Increased scale for more zoom */
 }
