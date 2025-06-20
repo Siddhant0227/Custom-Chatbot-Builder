@@ -778,26 +778,27 @@ textarea.input-box {
 /* --- Node Types (Sidebar) --- */
 .node-types {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Adjusted for better fit */
-  gap: var(--spacing-md);
+  /* Explicitly set to 2 columns, each taking equal available space */
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm); /* Consistent gap between node type items */
+  padding: 0; /* Ensure no extra padding, sidebar-section handles it */
 }
 
 .node-type-item {
-  padding: 16px 14px; /* Increased padding to make them bigger */
+  padding: 16px 14px;
   border-radius: var(--border-radius-md);
-  color: var(--text-dark);
-  font-size: 1rem; /* Larger font size */
+  color: var(--color-text-dark);
   font-weight: 600;
-  cursor: grab; /* Cursor indicates draggable */
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(0,0,0,0.1);
-  font-family: 'Open Sans', sans-serif; /* Ensure font is loaded if used */
-  display: flex; /* For text and potential future icons */
+  cursor: grab;
+  text-align: center; /* Center text within each item */
+  box-shadow: 0 2px 5px var(--color-shadow-light);
+  border: 1px solid transparent;
+  min-height: 90px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 90px; /* Consistent height for node type items */
+  transition: all var(--transition-speed-fast) var(--transition-ease);
+  width: 100%; /* Ensure each item takes full grid column width */
 }
 
 .node-type-item:hover {
@@ -1235,7 +1236,7 @@ textarea.input-box {
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
   cursor: crosshair;
   transition: background-color 0.2s ease, transform 0.15s ease;
-  z-index: 2;
+  z-index: 1;
 }
 
 .output-point:hover {
@@ -1307,8 +1308,7 @@ textarea.input-box {
     border-radius: 1px;
     transition: transform 0.2s ease;
 }
-.node-option-item-display .output-point::before { width: 100%; height: 2px; }
-.node-option-item-display .output-point::after { width: 2px; height: 100%; }
+
 
 .node-option-item-display .output-point:hover {
     color: var(--playful-light-purple);
