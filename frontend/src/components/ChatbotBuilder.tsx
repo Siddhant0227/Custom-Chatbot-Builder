@@ -97,6 +97,32 @@ const ChatbotBuilder = () => {
     const [isLoadingChatbotData, setIsLoadingChatbotData] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+        // Initialize theme from localStorage or default to 'light'
+        return localStorage.getItem('theme') as 'light' | 'dark' || 'light';
+    });
+
+ 
+
+    // --- NEW: Theme Toggle Logic ---
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(
+        () => localStorage.getItem('theme') === 'dark'
+    );
+
+    useEffect(() => {
+        if (isDarkMode) {
+            document.body.classList.add('dark-theme');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.body.classList.remove('dark-theme');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [isDarkMode]);
+
+    const toggleTheme = () => {
+        setIsDarkMode(prevMode => !prevMode);
+    };
+
     const [availableNodeTypes] = useState<NodeTypeDefinition[]>([
         { type: 'start', label: 'Start' },
         { type: 'message', label: 'Message' },
@@ -879,6 +905,10 @@ const ChatbotBuilder = () => {
                         <button onClick={togglePreviewMode} className="btn btn--secondary"> {/* Changed to btn--secondary */}
                             {isPreviewMode ? 'Exit Preview' : 'Preview Chatbot'}
                         </button>
+                        {/* NEW: Theme Toggle Button */}
+            <button className="theme-toggle-button" onClick={toggleTheme}>
+                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
                     </div>
                 </div>
             </header>

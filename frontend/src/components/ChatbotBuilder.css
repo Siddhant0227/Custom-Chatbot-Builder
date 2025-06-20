@@ -946,7 +946,7 @@ textarea.input-box {
   background-color: var(--bg-white);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  overflow: scroll; /* Changed from 'hidden' to 'auto' */
   border: 1px solid var(--playful-border-light);
   transition: all 0.3s ease;
 }
@@ -1012,6 +1012,9 @@ textarea.input-box {
     linear-gradient(to right, #eff0f1 1px, transparent 1px),
     linear-gradient(to bottom, #eff0f1 1px, transparent 1px);
   background-size: 20px 20px;
+  overflow: auto; /* Changed from 'hidden' to 'auto' */
+
+
 }
 
 .flow-canvas:active { cursor: grabbing; }
@@ -1590,4 +1593,424 @@ textarea.input-box {
     right: auto;
     padding: 8px 12px;
   }
+}
+/* ChatbotBuilder.css */
+
+/* ChatbotBuilder.css */
+
+/* ... (Your existing light theme CSS for :root) ... */
+
+/* Dark Theme Variables and Overrides */
+body.dark-theme {
+  /* Colors for Dark Theme - adjust these values as needed */
+  --color-brand-primary: #a3a6b8; /* Darker primary for text/elements */
+  --color-brand-secondary: #7986cb; /* Complementary color in dark mode */
+  --color-brand-secondary-light: #616db6; /* Lighter variant for hover */
+  /* For RGBA conversions (used in box-shadows) */
+  --color-brand-primary-rgb: 163, 166, 184;
+  --color-brand-secondary-rgb: 121, 134, 203;
+
+
+  --color-ui-background: #1a1a1a; /* Dark app/body background */
+  --color-ui-surface: #2c2c2c; /* Dark card, sidebar, and modal backgrounds */
+  --color-ui-surface-subtle: #363636; /* Subtle dark background for content areas */
+  --color-ui-surface-alt: #404040; /* Alternative dark surface */
+
+  --color-text-primary: #e0e0e0; /* Light text for readability */
+  --color-text-secondary: #b0b0b0; /* Slightly darker light text */
+  --color-text-tertiary: #808080; /* Even darker light text for hints */
+  --color-text-on-brand: #ffffff; /* White text on brand colors */
+
+  --color-border-light: #444444; /* Light border in dark mode */
+  --color-border-medium: #555555; /* Medium border */
+  --color-border-dark: #666666; /* Darker border */
+
+  --color-success: #66bb6a; /* Green for success */
+  --color-warning: #ffee58; /* Yellow for warning */
+  --color-error: #ef5350; /* Red for error */
+
+  /* Ensure the body itself updates */
+  background-color: var(--color-ui-background);
+  color: var(--color-text-primary);
+}
+
+/* Explicitly target elements within the flow canvas for dark theme */
+body.dark-theme .flow-canvas,
+body.dark-theme .canvas-content {
+  /* You can adjust the transparent background-color for the canvas itself */
+  background-color: var(--color-ui-background); /* Ensures the base background is dark */
+
+  /* Override the grid lines for dark mode */
+  background-image:
+    linear-gradient(to right, var(--color-border-light) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border-light) 1px, transparent 1px);
+  background-size: 6px 6px; /* Keep the same grid cell size */
+}
+
+body.dark-theme .flow-node {
+  background-color: var(--color-ui-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-medium); /* Adjust node borders */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Darker shadow for dark mode */
+}
+
+body.dark-theme .flow-node-header {
+  background-color: var(--color-ui-surface-alt); /* Slightly different header background */
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-dark);
+}
+
+body.dark-theme .flow-node-content {
+  background-color: var(--color-ui-surface);
+  color: var(--color-text-primary);
+}
+
+body.dark-theme .flow-node-type {
+  background-color: var(--color-ui-surface-subtle);
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--color-border-light);
+}
+
+/* Connection path colors */
+body.dark-theme .connection-path {
+  stroke: var(--color-border-medium); /* Adjust connection line color */
+}
+
+body.dark-theme .connection-path + circle { /* The circle at the end of connection */
+  fill: var(--color-border-medium);
+}
+
+body.dark-theme .connections-layer text {
+  fill: var(--color-text-tertiary); /* Label on connection path */
+}
+
+/* Input points and output points */
+body.dark-theme .input-point,
+body.dark-theme .output-point {
+  background-color: var(--color-brand-secondary);
+  border: 2px solid var(--color-border-light);
+}
+body.dark-theme .input-point:hover,
+body.dark-theme .output-point:hover {
+    background-color: var(--color-brand-secondary-light);
+}
+
+/* Delete button within nodes */
+body.dark-theme .delete-node-btn {
+  background-color: transparent; /* Or a subtle dark color */
+  color: var(--color-text-tertiary); /* Lighter icon color */
+}
+
+body.dark-theme .delete-node-btn:hover {
+  color: var(--color-error); /* Error color on hover */
+}
+
+/* Any other elements that are part of the flow-canvas or nodes that need styling */
+body.dark-theme .input-box,
+body.dark-theme textarea {
+  background-color: var(--color-ui-surface-subtle);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-dark);
+}
+
+body.dark-theme .input-box::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+body.dark-theme .input-box:focus {
+  border-color: var(--color-brand-secondary-light);
+  box-shadow: 0 0 0 3px rgba(var(--color-brand-secondary-rgb), 0.2);
+}
+
+/* Theme toggle button styling (as previously provided) */
+/* Styles for the theme toggle button */
+.theme-toggle-button {
+  /* Positioning (adjust as needed for your layout) */
+  position: relative; /* Allows precise placement */
+  top: 10; /* Distance from the top */
+  right: 8px; /* Distance from the right */
+  left: 50px;
+  
+  
+
+  /* Basic Button Styling */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px; /* Comfortable padding */
+  border: 1px solid var(--color-border-medium, #ccc); /* Subtle border */
+  border-radius: var(--color-dark-ui-surface-subtle, 80px); /* Pill shape for modern look */
+  background-color: var(--color-ui-surface, #ffffff); /* Match UI surface background */
+  color: var(--color-text-medium, #424242); /* Readable text color */
+  font-size: 0.9em; /* Slightly smaller font for compactness */
+  font-weight: 600;
+  cursor:grab;
+  outline: none; /* Remove default outline */
+  white-space: nowrap; /* Prevent text wrapping */
+
+  /* Transitions for smooth hover/active effects */
+  transition: background-color var(--transition-speed-normal) var(--transition-ease),
+              color var(--transition-speed-normal) var(--transition-ease),
+              border-color var(--transition-speed-normal) var(--transition-ease),
+              box-shadow var(--transition-speed-normal) var(--transition-ease);
+
+  /* Shadow for depth */
+  box-shadow: var(--shadow-sm); /* Using your defined shadow variable if available */
+}
+
+.theme-toggle-button:hover {
+  background-color: var(--color-ui-surface-subtle, #f0f0f0); /* Lighter background on hover */
+  border-color: var(--color-brand-secondary, #828dca); /* Highlight border on hover */
+  box-shadow: var(--shadow-md); /* Slightly larger shadow on hover */
+}
+
+.theme-toggle-button:active {
+  background-color: var(--color-ui-surface-alt, #e0e0e0); /* Even darker on click */
+  transform: translateY(1px); /* Slight press effect */
+}
+
+/* Icon Styling (retaining what we had, but ensuring consistency) */
+.theme-toggle-button::before {
+  font-family: 'Segoe UI Symbol', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif; /* Ensures emoji rendering */
+  content: '☀'; /* Default sun icon for light mode */
+  font-size: 1.2em;
+  margin-right: 8px; /* Space between icon and text */
+  transition: transform var(--transition-speed-normal) var(--transition-ease);
+  display: inline-block; /* Ensure it respects margin and transform */
+}
+
+/* Dark Theme Specific Styles */
+body.dark-theme .theme-toggle-button {
+  background-color: var(--color-dark-ui-surface, #3c4043); /* Dark surface background */
+  color: var(--color-dark-text-light, #e8eaed); /* Light text for dark mode */
+  border-color: var(--color-dark-border-medium, #5f6368); /* Dark border for dark mode */
+  box-shadow: var(--dark-shadow-sm); /* Dark mode shadow */
+}
+
+body.dark-theme .theme-toggle-button:hover {
+  background-color: var(--color-dark-ui-surface-subtle, #4b5054); /* Lighter dark background on hover */
+  border-color: var(--color-brand-secondary-light, #7e8ce3); /* Highlight border for dark mode */
+  box-shadow: var(--dark-shadow-md); /* Slightly larger shadow on hover */
+}
+
+body.dark-theme .theme-toggle-button:active {
+  background-color: var(--color-dark-ui-surface-alt, #5a5f63); /* Even darker on click */
+}
+
+body.dark-theme .theme-toggle-button::before {
+  content: '🌙'; /* Moon icon for dark mode */
+  transform: rotate(360deg); /* Spin animation on switch */
+}
+
+/* Dark theme specific styles for Header and Sidebar */
+body.dark-theme .app-header {
+  background-color: var(--color-ui-surface); /* Darken header background */
+  border: 1px solid var(--color-border-medium); /* Adjust border for dark theme */
+  box-shadow: var(--shadow-md); /* Use a standard shadow or adjust for dark theme */
+}
+
+body.dark-theme .app-title {
+  color: var(--color-text-primary); /* Ensure title text is light */
+}
+
+body.dark-theme .sidebar {
+  background-color: var(--color-ui-surface); /* Darken sidebar background */
+  border: 1px solid var(--color-border-medium); /* Adjust border for dark theme */
+  box-shadow: var(--shadow-md); /* Use a standard shadow or adjust for dark theme */
+}
+
+body.dark-theme .sidebar-toggle-bar {
+  background-color: var(--color-ui-surface); /* Darken toggle bar background */
+  border: 1px solid var(--color-border-medium); /* Adjust border */
+}
+
+body.dark-theme .sidebar-menu .menu-option {
+  background-color: var(--color-ui-surface-subtle); /* Darken menu options */
+  border: 1px solid var(--color-border-dark); /* Adjust border */
+  color: var(--color-text-secondary); /* Adjust text color */
+}
+
+body.dark-theme .sidebar-menu .menu-option.active {
+  background-color: var(--color-brand-secondary); /* Active tab color */
+  color: var(--color-text-on-brand); /* Text on active tab */
+  border-color: var(--color-brand-secondary);
+}
+
+body.dark-theme .sidebar-menu .menu-option:hover:not(.active) {
+  background-color: var(--color-ui-surface-alt); /* Hover for inactive tabs */
+  color: var(--color-text-primary); /* Text color on hover */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Adjust shadow on hover */
+}
+
+body.dark-theme .sidebar-section {
+  background-color: var(--color-ui-surface-subtle); /* Darken section background */
+  border: 1px solid var(--color-border-dark); /* Adjust section border */
+}
+
+body.dark-theme .sidebar-section h3 {
+  color: var(--color-text-primary); /* Ensure heading text is light */
+  border-bottom-color: var(--color-border-dark); /* Darken heading border */
+}
+
+body.dark-theme .setting-item label {
+  color: var(--color-text-secondary); /* Adjust label text color */
+}
+
+body.dark-theme .node-type-item {
+  box-shadow: var(--shadow-sm); /* Standard shadow for dark theme */
+  border: 1px solid var(--color-border-medium); /* Adjust border */
+  color: var(--color-text-primary); /* Ensure node type item text is visible */
+}
+
+/* Adjust gradients for dark theme for node type items */
+body.dark-theme .node-type-item.node-type-start { background: linear-gradient(145deg, #4CAF50 0%, #388E3C 100%); color: #ffffff;}
+body.dark-theme .node-type-item.node-type-message { background: linear-gradient(145deg, #2196F3 0%, #1976D2 100%); color: #ffffff;}
+body.dark-theme .node-type-item.node-type-multichoice { background: linear-gradient(145deg, #9C27B0 0%, #7B1FA2 100%); color: #ffffff;}
+body.dark-theme .node-type-item.node-type-button { background: linear-gradient(145deg, #FFC107 0%, #FFA000 100%); color: #333333;}
+body.dark-theme .node-type-item.node-type-textinput { background: linear-gradient(145deg, #795548 0%, #5D4037 100%); color: #ffffff;}
+body.dark-theme .node-type-item.node-type-rating { background: linear-gradient(145deg, #FF9800 0%, #F57C00 100%); color: #333333;}
+
+body.dark-theme .node-properties-back-area {
+  border-bottom-color: var(--color-border-dark); /* Adjust border */
+}
+
+body.dark-theme .back-btn {
+  color: var(--color-brand-secondary); /* Darken back button text */
+}
+
+body.dark-theme .back-btn:hover {
+  background-color: rgba(var(--color-brand-secondary-rgb), 0.1); /* Hover effect */
+  color: var(--color-brand-secondary-light);
+}
+
+body.dark-theme .node-properties-header {
+  border-bottom-color: var(--color-border-dark); /* Adjust border */
+}
+
+body.dark-theme .node-properties-header h3 {
+  color: var(--color-text-primary); /* Ensure heading text is light */
+}
+
+body.dark-theme .node-option-item {
+  background-color: var(--color-ui-surface-subtle); /* Darken node option items */
+  border: 1px solid var(--color-border-dark); /* Adjust border */
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1); /* Adjust inner shadow */
+}
+
+body.dark-theme .btn-add-option {
+  background-color: var(--color-brand-secondary); /* Darken add option button */
+  box-shadow: 0 4px 12px rgba(var(--color-brand-secondary-rgb), 0.3); /* Adjust shadow */
+}
+
+body.dark-theme .btn-add-option:hover {
+  background-color: var(--color-brand-secondary-light); /* Darken hover color */
+  box-shadow: 0 6px 18px rgba(var(--color-brand-secondary-rgb), 0.4); /* Adjust shadow */
+}
+
+body.dark-theme .setting-item.ai-toggle-section {
+  border-top-color: var(--color-border-dark); /* Adjust border */
+  color: var(--color-text-secondary); /* Adjust text color */
+}
+
+body.dark-theme .ai-toggle-section input[type="checkbox"] {
+  accent-color: var(--color-brand-secondary); /* Darken checkbox accent */
+}
+
+body.dark-theme .flow-canvas-tools {
+  background-color: var(--color-ui-surface); /* Darken canvas tools background */
+  border: 1px solid var(--color-border-medium); /* Adjust border */
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3); /* Adjust shadow */
+}
+
+body.dark-theme .zoom-btn {
+  background-color: var(--color-ui-surface-subtle); /* Darken zoom button background */
+  border: 1px solid var(--color-border-dark); /* Adjust border */
+  color: var(--color-text-secondary); /* Adjust text color */
+}
+
+body.dark-theme .zoom-btn:hover {
+  background-color: var(--color-ui-surface-alt); /* Darken zoom button hover */
+  border-color: var(--color-brand-secondary-light); /* Adjust hover border */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Adjust hover shadow */
+}
+
+body.dark-theme .flow-canvas-tools span {
+  color: var(--color-text-tertiary); /* Adjust text color */
+}
+
+body.dark-theme .preview-container {
+  background-color: var(--color-ui-surface); /* Darken preview container */
+  border: 1px solid var(--color-border-medium); /* Adjust border */
+  box-shadow: var(--shadow-md); /* Adjust shadow */
+}
+
+body.dark-theme .preview-header {
+  border-bottom-color: var(--color-border-dark); /* Adjust border */
+}
+
+body.dark-theme .preview-title {
+  color: var(--color-text-primary); /* Ensure title text is light */
+}
+
+body.dark-theme .chat-window {
+  border: 1px solid var(--color-border-dark); /* Adjust border */
+  box-shadow: inset 0 0 7px rgba(0, 0, 0, 0.2); /* Adjust inner shadow */
+}
+
+body.dark-theme .chat-messages {
+  background-color: var(--color-ui-background); /* Darken chat messages background */
+}
+
+body.dark-theme .chat-message-user .chat-bubble {
+  background-color: var(--color-brand-secondary); /* Darken user chat bubble */
+  color: var(--color-text-on-brand); /* Ensure text is light */
+}
+
+body.dark-theme .chat-message-bot .chat-bubble {
+  background-color: var(--color-ui-surface-subtle); /* Darken bot chat bubble */
+  color: var(--color-text-primary); /* Ensure text is light */
+}
+
+body.dark-theme .chat-input-container {
+  background-color: var(--color-ui-surface); /* Darken chat input container */
+  border-top: 1px solid var(--color-border-dark); /* Adjust border */
+}
+
+body.dark-theme .chat-input {
+  background-color: var(--color-ui-surface-subtle); /* Darken chat input */
+  border: 1px solid var(--color-border-dark); /* Adjust border */
+  color: var(--color-text-primary); /* Ensure text is light */
+}
+
+body.dark-theme .chat-input:focus {
+  border-color: var(--color-brand-secondary); /* Darken focus border */
+  box-shadow: 0 0 0 3px rgba(var(--color-brand-secondary-rgb), 0.2); /* Adjust shadow */
+}
+
+body.dark-theme .chat-send-btn {
+  background-color: var(--color-brand-secondary); /* Darken send button */
+}
+
+body.dark-theme .chat-send-btn:hover {
+  background-color: var(--color-brand-secondary-light); /* Darken send button hover */
+}
+
+body.dark-theme .typing-indicator {
+  background-color: var(--color-ui-surface-subtle); /* Darken typing indicator */
+}
+
+body.dark-theme .typing-dot {
+  background: var(--color-text-secondary); /* Darken typing dots */
+}
+
+body.dark-theme .text-center {
+  color: var(--color-text-tertiary); /* Adjust text color */
+}
+
+body.dark-theme .checkbox-label {
+  color: var(--color-text-secondary); /* Adjust label text color */
+}
+
+body.dark-theme .checkbox-label input[type="checkbox"] {
+  accent-color: var(--color-brand-secondary); /* Darken checkbox accent */
 }
