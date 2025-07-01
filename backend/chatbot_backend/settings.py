@@ -13,33 +13,21 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
-from django.core.exceptions import ImproperlyConfigured # Import for SECRET_KEY check
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Load environment variables from .env file for local development
-load_dotenv(os.path.join(BASE_DIR, '.env')) 
+load_dotenv(os.path.join(BASE_DIR, '.env')) # Loads environment variables from .env file
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-if not SECRET_KEY:
-    raise ImproperlyConfigured("DJANGO_SECRET_KEY not set in environment or .env file")
+SECRET_KEY = 'django-insecure-muaftkoj_gzw=q(^%*e%2t+#l(*ha(__1286s0k&q19=qnt8#w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False # Set to False for production
+DEBUG = True
 
-# ALLOWED_HOSTS for your deployed application
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.render.com', # Allow all subdomains of render.com
-    'your-app-name.onrender.com', # Replace with your actual Render app URL
-    # Add your custom domain here if you're using one (e.g., 'yourdomain.com')
-]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -54,17 +42,16 @@ INSTALLED_APPS = [
     'rest_framework',        # Django REST Framework
     'chatbotapi',            # Your application
     'corsheaders',           # For handling Cross-Origin Resource Sharing
-    'rest_framework.authtoken', # Enable Django REST Framework's Token Authentication
+    'rest_framework.authtoken', # <--- NEW: Enable Django REST Framework's Token Authentication
 ]
 
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', # Keep this high
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # ADD THIS LINE FOR STATIC FILES IN PRODUCTION
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware', # Keep this for forms/template-based CSRF if any, but less critical for token auth
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -96,11 +83,11 @@ WSGI_APPLICATION = 'chatbot_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),        # Environment variable from Render
-        'USER': os.getenv('DB_USER'),        # Environment variable from Render
-        'PASSWORD': os.getenv('DB_PASSWORD'),# Environment variable from Render
-        'HOST': os.getenv('DB_HOST'),        # Environment variable from Render
-        'PORT': os.getenv('DB_PORT'),        # Environment variable from Render
+        'NAME': 'customchatbotdb',  # Name of the database you created
+        'USER': 'siddhant',      # User you created
+        'PASSWORD': '*#227#0226',  # Password for the user
+        'HOST': 'localhost',          # Or the IP address if PostgreSQL is on a different server
+        'PORT': '5432',               # Default PostgreSQL port
     }
 }
 
@@ -140,17 +127,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Where collectstatic will put files in production
-
-# WhiteNoise configuration for serving static files
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -161,34 +137,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # Add your frontend's deployed URL here, e.g.:
-    # "https://your-frontend-app.onrender.com",
-    # "https://your-frontend-domain.com",
 ]
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True # Still important for preflight and if any cookies are sent (e.g. session for browsable API)
 
 # --- CSRF Trusted Origins for Django 4.0+ ---
-# If your frontend and backend are on different subdomains/domains, add your frontend's URL here.
+# With Token Auth, these are less critical for API authentication but still needed for the browsable API
+# or any form submissions.
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # Add your frontend's deployed URL here, e.g.:
-    # "https://your-frontend-app.onrender.com",
-    # "https://your-frontend-domain.com",
 ]
 
-# --- Session & CSRF Cookie Settings (recommended for security) ---
-# For production, these should generally be True if using HTTPS
-SESSION_COOKIE_SAMESITE = 'Lax' # Or 'None' if cross-site, along with SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True   # Set to True in production (requires HTTPS)
-CSRF_COOKIE_SAMESITE = 'Lax'   # Or 'None' if cross-site, along with CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True      # Set to True in production (requires HTTPS)
-
+# --- Session & CSRF Cookie Settings (less critical for pure token auth, but keep for browsable API) ---
+SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = False
 
 # --- Django REST Framework (DRF) Settings ---
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication', # <--- NEW: Primary authentication scheme
         'rest_framework.authentication.SessionAuthentication', # Keep for browsable API
     ],
     'DEFAULT_PERMISSION_CLASSES': [
