@@ -1,0 +1,1066 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$Gdjhs7S277s3T3f6LNV0wc$H6weEfvAsBjX3XifYs3fBnP4IbUfCHKwsYhFgjsCr/8=",
+    "last_login": "2025-06-03T09:42:28.599Z",
+    "is_superuser": true,
+    "username": "Hri",
+    "first_name": "",
+    "last_name": "",
+    "email": "hri@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-06-03T07:27:02.788Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$8f7fjwQ7abs9vybdbVSw5j$Vq1OixmDenmVjjw+VDTd9Q1Vn62MHO5vu81QgoIXZ2U=",
+    "last_login": "2025-06-03T09:37:55.931Z",
+    "is_superuser": false,
+    "username": "Akash",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-06-03T07:27:57.671Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$92PhceaPAYD08JVXmbWy2I$tOryc7qUhwhuCWYPuzh/SazkKtq08aozs/S+QrubMVY=",
+    "last_login": "2025-06-09T05:11:50.743Z",
+    "is_superuser": false,
+    "username": "plsrun",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-06-03T10:04:01.025Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$GunMaqBN1LwETWO34aZy6E$lEnlysnAOrFt52TSaamw6NgHEOv1MiMCALNCi2d9UhQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "godplsrun",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-06-09T05:25:31.564Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$5YbPzhXAwvgNCGccE0XzVK$CgLA7ozDoaiZwz0vFQdZE/X49DZWrlI9wf8Za8mWnbA=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "newuser",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-06-09T13:36:58.649Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$SawxXPCcK5QVL3CgW3C0Qp$ZofJb5o6qo3DnMmcKiC9rE5qvxPejL8qLdQlPP9e748=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "monk",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-06-09T18:26:19.121Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "4zuwc1djzh8ma6372ift618tj9whc2n8",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uMQ95:2sNZoV3oJvZoDPU6EkONtrYMin-3-SiN-A4x77W1Mok",
+    "expire_date": "2025-06-17T11:49:31.960Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "682s05274w55qhzxcoetv7ddtf3mcgrt",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uMPLn:pvwzWdZm3WX4tL458qsYUPkwFu0401W_jptQp-lkI9s",
+    "expire_date": "2025-06-17T10:58:35.117Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "6b209y9s93slt5yat0wgve9hoey1ldri",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uOUg7:Tz1huhsIJi-ZW1K1fySVjcoz5ETs1CB301RgIDIkJ-0",
+    "expire_date": "2025-06-23T05:04:11.171Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "6d21o3tisrwk42hiuqqmg95zoq9kth6z",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uOUnW:m9hqJaa96dSNDh15qxl0AnxOjTJ1FlrIblfOdV-8VxE",
+    "expire_date": "2025-06-23T05:11:50.755Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "73jn8fo2el8si049on32ad1w1pn2bfnr",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uOUkr:im5tCAExoYJtNMfvBcqi7E0yy5uwTPQRNBdt-B5B3Co",
+    "expire_date": "2025-06-23T05:09:05.530Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "7dgbqz0uylv4z40gu9ocq95p6gonhgrd",
+  "fields": {
+    "session_data": ".eJxVjEEOgjAQRe_StWmcTqHFpXvOQKbTGYsaSCisjHdXEha6_e-9_zIDbWsZtirLMGZzMWBOv1sifsi0g3yn6TZbnqd1GZPdFXvQavs5y_N6uH8HhWr51qokDjC2AA5UhKHFziOq085F8iGKT-GM2SUvwLFRDYQNM2MbM6B5fwDfNDfS:1uMOA8:k8wMov78vUGpk_DW5-B12eaO4_blfm9BMTT_vUfB9mE",
+    "expire_date": "2025-06-17T09:42:28.601Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "8zi45c53oghomlzz3f453xkhvn7embr0",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uOUTo:Y5b0jKQi2RKLONZ66v2bIl9kILUFGecGOgfiJHO7BKY",
+    "expire_date": "2025-06-23T04:51:28.110Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "9013r3u6vooy2abyyieni3g800c9vepy",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-rgMlfc5g7XptHECOFCcV4u4QKQW0b2beS0Tc1hq3npc4sbgII06_G2F65LYDvmO7zTLNbV0mkrsiD9rlOHN-Xg_376Bir986Dz4hKDwP4DwqbZDBeyoaObNTKmkDtngKJWAggypYTaBcxqCtBRDvD-ORN4M:1uMM8p:HgnaXjtqo-NtGzBz9W24OuXR_z0SjibdRgEzC8rSiNo",
+    "expire_date": "2025-06-17T07:32:59.784Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "a98sz5sa1fa66apz2ryu7r5637ey30jd",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-rgMlfc5g7XptHECOFCcV4u4QKQW0b2beS0Tc1hq3npc4sbgII06_G2F65LYDvmO7zTLNbV0mkrsiD9rlOHN-Xg_376Bir986Dz4hKDwP4DwqbZDBeyoaObNTKmkDtngKJWAggypYTaBcxqCtBRDvD-ORN4M:1uMO5j:cK7Z7Po-7h-bn3ezRhjv9Non6zqHgWNZz2QxUSHG8Ss",
+    "expire_date": "2025-06-17T09:37:55.937Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "bd5934k7vyb5b2uayg1cgn28bs942l47",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uOU3O:q4anbUSzzqnGhwQLCUGjyRTAmK6JCxvgIlY0fL_gXIw",
+    "expire_date": "2025-06-23T04:24:10.233Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "f74nkojvhhz3f29fuder88n0kv74voby",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uMPH1:IEW_FNW3Lq_5PH5XVW18AnKbk-1LwDCAjKksp7dZXO4",
+    "expire_date": "2025-06-17T10:53:39.541Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "lo3rtsa9uveflzq4pwotsk69f4itl4p5",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uOUgb:GTypb7fp9nzri90uA0upx_vfyQVxbpe_0dDkeXosXt4",
+    "expire_date": "2025-06-23T05:04:41.928Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "m4enwpinniy7vzhrf40m2rma63b3h22a",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uMQ75:q3rFT_R-q2nTaVk4DmQRzVpbhtUOsgWihrT-uFYFAvA",
+    "expire_date": "2025-06-17T11:47:27.628Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "mu9ibrjqzp1u8swg8zqyy82d6uy2vs3t",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uMPuv:FlbKMFDbfj2WepQFGpsoDsFErvAuL_1BFd-QmjM0FCk",
+    "expire_date": "2025-06-17T11:34:53.922Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "ok47iqwf9h4aiii4qmha3za81c8qf97f",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uMPwF:UGGIKJ-MkZKogBCTn53KsMmvxr39aWE0vcTIz5pHcDY",
+    "expire_date": "2025-06-17T11:36:15.126Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "q24vvsmw17sati04ljievx2i3qi65or1",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uMPQ8:umqhicTjRSVXtygUlETO5UAaKhXtIqt60q_CbKSeGsM",
+    "expire_date": "2025-06-17T11:03:04.057Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "rz67k5lhe2vuye4kdivij9maa1nzsmxs",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGln4WNZLSZ83WOsLB5AjxUmF-DuylALamdG8hed9q37vefVzEldhxOmXBY7P3IZID273Rcalbesc5EjkYbuclpRft6P9G1TudWwNIQYmpRmJjDExkoICxCmfQaliLGIBRHex2oKDGBI4mzE7TYlBfL64iTbe:1uMPWj:o_Q3KYMdQdQ-28mZM2-2j8zG0kyLZr7q9qCypc3GPaA",
+    "expire_date": "2025-06-17T11:09:53.088Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 1,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 10:59:15",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": []
+    },
+    "user": 4,
+    "created_at": "2025-06-09T05:29:15.376Z",
+    "updated_at": "2025-06-09T05:29:15.376Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 2,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 10:59:57",
+    "configuration": {
+      "botName": "New Chatbot 09/06/2025, 10:59:57",
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 83,
+          "y": 96,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        },
+        {
+          "id": "message-1750145296411-181",
+          "type": "message",
+          "x": 502.9722222222223,
+          "y": 96.13888888888891,
+          "data": {
+            "title": "Message Card",
+            "content": "This is a general message.",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        },
+        {
+          "id": "multichoice-1750404736155-272",
+          "type": "multichoice",
+          "x": 870,
+          "y": 114,
+          "data": {
+            "title": "Multi Choice Card",
+            "content": "Please choose an option:",
+            "options": [
+              {
+                "label": "sales",
+                "value": "yes"
+              },
+              {
+                "label": "inventory",
+                "value": "no"
+              }
+            ],
+            "useAI": false
+          },
+          "outputs": [
+            "yes",
+            "no"
+          ]
+        },
+        {
+          "id": "message-1750404800758-93",
+          "type": "message",
+          "x": 1208,
+          "y": 193,
+          "data": {
+            "title": "Message Card",
+            "content": "This is a general message.",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        },
+        {
+          "id": "multichoice-1750404812665-501",
+          "type": "multichoice",
+          "x": 343,
+          "y": 406,
+          "data": {
+            "title": "Multi Choice Card",
+            "content": "Please choose an option:",
+            "options": [
+              {
+                "label": "Option 1",
+                "value": "one"
+              },
+              {
+                "label": "Option 2",
+                "value": "two"
+              }
+            ],
+            "useAI": false
+          },
+          "outputs": [
+            "one",
+            "two"
+          ]
+        },
+        {
+          "id": "rating-1750404845656-211",
+          "type": "rating",
+          "x": 730,
+          "y": 666,
+          "data": {
+            "title": "Rating Card",
+            "content": "Please rate your experience (1-5).",
+            "useAI": false
+          },
+          "outputs": []
+        },
+        {
+          "id": "message-1750404863089-296",
+          "type": "message",
+          "x": 809,
+          "y": 463,
+          "data": {
+            "title": "Message Card",
+            "content": "This is a general message.",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        },
+        {
+          "id": "end-1750404903132-368",
+          "type": "end",
+          "x": 1281,
+          "y": 497,
+          "data": {
+            "title": "End",
+            "content": "Thank you for your time!",
+            "useAI": false
+          },
+          "outputs": []
+        }
+      ],
+      "connections": [
+        {
+          "id": "conn-1750145311937-620",
+          "sourceId": "start-1",
+          "sourceOutput": "output-1",
+          "targetId": "message-1750145296411-181"
+        },
+        {
+          "id": "conn-1750404763691-712",
+          "sourceId": "message-1750145296411-181",
+          "sourceOutput": "output-1",
+          "targetId": "multichoice-1750404736155-272"
+        },
+        {
+          "id": "conn-1750404808258-127",
+          "sourceId": "multichoice-1750404736155-272",
+          "sourceOutput": "yes",
+          "targetId": "message-1750404800758-93"
+        },
+        {
+          "id": "conn-1750404821248-379",
+          "sourceId": "multichoice-1750404736155-272",
+          "sourceOutput": "no",
+          "targetId": "multichoice-1750404812665-501"
+        },
+        {
+          "id": "conn-1750404855740-184",
+          "sourceId": "multichoice-1750404812665-501",
+          "sourceOutput": "two",
+          "targetId": "rating-1750404845656-211"
+        },
+        {
+          "id": "conn-1750404894332-554",
+          "sourceId": "multichoice-1750404812665-501",
+          "sourceOutput": "one",
+          "targetId": "message-1750404863089-296"
+        },
+        {
+          "id": "conn-1750404908379-668",
+          "sourceId": "message-1750404863089-296",
+          "sourceOutput": "output-1",
+          "targetId": "end-1750404903132-368"
+        },
+        {
+          "id": "conn-1750404918759-804",
+          "sourceId": "message-1750404800758-93",
+          "sourceOutput": "output-1",
+          "targetId": "end-1750404903132-368"
+        }
+      ],
+      "mountId": "my-chatbot-widget"
+    },
+    "user": 3,
+    "created_at": "2025-06-09T05:29:57.498Z",
+    "updated_at": "2025-07-01T04:37:23.980Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 3,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 11:53:57",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": []
+    },
+    "user": 2,
+    "created_at": "2025-06-09T06:23:57.817Z",
+    "updated_at": "2025-06-09T06:23:57.817Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 4,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 11:54:10",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": []
+    },
+    "user": 2,
+    "created_at": "2025-06-09T06:24:10.087Z",
+    "updated_at": "2025-06-09T06:24:10.087Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 5,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 12:04:36",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": []
+    },
+    "user": 2,
+    "created_at": "2025-06-09T06:34:36.240Z",
+    "updated_at": "2025-06-09T06:34:36.240Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 6,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 12:34:02",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": []
+    },
+    "user": 2,
+    "created_at": "2025-06-09T07:04:02.846Z",
+    "updated_at": "2025-06-09T07:04:02.846Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 7,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 12:34:05",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": []
+    },
+    "user": 2,
+    "created_at": "2025-06-09T07:04:05.725Z",
+    "updated_at": "2025-06-09T07:04:05.725Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 8,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 12:34:07",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": []
+    },
+    "user": 2,
+    "created_at": "2025-06-09T07:04:07.324Z",
+    "updated_at": "2025-06-09T07:04:07.324Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 9,
+  "fields": {
+    "name": "New Chatbot 09/06/2025, 12:52:42",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": []
+    },
+    "user": 2,
+    "created_at": "2025-06-09T07:22:42.384Z",
+    "updated_at": "2025-06-09T07:22:42.384Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 10,
+  "fields": {
+    "name": "My Chatbot",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": [],
+      "mountId": "my-chatbot-widget"
+    },
+    "user": 2,
+    "created_at": "2025-06-09T07:28:31.125Z",
+    "updated_at": "2025-06-09T08:02:26.337Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 11,
+  "fields": {
+    "name": "mine",
+    "configuration": {
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        },
+        {
+          "id": "message-1749454241607-165",
+          "type": "message",
+          "x": 585,
+          "y": 193,
+          "data": {
+            "title": "Message Card",
+            "content": "This is a general message.",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": [
+        {
+          "id": "conn-1749454244724-801",
+          "sourceId": "start-1",
+          "sourceOutput": "output-1",
+          "targetId": "message-1749454241607-165"
+        }
+      ],
+      "mountId": "my-chatbot-widget"
+    },
+    "user": 2,
+    "created_at": "2025-06-09T07:30:52.704Z",
+    "updated_at": "2025-06-09T07:30:52.704Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 12,
+  "fields": {
+    "name": "My Chatbot 1",
+    "configuration": {
+      "botName": "My Chatbot 1",
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 92.5,
+          "y": 75.5,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        },
+        {
+          "id": "message-1749459820131-963",
+          "type": "message",
+          "x": 96,
+          "y": 267,
+          "data": {
+            "title": "Message Card",
+            "content": "This is a general message.",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        },
+        {
+          "id": "multichoice-1749459888428-128",
+          "type": "multichoice",
+          "x": 519.4642857142858,
+          "y": 123.35714285714286,
+          "data": {
+            "title": "Multi Choice Card",
+            "content": "Please choose an option:",
+            "options": [
+              {
+                "label": "Option 1",
+                "value": "option1"
+              },
+              {
+                "label": "Option 2",
+                "value": "option2"
+              }
+            ],
+            "useAI": false
+          },
+          "outputs": [
+            "option1",
+            "option2"
+          ]
+        },
+        {
+          "id": "button-1749459904103-839",
+          "type": "button",
+          "x": 1121.2142857142853,
+          "y": 182.8928571428571,
+          "data": {
+            "title": "Button Card",
+            "content": "Click a button to continue:",
+            "options": [
+              {
+                "label": "Yes",
+                "value": "yes"
+              },
+              {
+                "label": "No",
+                "value": "no"
+              }
+            ],
+            "useAI": false
+          },
+          "outputs": [
+            "yes",
+            "no"
+          ]
+        },
+        {
+          "id": "rating-1750363057845-185",
+          "type": "rating",
+          "x": 954,
+          "y": 476,
+          "data": {
+            "title": "Rating Card",
+            "content": "Please rate your experience (1-5).",
+            "useAI": false
+          },
+          "outputs": []
+        }
+      ],
+      "connections": [
+        {
+          "id": "conn-1749459823758-816",
+          "sourceId": "start-1",
+          "sourceOutput": "output-1",
+          "targetId": "message-1749459820131-963"
+        },
+        {
+          "id": "conn-1749459894382-803",
+          "sourceId": "start-1",
+          "sourceOutput": "output-1",
+          "targetId": "multichoice-1749459888428-128"
+        },
+        {
+          "id": "conn-1749459915390-894",
+          "sourceId": "multichoice-1749459888428-128",
+          "sourceOutput": "yo",
+          "targetId": "button-1749459904103-839"
+        }
+      ],
+      "mountId": "my-chatbot-widget"
+    },
+    "user": 3,
+    "created_at": "2025-06-09T09:01:16.159Z",
+    "updated_at": "2025-06-19T19:57:45.342Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 13,
+  "fields": {
+    "name": "mera chatbot",
+    "configuration": {
+      "botName": "mera chatbot",
+      "welcomeMessage": "kesi sahayata kasru apki?",
+      "fallbackMessage": "mazak mt karo bhai",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 184,
+          "y": 83,
+          "data": {
+            "title": "Start",
+            "content": "kese ho bhai",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        },
+        {
+          "id": "multichoice-1749476363399-510",
+          "type": "multichoice",
+          "x": 536,
+          "y": 104,
+          "data": {
+            "title": "Multi Choice Card",
+            "content": "kya loge app",
+            "options": [
+              {
+                "label": "Option1",
+                "value": "peener k liye kuch"
+              },
+              {
+                "label": "Option 2",
+                "value": "khana"
+              },
+              {
+                "label": "New Option 3",
+                "value": "kuch bhi nhi"
+              }
+            ],
+            "useAI": false
+          },
+          "outputs": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "rating-1749476585894-342",
+          "type": "rating",
+          "x": 941,
+          "y": 37,
+          "data": {
+            "title": "Rating Card",
+            "content": "Please rate your experience (1-5).",
+            "useAI": false
+          },
+          "outputs": []
+        }
+      ],
+      "connections": [
+        {
+          "id": "conn-1749476459202-892",
+          "sourceId": "start-1",
+          "sourceOutput": "output-1",
+          "targetId": "multichoice-1749476363399-510"
+        },
+        {
+          "id": "conn-1749476763783-719",
+          "sourceId": "multichoice-1749476363399-510",
+          "sourceOutput": "khana",
+          "targetId": "rating-1749476585894-342"
+        }
+      ],
+      "mountId": "my-chatbot-widget"
+    },
+    "user": 5,
+    "created_at": "2025-06-09T13:46:41.953Z",
+    "updated_at": "2025-06-09T13:46:41.953Z"
+  }
+},
+{
+  "model": "chatbotapi.chatbot",
+  "pk": 14,
+  "fields": {
+    "name": "My New Chatbot",
+    "configuration": {
+      "botName": "My New Chatbot",
+      "welcomeMessage": "Hello! How can I help you today?",
+      "fallbackMessage": "I'm sorry, I don't understand. Can you please rephrase?",
+      "nodes": [
+        {
+          "id": "start-1",
+          "type": "start",
+          "x": 100,
+          "y": 120,
+          "data": {
+            "title": "Start",
+            "content": "Start your chatbot flow here",
+            "useAI": false
+          },
+          "outputs": [
+            "output-1"
+          ]
+        }
+      ],
+      "connections": [],
+      "mountId": "my-chatbot-widget"
+    },
+    "user": 3,
+    "created_at": "2025-06-19T14:51:57.686Z",
+    "updated_at": "2025-06-19T14:51:57.687Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "7818b74a6be3ef36457f4a4c0c068b73f3e88958",
+  "fields": {
+    "user": 4,
+    "created": "2025-06-09T05:25:32.592Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "92c7d250a32da9670dba95d7437c616176b357a3",
+  "fields": {
+    "user": 5,
+    "created": "2025-06-09T13:36:59.538Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "bee98de333eff9c77b13797f407d79cfe60dc238",
+  "fields": {
+    "user": 6,
+    "created": "2025-06-09T18:26:20.072Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "c9055b027a51e141cc96ba552f0c9c69d7400066",
+  "fields": {
+    "user": 2,
+    "created": "2025-06-09T06:23:56.863Z"
+  }
+},
+{
+  "model": "authtoken.token",
+  "pk": "e0e95b52464e054ada738835d83116fc5879db46",
+  "fields": {
+    "user": 3,
+    "created": "2025-06-09T05:29:56.454Z"
+  }
+}
+]
